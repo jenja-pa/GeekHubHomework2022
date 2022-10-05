@@ -1,4 +1,4 @@
-# GeekHubHomework2022
+# GeekHubHomework2022 ![Logo](logo.png)
 Сховище домашніх робіт курсу GeekHub 2022 Python
 
 ```
