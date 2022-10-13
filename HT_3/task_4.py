@@ -13,5 +13,5 @@ print(f"{dict_3=}")
 dict_1.update(dict_2)
 dict_1.update(dict_3)
 
-print("Result")
-print(f"{dict_1=}")
+print()
+print(f"Result: {dict_1=}")
