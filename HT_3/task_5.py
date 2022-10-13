@@ -1,13 +1,26 @@
 # task_5.py
-# Write a script to remove values duplicates from dictionary. Feel free to hardcode your dictionary.
+# Write a script to remove values duplicates from dictionary. 
+# Feel free to hardcode your dictionary.
+# Уточнення:
+#  Повинні бути вилучені всі дублікати значень, 
+#  тобто словник типа {1: 1, 2: 2, 3: 2, 4: 1} 
+#  перетвориться в {1: 1, 2: 2} , бо значення у ключів 3 та 4 вже існують
 # 
 # # Робота над помилками:
 # * замінено два принти на один, з f-рядком
 # * попередній варант пердбачав повернення словника з вилученими елементами значення яких
 # дублюється, а потрібно було отримати тільки унікальні значення.
+# 2
+# * проведено зміну алгоритма для скрипта відповідно до Уточнення, 
+# реалізація проведена без додаткового списка
 
-dct = {1: 1, 2:2, 3:1, 4:1, 5:2, 6:3, 7:1, 8:4, 9:2}
-print(f"Input dict: {dct}")
-print(f"Input values: {tuple(dct.values())}")
+dct = {1: 1, 2:2, 3:1, 4:1, 5:2, 6:3, 7:1, 8:4, 9:2, "A": "baz", "B":"baz", 10:"foo"}
+print(f"{dct=}")
+
+dct_result = dict()
+for key, val in dct.items():
+    if not val in dct_result.values():
+        dct_result[key] = val
+
 print("-"*78)
-print(f"Unique values: {tuple(set(dct.values()))}")
+print(f"Result: {dct_result}")
