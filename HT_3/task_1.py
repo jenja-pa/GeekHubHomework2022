@@ -4,19 +4,23 @@
 # The "replacement" value is entered by user. 
 # The number of elements in the tuples must be different.
 
-lst_tpls = [(1, 24, 17, "A"), (2, "B"), (3 ,45, "C"), (4, 5, 5, "D"), (5, "E"), ("F", )]
-print("Input values:")
-print(lst_tpls)
+# Робота над помилками:
+# * замінено 2ва принти на один, з f-рядком
+# * обробка ситуації наявності пустого кожтежа, оскільки потрбно замінювати останній елемент, а 
+# він відсутній, то в результат вставляємо пустий кортеж
+
+lst_tpls = [(1, 24, 17, "A"), (2, "B"), (3 ,45, "C"), (4, 5, 5, "D"), (5, "E"), ("F", ), ()]
+print(f"Input values: {lst_tpls}")
 
 value = input("Enter any value to replacenment: ")
 
 lst_result = []
 for tpl in lst_tpls:
     lst_t = list(tpl)
-    lst_t[-1] = value
+    if len(tpl) > 0:
+        lst_t[-1] = value
     lst_result.append(tuple(lst_t))
 
 lst_tpls = lst_result
 print("-"*78)
-print("Changed values:")
-print(lst_tpls)
+print(f"Changed values: {lst_tpls}")
