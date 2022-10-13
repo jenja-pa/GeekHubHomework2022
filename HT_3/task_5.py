@@ -13,13 +13,15 @@
 # 2
 # * проведено зміну алгоритма для скрипта відповідно до Уточнення, 
 # реалізація проведена без додаткового списка
+# 3
+# приведення виразу у відповідність до PEP-8
 
 dct = {1: 1, 2:2, 3:1, 4:1, 5:2, 6:3, 7:1, 8:4, 9:2, "A": "baz", "B":"baz", 10:"foo"}
 print(f"{dct=}")
 
 dct_result = dict()
 for key, val in dct.items():
-    if not val in dct_result.values():
+    if val not in dct_result.values():
         dct_result[key] = val
 
 print("-"*78)
