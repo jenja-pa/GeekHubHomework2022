@@ -8,9 +8,16 @@ import math
  
 
 def characteristic_sqare(value):
+    """
+    Формування кортежу характеристик квадрада
+    Периметр, Площа, Довжина діагоналі
+    """
     return (4 * value, value * value, value * math.sqrt(2))
 
 def remove_illegal_symbs(value):
+    """
+    Видалення із отриманого рядка вводу нечислових символів
+    """
     templ = list(map(str, range(10)))
     templ.append(".")
     lst = []
@@ -21,6 +28,7 @@ def remove_illegal_symbs(value):
 
 
 if __name__ == "__main__":
+    # Введення значення від користувача 
     for attempt in range(5):
         print(f"Attempt {attempt + 1}. ", end=" ")
         sinp = input("Enter side of sqare (number): ")
@@ -32,7 +40,8 @@ if __name__ == "__main__":
             continue
 
         break
-
+        
+    # Обробка введеног значення
     if value:
         print(characteristic_sqare(value))
     else:
