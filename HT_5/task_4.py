@@ -150,7 +150,7 @@ if __name__ == "__main__":
     print(f"End execute. Spent: {end - start} seconds")
 
     start = time.time()
-    # print("Begin execute Eratosfen prime test: Case 2")
+    print("Begin execute Eratosfen prime test: Case 2")
     # print(prime_list2(*range_gen))
     prime_list2(*range_gen)
     end = time.time()
