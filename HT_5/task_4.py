@@ -69,8 +69,9 @@ def prime_list2(beg_range, end_range):
     lst = list(range(2, end_range + 1)) 
     for n in lst:
         if n != 0:
-            for candidate in range(2 * n, n + 1, n):
-                lst[candidate-2] = 0    
+            for candidate in range(2 * n, end_range + 1, n):
+                lst[candidate - 2] = 0    
+
     # filter 0 in result list
     lst = list(filter(lambda x: x != 0 and x > beg_range, lst))
     return lst
@@ -122,7 +123,6 @@ def enter_numeric_value(msg, flag_empty=False, type_cast_function=float, cnt_att
 
 
 if __name__ == "__main__":
-    # range_gen = (100, 10000)
 
     beg_limit = enter_numeric_value("Enter Begin limit for generate Primary numbers", type_cast_function=int)
     if beg_limit is None:
@@ -139,6 +139,7 @@ if __name__ == "__main__":
         raise ValueError("End limit mast be greater thet begin limit")
 
     range_gen = (beg_limit, end_limit)
+    # range_gen = (100, 10000)
 
     print(f"Current range to generate prime: {range_gen}")
     start = time.time()
@@ -149,8 +150,8 @@ if __name__ == "__main__":
     print(f"End execute. Spent: {end - start} seconds")
 
     start = time.time()
-    print("Begin execute Eratosfen prime test: Case 2")
-    # print(prime_list2(*range_gen))
+    # print("Begin execute Eratosfen prime test: Case 2")
+    print(prime_list2(*range_gen))
     prime_list2(*range_gen)
     end = time.time()
     print(f"End execute. Spent: {end - start} seconds")
