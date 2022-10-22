@@ -44,12 +44,18 @@ def test_credential(username, password, silent=False):
             raise WrongUserException("You pass not not existing username or password.")
 
 if __name__ == "__main__":
-    print("1 silent: False")
-    usr = input("Enter username: ")
-    pwd = input("Enter pasword: ")
-    print(f"Result test credential: {test_credential(usr, pwd)}")
+    print("1 silent: False - correct pars")
+    pars = ("simon", "34TRObert")
+    print(f"Result test_credential{pars}: {test_credential(*pars)} must be: True")
+    print("2 silent: False - incorrect myException")
+    pars = ("salmon", "3booZOO")
+    # Comment this line for next execution
+    # print(f"Result test_credential{pars}: {test_credential(*pars)} must be: Exception")
 
-    print("2 silent: True")
-    usr = input("Enter username: ")
-    pwd = input("Enter pasword: ")
-    print(f"Result test credential: {test_credential(usr, pwd, True)}")
+    print("3 silent: True - correct pars")
+    pars = ("josh34", "armeNT32tab", True)
+    print(f"Result test_credential{pars}: {test_credential(*pars)} must be: True")
+    print("4 silent: True - incorrect pars")
+    pars = ("joker34", "alsdeNT4tab", True)
+    print(f"Result test_credential{pars}: {test_credential(*pars)} must be: False")
+
