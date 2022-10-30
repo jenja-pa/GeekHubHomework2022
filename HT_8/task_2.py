@@ -34,6 +34,9 @@ def boo(fname, cnt_chars):
     if file_size < cnt_chars:
         raise FileTooShortError(f"Your file {fname} too short for execution function operation")
 
+    if cnt_chars < 1:
+        raise ValueError(f"Sorry your len block(cnt_chars:{cnt_chars}) must be large that 0")
+
     lst = []
     with open(fname) as f:
         f.seek(0)
@@ -57,4 +60,8 @@ if __name__ == "__main__":
     boo("test_1.txt", 7)
     # boo("test_1.txt", 15)
     boo("test_2.txt", 1)    
+
+    # boo("test_1.txt", -1)
+    # boo("test_1.txt", -3)
+    # boo("test_1.txt", 0)
 
