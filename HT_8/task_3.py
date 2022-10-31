@@ -167,25 +167,26 @@ def look_balance(user):
     value = get_balance(user)
     log_transaction(f"Operation Viewing the balance: {value:.2f}")
     print(f"Your balance: {value:.2f}")
-    _ = input("Press Enter: ")
+    _ = input("Press Enter to Continue ...")
 
 def top_up_balance(user):
     """
-    Поповнити баланс
+    Поповнення балансу
     """
     try:
         inp = input("Enter sum (float with 2 decimal) to top up balance: ")
         value = abs(round(float(inp), 2))
+        modi_balance(user, value)
+        log_transaction(f"Operation top up balance to: {value}")
     except ValueError as ex:
+        log_transaction(f"Operation top up balance by: {inp}, interrrupted you enetered wrong value.")
         print(f"Sorry You enter wrong value: {inp}. Try again")
-
-    modi_balance(user, value)
-    log_transaction(f"Operation top up balance to: {value}")
+        _ = input("Press Enter to Continue ...")
 
 
 def write_balance(user, value):
     """
-    Занести значення поточного балансу
+    Занести у файл значення поточного балансу
     """
     with open(f"{user}_balance.txt", "w") as f:
         f.write(str(value))
@@ -208,16 +209,17 @@ def modi_balance(user, value):
 
 def withdraw_funds(user):
     """
-    Зняти готівку
+    Зняття готівки
     """
     try:
         inp = input("Enter sum (float with 2 decimal) to withdraw funds: ")
         value = abs(round(float(inp), 2))
+        modi_balance(user, -value)
+        log_transaction(f"Operation withdraw_funds by: {value}")
     except ValueError as ex:
-        print(f"Sorry You enter wrong value: {inp}. Try again")
-
-    modi_balance(user, -value)
-    log_transaction(f"Operation withdraw_funds by: {value}")
+        log_transaction(f"Operation withdraw_funds by: {inp}, interrrupted you enetered wrong value.")
+        print(f"Sorry. Operation withdraw_funds. You enter wrong value: {inp}. Try again")
+        _ = input("Press Enter to Continue ...")
 
 
 def done_user_workflow(user):
