@@ -47,7 +47,8 @@ import sqlite3
 from sqlite3 import Error
 
 
-users = None
+admin = {"admin": "barBarMiaKirGudoo6"}
+
 
 class UserLogonFallied(Exception):
     """
@@ -69,82 +70,158 @@ def start():
     """
     cls()
 
-    # Prepare
-    users = get_start_users("users.json")
-    print(f"{users}")
-    conn = prepare_db("database.db", users) 
-    if not conn:
-        # Problemm connect to DB - need exit
-        return None
+    # Prepare DB
+    prepare_db("database.db") 
+
+
+
+    
+    # if not conn:
+    #     # Problemm connect to DB - need exit
+    #     return None
 
     # login
 
-def prepare_db(db_file_name, def_users):
-    """
-    Підготовка БД до подальшої роботи (нормалізація)
 
-    повертаємо 
-     - об'єкт під'єднання якщо все вдалося
-     - None - якщо виникли проблеми
+def connect_db(db_file_name):
     """
-    fl_create_def_users = False
-    if not os.path.exists(db_file_name):
-        # файл БД не існує - потрібно наповнити БД відповідно до def_users
-        fl_create_def_users = True
+    Забезпечення приєднання до БД
 
-    # try connect
+    Повертаємо об'єкт connection або None при неудачі
+    """
     conn = None 
     try:
         conn = sqlite3.connect(db_file_name)
     except Error as ex:
         print(f"Sorry problem to connect DB: {db_file_name}, need to quit")
         print(ex)
-        return
-
-    # Connect success
-    # Create need tables
-    sql = """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT, 
-            name TEXT NOT NULL
-        )
-    """
-    helper_create_table(conn, sql, "users")
-
-    sql = """
-        CREATE TABLE IF NOT EXISTS balance (
-            id INTEGER PRIMARY KEY, 
-            value DECIMAL(10,2)
-        )
-    """
-    helper_create_table(conn, sql, "balance")
-
-    sql = """
-        CREATE TABLE IF NOT EXISTS transaction_ (
-            id          INTEGER,
-            date_time   TIMESTAMP,
-            message     TEXT,
-            PRIMARY KEY("id","date_time")        
-        )
-    """
-    helper_create_table(conn, sql, "transaction_")
-
-    # Fill empty bd for testing
-    if fl_create_def_users:
-        # потрібно наповнити таблиці
-        cur = conn.cursor()
-        # fill table users
-        users = tuple((item, ) for item in def_users)
-        print(users)
-        cur.executemany("INSERT INTO users (name) VALUES(?)", users)
-        conn.commit()
-        # fill table balance
-        empty_balances = ((row[0], 0.0) for row in cur.execute("SELECT * FROM users").fetchall() if row[1] != "admin")
-        cur.executemany("INSERT INTO balance (id, value) VALUES (?, ?)", empty_balances)
-        conn.commit()
-        # fill transaction not needed
-
     return conn
+
+
+def prepare_db(db_file_name):
+    """
+    Створення порібної нам структури БД для подальшої роботи
+    та проведення підготовчих дій по снаповненню початковими даними (нормалізація БД)
+
+    input:
+        conn - об'єкт з'єднання 
+    """
+    # Create need tables if one not exsists
+    with connect_db(db_file_name) as conn:
+        sql = """
+            CREATE TABLE IF NOT EXISTS users (
+                name TEXT NOT NULL,
+                password TEXT NOT NULL,
+                PRIMARY KEY("name")        
+            )
+        """
+        helper_create_table(conn, sql, "users")
+
+        sql = """
+            CREATE TABLE IF NOT EXISTS balance (
+                id INTEGER PRIMARY KEY, 
+                value DECIMAL(10,2)
+            )
+        """
+        helper_create_table(conn, sql, "balance")
+
+        sql = """
+            CREATE TABLE IF NOT EXISTS transaction_ (
+                id          INTEGER,
+                date_time   TIMESTAMP,
+                message     TEXT,
+                PRIMARY KEY("id","date_time")        
+            )
+        """
+        helper_create_table(conn, sql, "transaction_")
+
+        if len(get_db_users(conn)) == 0: 
+            # таблиця користувачів порожня - наповнюємо її із можливо наданого users.json
+            # якщо users.json не надано - там буде тільки admin
+            
+            # remove data in other tables
+            helper_DML(conn, "DELETE FROM balance")
+            helper_DML(conn, "DELETE FROM transaction_")
+
+            #fill and prepare tables
+            json_users = get_json_users("users.json")
+            prepare_users = tuple((user, pwd) for user, pwd in json_users.items())
+            helper_DML(conn, "INSERT INTO users (name, password) VALUES (?, ?)", prepare_users)
+
+            db_users = get_db_users(conn)
+            prepare_balances = tuple((row[0], 0.0) for row in db_users)
+            helper_DML(conn, "INSERT INTO balance (id, value) VALUES (?, ?)", prepare_balances)
+
+
+# getter DB value(s)
+def get_db_users(conn):
+    """
+    Допоміжна функція - отримання списку доступних користувачів із БД
+    """
+    return helper_select_rows(conn, "SELECT rowid, name, password FROM users", "Trouble select from users")    
+
+# Допоміжні функції отриманна даних із БД
+def helper_select_value(conn, sql, err_msg):
+    """
+    Допоміжна функція - повернення одного значення за допомогою sql із 
+        БД вказаної в conn, err_msg - Повідомлення про помилку
+    """
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)
+        return cur.fetchone()[0]
+    except Error as ex:
+        print("Error.", err_msg)
+        print(ex)
+        raise
+
+def helper_select_row(conn, sql, err_msg):
+    """
+    Допоміжна функція - повернення одного рядка за допомогою sql із 
+        БД вказаної в conn, err_msg - Повідомлення про помилку
+    """
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)
+        return cur.fetchone()
+    except Error as ex:
+        print("Error.", err_msg)
+        print(ex)
+        raise
+
+def helper_select_rows(conn, sql, err_msg):
+    """
+    Допоміжна функція - повернення переліку рядків за допомогою sql із 
+        БД вказаної в conn, err_msg - Повідомлення про помилку
+    """
+    try:
+        cur = conn.cursor()
+        cur.execute(sql)
+        return cur.fetchall()
+    except Error as ex:
+        print("Error.", err_msg)
+        print(ex)
+        raise
+
+def helper_DML(conn, sql, args = None):
+    """
+    Виконання запиту зміни дани
+    """
+    try:
+        cur = conn.cursor()
+        if args is None:
+            cur.execute(sql)
+        elif len(args) == 1:
+            cur.execute(sql, args)
+        else:
+            cur.executemany(sql, args)
+        conn.commit()
+    except Error as ex:
+        if len(args) == 0:
+            print(f"Error. Execution {sql}")
+        else:
+            print(f"Error. Execution {sql} with params: {args}")
+        raise
 
 def helper_create_table(conn, sql, name_table_msg):
     """
@@ -153,7 +230,8 @@ def helper_create_table(conn, sql, name_table_msg):
     Визиває Exception - якщо проблема
     """
     try:
-        cur = conn.execute(sql)
+        cur = conn.cursor()
+        cur.execute(sql)
         conn.commit()
     except Error as ex:
         print(f"Sorry problem to create {name_table_msg} table, need to quit")
@@ -161,7 +239,7 @@ def helper_create_table(conn, sql, name_table_msg):
         raise 
 
 
-def get_start_users(file_name):
+def get_json_users(file_name):
     """
     Отримати словник користувач:пароль із файла вказаного в file_name
 
@@ -173,8 +251,6 @@ def get_start_users(file_name):
     if os.path.exists(file_name):
         with open(file_name) as f:
             dct = json.load(f)
-
-    dct["admin"] = "barBarMiaKirGudoo6"
     
     return dct
 
