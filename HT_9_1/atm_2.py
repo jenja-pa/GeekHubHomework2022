@@ -45,9 +45,10 @@ import os
 import json
 import sqlite3
 from sqlite3 import Error
+import shutil
 
 
-admin = {"admin": "barBarMiaKirGudoo6"}
+dct_admin = {"admin": "barBarMiaKirGudoo6"}
 
 
 class UserLogonFallied(Exception):
@@ -56,12 +57,6 @@ class UserLogonFallied(Exception):
     """
     pass 
 
-
-def cls():
-    """
-    Функція очистки екрана
-    """
-    os.system('cls' if os.name=='nt' else 'clear')
 
 
 def start():
@@ -73,16 +68,230 @@ def start():
     # Prepare DB
     prepare_db("database.db") 
 
+    # login ATM
+    with connect_db("database.db") as conn:
+        logon_user = None
+        users = get_db_users(conn)
+        # print("users:", users)
+        avialible_users = ", ".join(user if user != "alex" else f"{user}({pwd})"  for id, user, pwd in users)
+        try:
+            logon_user = login_user(users, f"Available users are: {avialible_users}")
+        except UserLogonFallied as ex:
+            print("Sorry. You does not enter correct user login. Bye.", ex)
+            return
+        else:
+            # Get user info from users to further work
+            if logon_user in dct_admin.keys():
+                # Admin logon
+                print("Admin logon")
+            else:
+                logon_user = next(filter(lambda item: item[1] == logon_user, users))
+                print(logon_user)
+
+        # workflow_user()
 
 
+# SET of UI function
+def cls():
+    """
+    Функція очистки екрана
+    """
+    os.system('cls' if os.name=='nt' else 'clear')
+
+
+def align_center_terminal(value, width):
+    """
+    Функція вирівнювання виводу по центру термінала
+    """
+    spaces = (width - len(str(value))) // 2
+    return " " * spaces + str(value) + " " * spaces
+
+
+def get_terminal_size():
+    """
+    повертається поточна ширина(кільк.символів) вікна термінала 
+    """
+    return shutil.get_terminal_size()[0]
+
+
+def move_cursor_to_n_lines_up(n):
+    """
+    Переміщення курсора термінала на n рядків вверх
+    """
+    print(f"\\033[{n}A")
+
+
+def input_int(msg, attempts=3):
+    """
+    Функція вводу від користувача цілого числа з обробкою невірного вводу
+
+    Params:
+        msg - Запрошення для інформування користувача
+        attempts - кількість спроб вводу    
     
-    # if not conn:
-    #     # Problemm connect to DB - need exit
-    #     return None
+    Output:
+        Повідомлення про невдалі спроби
 
-    # login
+    Return:
+        int - введене приведене число
+        Exception (ValueError) - якщо не вдалося отримати адекватні дані від користувача
+    """
+    ACCETABLE_SYMBS = tuple(str(i) for i in range(10))
+    for attempt in range(attempts):
+        try:
+            text = input(f"{attemt}.", msg)
+            replaced = "".join((char if char in ACCETABLE_SYMBS else " " for char in text)) 
+            lst = replaced.split()
+            if len(lst) == 0:
+                raise ValueError(f"You Enter wrong integer number: {text}")
+            return int(lst[0])
+        except ValueError as ex:
+            print("Error.", ex)
+            _ = input("Press Enter")
+            move_cursor_to_n_lines_up(2)
+            continue
+
+    raise ValueError(f"Error. Sorry your: {attempts} attempts of input are wrong.")
 
 
+def input_float(msg, attempts=3):
+    """
+    Функція вводу від користувача дійсного числа з обробкою невірного вводу
+
+    Params:
+        msg - Запрошення для інформування користувача
+        attempts - кількість спроб вводу    
+    
+    Output:
+        Повідомлення про невдалі спроби
+
+    Return:
+        float - введене приведене число
+        Exception (ValueError) - якщо не вдалося отримати адекватні дані від користувача
+    """
+    ACCETABLE_SYMBS = tuple(".", *tuple(str(i) for i in range(10)))
+    for attempt in range(attempts):
+        try:
+            text = input(f"{attemt}.", msg)
+            replaced = "".join((char if char in ACCETABLE_SYMBS else " " for char in text)) 
+            lst = replaced.split()
+            if len(lst) == 0:
+                raise ValueError(f"You Enter wrong float number: {text}")
+            return float(lst[0])
+        except ValueError as ex:
+            print("Error.", ex)
+            _ = input("Press Enter")
+            move_cursor_to_n_lines_up(2)
+            continue
+
+    raise ValueError(f"Error. Sorry your: {attempts} attempts of input are wrong.")
+
+
+def output_lines(seq):
+    """
+    Вивід на екран термінала рядка чи рядків, вирівненого по центру
+    """
+    if len(seq) > 0:
+        if isinstance(seq, list, tuple):
+            for item in seq:
+                print(align_center_terminal(str(item)), get_terminal_size())
+        else:
+            print(align_center_terminal(str(seq)), get_terminal_size())
+
+
+def input_logon(attempt, msg_input="Login user. Enter user and password separated by space"):
+    """
+    Спроба ввести користувача та пароль
+
+    Return:
+        Якщо введено два значення розділені пробілом - повертаємо їх
+        інакше генеруємо виключення ValueError
+    """
+    text = input(f"{attempt + 1:>2}. {msg_input}: ")
+    try:
+        user, pwd, *_ = text.split(" ")
+    except Exception as ex:
+        raise ValueError(f"Not correct input: {text}, need-> user password")
+    return user, pwd
+
+def choice_menu(msg="Available users are: ...not passed...", attempts=3):
+    """
+    Функція формує запит на вхід користувача у банкомат
+
+    Input:
+        * items - перелік для формування пунктів меню
+            (text, key, fun_to_call)
+
+    Return:
+        * Повертає інформацію про вибраний пункт
+    """
+    pass
+
+# def user_menu(user):
+#     """
+#     Вивід меню та отримання від користувача його вибір
+#     """
+#     lst = [
+#         ("1. Look at the balance", look_balance),
+#         ("2. Top up the balance", top_up_balance),
+#         ("3. Withdraw funds", withdraw_funds),
+#         ("x. Exit", done_user_workflow),
+#         ]
+
+#     choice = None    
+#     log_transaction("Open new session to work with user")
+#     while choice != "x":
+#         cls()
+#         print(f"ATM #1 - for: {user}")
+#         print("What do you need?")
+#         for item in lst: 
+#             print(item[0])
+
+#         choice = input("Made you choice: ")
+#         if choice in choiсes_menu(lst):
+#             # Call apropriate function
+#             lst[index_menu(lst, choice)][1](user)
+
+
+# Logic workflow
+def login_user(db_users, title="Available users are: ...not passed...", attempts=3):
+    """
+    Проведення спроби входу користувача
+
+    Return:
+        Повериаємо name користувача який здійснив вхід, це може бути і адміністратор
+    """
+    print(title)
+    dct_users = {user: pwd for id, user, pwd in db_users}
+    for attempt in range(attempts):
+        try:
+            user, pwd = input_logon(attempt)
+            #handler admin 
+            if dct_admin.get(user, None) is not None:
+                if dct_admin[user] == pwd:
+                    print("logon ADMIN Success")
+                    return user
+            # test user and password
+            if dct_users.get(user, None) is None:
+                raise UserLogonFallied(f"Sorry. Entered user: {user}, are not avialible")
+            if dct_users[user] != pwd:
+                raise UserLogonFallied(f"Sorry. Entered password for user: {user} are wrong")
+        except ValueError as ex:
+            print(ex)
+            continue
+        except UserLogonFallied as ex:
+            print(ex)
+            continue
+        except Exception as ex:
+            print("Unhandled.", ex)
+        else:
+            # logon succefnll
+            print("logon SUCCESS")
+            return user
+    raise UserLogonFallied("You spent all attempts to logon. Work ended.")
+
+
+# SET of DB functions
 def connect_db(db_file_name):
     """
     Забезпечення приєднання до БД
@@ -254,7 +463,6 @@ def get_json_users(file_name):
     
     return dct
 
-# def 
 
 
 
