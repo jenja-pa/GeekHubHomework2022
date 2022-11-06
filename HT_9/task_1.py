@@ -374,7 +374,7 @@ def login_user(conn, attempts=3):
             db_user_info = dct_users[user]    
             # user login success
             # define N session to user
-            print("test", get_db_max_session4user_id(conn, db_user_info["id"])) 
+            # print("test", get_db_max_session4user_id(conn, db_user_info["id"])) 
             session_id = get_db_max_session4user_id(conn, db_user_info["id"]) + 1
             # append N session to db_user_info
             db_user_info["id_session"] = session_id
@@ -656,7 +656,6 @@ def prepare_db(db_file_name):
         """
         helper_DML(conn, sql)
  
-        print(get_db_users(conn))
         if len(get_db_users(conn)) == 0: 
             # таблиця користувачів порожня - тому проводимо наповнюємо БД 
             # мінімально потрібними початковими даними
