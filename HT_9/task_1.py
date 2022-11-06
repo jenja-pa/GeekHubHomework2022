@@ -33,18 +33,49 @@
 #   	що б ми могли його використати
 
 import os
+import sys
 import json
 import sqlite3
 from sqlite3 import Error
 import shutil
+from datetime import datetime
+from itertools import chain
 
-class UserLogonFallied(Exception):
+class UserLogonFalliedError(Exception):
     """
     Виключна ситуація - проблема входу в банкомат
     """
     pass 
 
-# SET of UI function
+
+# Thirdh side class for implementation cross platform analogue getch() - function
+# ################################
+def wait_key():
+    ''' Wait for a key press on the console and return it. '''
+    result = None
+    if os.name == 'nt':
+        import msvcrt
+        result = msvcrt.getwch()
+    else:
+        import termios
+        fd = sys.stdin.fileno()
+
+        oldterm = termios.tcgetattr(fd)
+        newattr = termios.tcgetattr(fd)
+        newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+        termios.tcsetattr(fd, termios.TCSANOW, newattr)
+
+        try:
+            result = sys.stdin.read(1)
+        except IOError:
+            pass
+        finally:
+            termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
+
+    return result
+# #################################
+
+
 # SET of UI function
 def cls():
     """
@@ -53,12 +84,11 @@ def cls():
     os.system('cls' if os.name=='nt' else 'clear')
 
 
-def align_center_terminal(value, width):
+def align_from_left(value, width):
     """
-    Функція вирівнювання виводу по центру термінала
+    Функція вирівнювання виводу зліва
     """
-    spaces = (width - len(str(value))) // 2
-    return " " * spaces + str(value) + " " * spaces
+    return " " * width + str(value)
 
 
 def get_terminal_size():
@@ -72,7 +102,8 @@ def move_cursor_to_n_lines_up(n):
     """
     Переміщення курсора термінала на n рядків вверх
     """
-    print(f"\\033[{n}A")
+    # print(f"\\033[{n}A")
+    sys.stdout.write(f"\\033[{n}A")
 
 
 def input_int(msg, attempts=3):
@@ -141,19 +172,25 @@ def input_float(msg, attempts=3):
     raise ValueError(f"Error. Sorry your: {attempts} attempts of input are wrong.")
 
 
-def output_lines(seq):
+def output_lines(value):
     """
     Вивід на екран термінала рядка чи рядків, вирівненого по центру
     """
-    if len(seq) > 0:
-        if isinstance(seq, list, tuple):
-            for item in seq:
-                print(align_center_terminal(str(item)), get_terminal_size())
-        else:
-            print(align_center_terminal(str(seq)), get_terminal_size())
+    if value is None:
+        # Nothing to output
+        return
+    elif isinstance(value, str):
+        for item in map(lambda line: line.strip(), value.split("\n")):
+            if item:
+                print(align_from_left(item, 10))
+    elif isinstance(value, list, tuple):
+        for item in value:
+            print(align_from_left(str(item).strip(), 10))
+    else:
+        print(align_from_left(str(value).strip(), 10))
 
 
-def input_logon(attempt, msg_input="Login user. Enter user and password separated by space"):
+def input_logon(attempt, msg_input="Enter user and password separated by space"):
     """
     Спроба ввести користувача та пароль
 
@@ -161,64 +198,203 @@ def input_logon(attempt, msg_input="Login user. Enter user and password separate
         Якщо введено два значення розділені пробілом - повертаємо їх
         інакше генеруємо виключення ValueError
     """
-    text = input(f"{attempt + 1:>2}. {msg_input}: ")
+    text = input(f"       {attempt + 1:>2}. {msg_input}: ")
     try:
         user, pwd, *_ = text.split(" ")
     except Exception as ex:
-        raise ValueError(f"Not correct input: {text}, need-> user password")
+        raise ValueError(f"        Not correct input: {text}, need-> user password")
     return user, pwd
 
-def choice_menu(msg="Available users are: ...not passed...", attempts=3):
+def choice_menu(title, items, footer):
     """
-    Функція формує запит на вхід користувача у банкомат
-
+    Функція що показує форму для вибору варыанта дії(меню)
+    
     Input:
+        * title - Заголовок 
         * items - перелік для формування пунктів меню
-            (text, key, fun_to_call)
+            ((text, key, fun_to_call), ...)
+        * footer- Закінчення меню 
 
     Return:
-        * Повертає інформацію про вибраний пункт
+        * Повертає кортеж із інформацію про вибраний пункт
     """
-    pass
+    cls()
+    output_lines(title)
+    lst_keys = []
+    for text, key, _ in items:
+        lst_keys.append(key)
+        output_lines(text)
+    output_lines(footer)
+    # move_cursor_to_n_lines_up(2)
 
+    while True:
+        char = wait_key()
+        if char in lst_keys:
+            # acceptable char
+            for item in items:
+                if item[1] == char:
+                    return item
+
+def menu_1_level(conn):
+    """
+    Формування меню 1го рівня від входу в банкомат
+    """
+    return choice_menu(
+            f"""## Welcome to ATM v 2.0 sqlite3 powered ##########################
+#--------------------------------------------------------------------""", (
+                ("# 1. Create new user", "1", create_new_user),
+                ("# 2. Login to ATM", "2", login_user),
+                ("# ", None, None),
+                ("# x. Exit", "x", exit_atm)
+            ), """
+#-------------------------------------------------------------------
+ Choose one of case ?""")
 
 # SET functions of buissnes logic
-# Logic workflow
-def login_user(db_users, title="Available users are: ...not passed...", attempts=3):
+def create_new_user(conn):
+    """
+    Створення нового користувача ATM
+    """
+    print("Begin create new user")
+    add_log_atm(conn, "Begin create new user ...")
+
+    print(f"User ... are created successfuly")
+    add_log_atm(conn, f"User ... are created successfuly")
+    
+    print("Press any key ...")
+    wait_key()
+
+def exit_atm(conn):
+    """
+    Функція, що визивається при кінцевому виході із ATM
+    """
+    add_log_atm(conn, "User ended work with ATM")
+    print("        Exit from ATM")
+
+def login_user(conn, attempts=3):
     """
     Проведення спроби входу користувача
 
-    Return:
-        Повериаємо name користувача який здійснив вхід, це може бути і адміністратор
+    * Отримуємо пару user/password
+    * Перевіряємо user/password на правильність
+    * в залежності від типу користувача визиваємо наступне меню
     """
-    print(title)
-    dct_users = {user: pwd for id, user, pwd in db_users}
+    add_log_atm(conn, "Begin process login to ATM")
+    cls()
+    dct_users = get_db_users(conn)
+    avialible_users = ",".join(
+        user if user not in ("admin", "alex") else f"{user}/{dct_users[user]['password']}" 
+        for user in dct_users
+        )
+    print(f"""
+        ## Login -=- ATM v 2.0 sqlite3 powered ##########################
+        ##  You have {attempts} attempts to enter the ATM
+        #################################################################
+        # Avialible_users: {avialible_users}
+        #----------------------------------------------------------------
+        # """)
     for attempt in range(attempts):
         try:
             user, pwd = input_logon(attempt)
-            #handler admin 
-            if dct_admin.get(user, None) is not None:
-                if dct_admin[user] == pwd:
-                    print("logon ADMIN Success")
-                    return user
             # test user and password
             if dct_users.get(user, None) is None:
-                raise UserLogonFallied(f"Sorry. Entered user: {user}, are not avialible")
-            if dct_users[user] != pwd:
-                raise UserLogonFallied(f"Sorry. Entered password for user: {user} are wrong")
+                raise UserLogonFalliedError(f"        Sorry. Entered user: {user}, are not avialible")
+            if dct_users[user]["password"] != pwd:
+                raise UserLogonFalliedError(f"        Sorry. Entered password for user: {user} are wrong")
+
+            #handler admin 
+            if dct_users[user]["permision"] & 1 == 1:
+                print("        logon ADMIN Success")
+                add_log_atm(conn, "Begin Administrator session.")
+                admin_workflow(conn, dct_users[user])
+                print("        logout ADMIN")
+                add_log_atm(conn, "End Administrator session.")
+                return
+            else:
+                # simple user
+                print("        logon USER Success")
+                add_log_atm(conn, f"Begin User:{user} session.")
+                user_workflow(conn, dct_users[user])
+                print(f"        logout USER {user}")
+                return
+
         except ValueError as ex:
             print(ex)
+            add_log_atm(conn, f"attempt: {attempt + 1}. You Fallied to Login. user: {ex}")
             continue
-        except UserLogonFallied as ex:
+        except UserLogonFalliedError as ex:
             print(ex)
+            add_log_atm(conn, f"attempt: {attempt + 1}. You Fallied to Login. user: {user}")
             continue
         except Exception as ex:
             print("Unhandled.", ex)
-        else:
-            # logon succefnll
-            print("logon SUCCESS")
-            return user
-    raise UserLogonFallied("You spent all attempts to logon. Work ended.")
+            add_log_atm(conn, f"attempt: {attempt + 1}. Unknown error {ex}")
+    
+    print("        You spent all attempts to login. Try again later. Press any key...")
+    wait_key()
+    add_log_atm(conn, "You spent all attempts to login. Try again later.")
+
+def admin_workflow(conn, db_user_info):
+    """
+    Робочий процес адміністратора
+    """
+    # В подальшому можливо вставити сюди меню для вибору із 
+    # більше ніж 1 варіанта дії, зараз дія одна тому просто
+    # її запускаємо
+    change_cnt_of_bancnotes(conn, db_user_info)
+
+
+def menu_bancnotes(conn):
+    """
+    Формування меню переліку кількості банкнот у банкоматі
+    """
+    dct_bancnotes = get_bancnotes(conn)
+    print("dct_bancnotes", dct_bancnotes)
+    prepare = tuple((
+        (f"# {row['idx']:2>}. '{nominal:4>}' -- {row['cnt']}", f"row['idx']", modi_bancnote) 
+        for nominal, row in dct_bancnotes.items()
+        ))
+    print("prepare")
+    print(prepare)
+
+    prepare = tuple(item for item in chain(prepare, ((("# ", None, None), ("# x. Exit", "x", exit_bancnotes)))))
+    print("prepare")
+    print(prepare)
+
+    return choice_menu(
+            f"""## Change Count of bancnotes ATM v 2.0 sqlite3   #
+#-----------------------------------------------------------------
+""", prepare, """
+#-----------------------------------------------------------------
+ Choose one of case ?""")
+
+def modi_bancnote(conn, nominal):
+    """
+    Отримати від користувача потрібну кількість 
+    банкнот вказаного моміналу
+    Занести отриману кулькість в таблицю
+    """
+    pass
+def exit_bancnotes(conn, tmp):
+    """
+    Вихід із режиму модифікації кількості банснот
+    """
+    add_log_transaction()
+    return
+
+def change_cnt_of_bancnotes(conn, db_user_info)
+    """
+    Перегляд модифікація наявності купюр у банкоматі
+    """
+   choice = menu_bancnotes(conn) 
+
+def user_workflow(conn, db_user_info):
+    """
+    Робочий процес простого користувача
+    """
+    print("user_workflow")
+    key = wait_key()
+
 
 
 # SET of DB functions
@@ -236,7 +412,6 @@ def connect_db(db_file_name):
         print(ex)
     return conn
 
-
 def prepare_db(db_file_name):
     """
     Створення порібної нам структури БД для подальшої роботи
@@ -249,70 +424,106 @@ def prepare_db(db_file_name):
     with connect_db(db_file_name) as conn:
         sql = """
             CREATE TABLE IF NOT EXISTS users (
-                name TEXT NOT NULL,
-                password TEXT NOT NULL,
-                balance DECIMAL(10,2) not null,
-                permision INTEGER not null,
+                id          INTEGER not null,
+                name        TEXT NOT NULL,
+                password    TEXT NOT NULL,
+                balance     DECIMAL(10,2) not null,
+                permision   INTEGER not null,
                 PRIMARY KEY("name")        
             )
         """
-        helper_create_table(conn, sql, "users")
+        helper_DML(conn, sql)
 
         sql = """
             CREATE TABLE IF NOT EXISTS log_transactions (
                 id_user     INTEGER not null,
-                session		INTEGER not null,
-                date_time   TIMESTAMP,
+                id_session  INTEGER not null,
+                date_time   TIMESTAMP not null,
                 message     TEXT,
-                PRIMARY KEY("id_user","session", "date_time")        
+                PRIMARY KEY("id_user","id_session", "date_time")        
             )
         """
-        helper_create_table(conn, sql, "log_transaction")
+        helper_DML(conn, sql)
+
+        sql = """
+            CREATE TABLE IF NOT EXISTS log_atm (
+                ID          integer primary key not null,
+                date_time   TIMESTAMP not null,
+                message     TEXT
+            )
+        """
+        helper_DML(conn, sql)
 
         # banknotes
         sql = """
             CREATE TABLE IF NOT EXISTS atm_banknotes (
-                nominal_value	INTEGER primary key not null,
-                cnt				INTEGER not null
+                nominal	INTEGER primary key not null,
+                cnt		INTEGER not null
             )
         """
-        helper_create_table(conn, sql, "atm_banknotes")
+        helper_DML(conn, sql)
  
+        print(get_db_users(conn))
         if len(get_db_users(conn)) == 0: 
-            # таблиця користувачів порожня - наповнюємо БД 
-            # мінімально початковими даними
+            # таблиця користувачів порожня - тому проводимо наповнюємо БД 
+            # мінімально потрібними початковими даними
             
             # remove data in other tables
             helper_DML(conn, "DELETE FROM log_transactions")
             helper_DML(conn, "DELETE FROM atm_banknotes")
 
-            #first fill begins data
+            #first fill begins data - Вставляємо адміна
             helper_DML(conn, 
-            	"INSERT INTO users (name, password, balance, permision) VALUES (?,?,?,?)", 
-            	(("admin", "admin", 0.0, 1), )
+            	"INSERT INTO users (id, name, password, balance, permision) VALUES (?,?,?,?,?)", 
+            	((1, "admin", "admin", 0.0, 1), )
             )
-
+            # Наповнюємо класифікатор наявних номіналів банкнот
             prepare_banknotes = ((item, 0) for item in (10, 20, 50, 100, 200, 500, 1000))
-            helper_DML(conn, "INSERT INTO atm_banknotes (nominal_value, cnt) VALUES (?, ?)", 
+            helper_DML(conn, "INSERT INTO atm_banknotes (nominal, cnt) VALUES (?, ?)", 
             	tuple(prepare_banknotes))
 
 
-# getter DB value(s)
-def get_db_users(conn):
+def add_log_atm(conn, message):
     """
-    Допоміжна функція - отримання списку доступних користувачів із БД
+    Ведення логу роботи із банкоматом без прив'язки до користувача
     """
-    return helper_select_rows(conn, "SELECT rowid, name, password FROM users", "Trouble select from users")    
+    try:
+        conn.execute("INSERT INTO log_atm (date_time, message) VALUES (?, ?)", (datetime.now(), message))
+    except Error as ex:
+        print("Error insert into log_atm. Details are:")
+        print(ex)
+
+def add_log_transaction(conn, user_id, session_id, message):
+    """
+    Ведення логу роботи із банкоматом по користувачу
+    """
+    try:
+        conn.execute(
+            """INSERT INTO log_transactions (id_user, id_session, date_time, message) 
+            VALUES (?, ?, ?. ?)""", (user_id, session_id, datetime.now(), message)
+            )
+    except Error as ex:
+        print("Error. Problem insert message to transaction users log. Delails are:")
+        prine(ex)
+        add_log_atm(f"Error insert log message for user:{get_user_4_id(user_id)}, session:{session_id}  to transaction users log")
+
 
 # Допоміжні функції отриманна даних із БД
-def helper_select_value(conn, sql, err_msg):
+def helper_select_value(conn, sql, args=None, err_msg="No message"):
     """
-    Допоміжна функція - повернення одного значення за допомогою sql із 
-        БД вказаної в conn, err_msg - Повідомлення про помилку
+    Допоміжна функція - повернення одного значення за допомогою sql з 
+        можливими параметрами args(tuple) із БД вказаної в conn, 
+        err_msg - Повідомлення про помилку
     """
     try:
         cur = conn.cursor()
-        cur.execute(sql)
+        if args is None:
+            cur.execute(sql)
+        else:
+            if isinstance(args, tuple):
+                cur.execute(sql, args)
+            else:
+                cur.execute(sql, tuple(args))
         return cur.fetchone()[0]
     except Error as ex:
         print("Error.", err_msg)
@@ -325,6 +536,7 @@ def helper_select_row(conn, sql, err_msg):
         БД вказаної в conn, err_msg - Повідомлення про помилку
     """
     try:
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute(sql)
         return cur.fetchone()
@@ -335,10 +547,12 @@ def helper_select_row(conn, sql, err_msg):
 
 def helper_select_rows(conn, sql, err_msg):
     """
-    Допоміжна функція - повернення переліку рядків за допомогою sql із 
+    Допоміжна функція - повернення 
+    -переліку рядків за допомогою sql із 
         БД вказаної в conn, err_msg - Повідомлення про помилку
     """
     try:
+        conn.row_factory = sqlite3.Row
         cur = conn.cursor()
         cur.execute(sql)
         return cur.fetchall()
@@ -346,7 +560,6 @@ def helper_select_rows(conn, sql, err_msg):
         print("Error.", err_msg)
         print(ex)
         raise
-
 
 def helper_DML(conn, sql, args = None):
     """
@@ -368,27 +581,56 @@ def helper_DML(conn, sql, args = None):
             cur.executemany(sql, args)
         conn.commit()
     except Error as ex:
-        if len(args) == 0:
+        if args is None or len(args) == 0:
             print(f"Error. Execution {sql}")
         else:
             print(f"Error. Execution {sql} with params: {args}")
         raise
 
-def helper_create_table(conn, sql, name_table_msg):
+# getter DB value(s)
+def get_db_users(conn):
     """
-    Допоміжна функція створення потрібної таблиці
-
-    Визиває Exception - якщо проблема
+    Отримання списку доступних користувачів із БД
+    Return:
+        dict of dict: dct["user"]{dct info about user}
     """
-    try:
-        conn.execute(sql)
-        conn.commit()
-    except Error as ex:
-        print(f"Sorry problem to create {name_table_msg} table, need to quit")
-        print(ex)
-        raise 
+    rows = helper_select_rows_gen(conn, 
+        "SELECT id, name, password, balance, permision FROM users", 
+        "Trouble select all from users"
+        )
+    return {row["name"]: {key: value for key, value in zip(row.keys(), row)} for row in rows}
+
+def get_bancnotes(conn):
+    """
+    Отримання переліку банкнот та їх кількості
+    Return:
+        dict:  of dict dct["<nominal>"]{idx, cnt}
+    """
+    rows = helper_select_rows_gen(conn, 
+        "SELECT nominal, cnt FROM atm_banknotes ORDER BY nominal", 
+        "Trouble select all from atm_banknotes"
+        )
+    return {row["nominal"]: {"idx": idx+1, "cnt": row["cnt"]} for idx, row in enumerate(rows)}
+
+def get_max_id_users(conn):
+    """
+    Отримати максимальний існуючий id
+    """
+    return helper_select_value(conn, "SELECT max(id) FROM users", err_msg="Trouble select max(id) from users")
+
+def get_max_session4user_id(conn, user_id):
+    """
+    Отримати максимальний існуючий id_session для id_user в log_transactions
+    """
+    return helper_select_value(conn, 
+        "SELECT max(id_session) FROM log_transactions WHERE id_user=?", 
+        (user_id, ),
+        "Trouble select max(id_session) from log_transactions for user_id:{user_id}"
+        )
 
 
+
+CNT_OF_ATTEMPTS = 3
 
 def start():
     """
@@ -400,8 +642,13 @@ def start():
     prepare_db("database.db") 
 
     # first menu 
-    
-    # login ATM
+    with connect_db("database.db") as conn:
+        conn.row_factory = sqlite3.Row
+        menu_result = ("", "0", None)
+        while menu_result[1] != "x":
+            menu_result = menu_1_level(conn)
+            if menu_result[2] is not None:
+                menu_result[2](conn)    
 
 
 if __name__ == "__main__":
