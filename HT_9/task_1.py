@@ -76,6 +76,54 @@ def wait_key():
 # #################################
 
 
+# =================================
+# Раніше розроблена ф-ія перевіркм імені та пароля
+class NameIncorrectException(Exception):
+    pass
+
+class PasswordIncorrectException(Exception):
+    pass
+
+def validations_name_password(name, pwd):
+    """
+    Перевірка валідності пари:
+     * name     - Ім'я
+     * pwd      - Пароль 
+
+    Return:
+        True    - Якщо параметри задовільняють вимогам
+        Exception   - якщо маємо проблеми
+    """
+    digits = (*map(str, range(10)), )
+    lower_lets = (*map(chr, (el for el in range(ord('a'), ord("z")+1))), )
+    upper_lets = (*map(chr, (el for el in range(ord('A'), ord("Z")+1))), )
+    service_name_chars = ("_", "-")
+    service_pwd_chars = ("_", )
+
+    valid_name_chars = (*digits, *lower_lets, *upper_lets, *service_name_chars)
+    valid_pwd_chars = (*digits, *lower_lets, *upper_lets, *service_pwd_chars)
+
+    if len(name) < 3:
+        raise NameIncorrectException(f"Your name '{name}' is short")
+    elif len(name) > 50:
+        raise NameIncorrectException(f"Your name '{name}' is too long")
+    elif len(set(name) - set(valid_name_chars)) != 0:
+        raise NameIncorrectException(f"Your name '{name}' contain incorrect symbols")
+    elif name[0] in digits:
+        raise NameIncorrectException(f"Your name '{name}' begins from incorrect symbols")
+
+    if len(pwd) < 8:
+        raise PasswordIncorrectException(f"Your password '{pwd}' is short")
+    elif len(set(pwd) - set(digits)) == len(set(pwd)):
+        raise PasswordIncorrectException(f"Your password '{pwd}' must contain least one digit")
+    elif len(set(pwd) - set(valid_pwd_chars)) != 0:
+        raise PasswordIncorrectException(f"Your password '{pwd}' contain incorrect symbols")
+    elif len(set(pwd) - set(lower_lets)) == len(set(pwd)):
+        raise PasswordIncorrectException(f"Your password '{pwd}' must contain least one char in lower registry")
+    elif len(set(pwd) - set(upper_lets)) == len(set(pwd)):
+        raise PasswordIncorrectException(f"Your password '{pwd}' must contain least one char in UPPER registry")
+# =================================
+
 # SET of UI function
 def cls():
     """
@@ -258,17 +306,31 @@ def create_new_user(conn):
     """
     Створення нового користувача ATM
     """
-    print("Begin create new user")
     add_log_atm(conn, "Begin create new user ...")
+    user_name = input("Enter name for new user: ")
+    pwd = input("Enter password for new user: ")
+    add_log_atm(conn, f"Testing {user_name=}, password={pwd}")
+    try:
+        validations_name_password(user_name, pwd)
+        set_db_new_user(conn, user_name, pwd)
+    except NameIncorrectException as ex:
+        add_log_atm(conn, f"Atention your user name '{user_name}' is inappropriate. Reason: {ex}")
+        print(f"Atention your user name '{user_name}' is inappropriate. Reason: {ex}")
+    except PasswordIncorrectException as ex:
+        add_log_atm(conn, f"Atention your password '{pwd}' is inappropriate. Reason: {ex}")
+        print(f"Atention your user password '{pwd}' is inappropriate. Reason: {ex}")
+    except Error as ex:
+        add_log_atm(conn, f"Atention this user '{user_name}' cannot be applied. Reason: {ex}")
+        print(f"Atention this user '{user_name}' cannot be applied. Reason: {ex}")
+    except Exception as ex:
+        add_log_atm(conn, f"Unknown unhandled error. Reason: {ex}")
+        print("You are have Unknown error.", ex)
+    else:
+        add_log_atm(conn, f"User {user_name}/{pwd} created successfuly and ready to use")
+        print(f"User {user_name}/{pwd} created successfuly and ready to use")
 
-
-
-    
-    print(f"User ... are created successfuly")
-    add_log_atm(conn, f"User ... are created successfuly")
-    
-    print("Press any key ...")
-    wait_key()
+    input("Press Enter")
+ 
 
 def exit_atm(conn):
     """
@@ -556,7 +618,7 @@ def helper_select_value(conn, sql, args=None, err_msg="No message"):
                 cur.execute(sql, tuple(args))
         return cur.fetchone()[0]
     except Error as ex:
-        print("Error.", err_msg)
+        print("Error.", err_msg, " Reason:", ex)
         print(ex)
         raise
 
@@ -660,6 +722,28 @@ def set_db_banknote_cnt(conn, user_info, nominal, value):
     else:
         add_log_transaction(conn, user_info, f"Change count of banknotes {nominal} to {value} performed successfuly")
 
+
+def set_db_new_user(conn, nick, pwd):
+    """
+    Вставка нового користувача в БД
+    """
+    cnt = helper_select_value(conn, "SELECT count(*) FROM users WHERE name=?", (nick, ), f"Select count of: {nick}")
+    if cnt > 0:
+        # user name already present
+        raise Error(f"Sorry this user: {nick} already present")
+
+    id_user = get_db_max_id_users(conn) + 1
+    
+    try:
+        helper_DML(conn, 
+            "INSERT INTO users (id, name, password, balance, permision) VALUES(?,?,?, 0.0, 0)",
+            ((id_user, nick, pwd), )
+            )
+    except Exception as ex:
+        add_log_atm(conn, "Exception insert new user. Reason: " + ex)
+        print("Exception insert new user. Reason: " + ex)
+        input("Press enter after reading...")
+    
 
 def get_db_atm_balance(conn):
     """
