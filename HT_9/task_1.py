@@ -31,15 +31,15 @@
 #   	  * неможливо видати суму наявними купюрами тощо.
 #   - файл бази даних з усіма створеними таблицями і даними також додайте в репозиторій, 
 #   	що б ми могли його використати
-
 import os
 import sys
+import traceback
 import json
 import sqlite3
 from sqlite3 import Error
 import shutil
 from datetime import datetime
-from itertools import chain
+from itertools import chain as it_chain, count as it_count
 
 class UserLogonFalliedError(Exception):
     """
@@ -124,7 +124,7 @@ def input_int(msg, attempts=3):
     ACCETABLE_SYMBS = tuple(str(i) for i in range(10))
     for attempt in range(attempts):
         try:
-            text = input(f"{attemt}.", msg)
+            text = input(f"{attempt}. {msg}")
             replaced = "".join((char if char in ACCETABLE_SYMBS else " " for char in text)) 
             lst = replaced.split()
             if len(lst) == 0:
@@ -132,7 +132,8 @@ def input_int(msg, attempts=3):
             return int(lst[0])
         except ValueError as ex:
             print("Error.", ex)
-            _ = input("Press Enter")
+            print("Press any key ...")
+            wait_key() 
             move_cursor_to_n_lines_up(2)
             continue
 
@@ -241,6 +242,8 @@ def menu_1_level(conn):
     """
     return choice_menu(
             f"""## Welcome to ATM v 2.0 sqlite3 powered ##########################
+#--------------------------------------------------------------------
+# ATM balance is: {get_db_atm_balance(conn):.2f}
 #--------------------------------------------------------------------""", (
                 ("# 1. Create new user", "1", create_new_user),
                 ("# 2. Login to ATM", "2", login_user),
@@ -258,6 +261,9 @@ def create_new_user(conn):
     print("Begin create new user")
     add_log_atm(conn, "Begin create new user ...")
 
+
+
+    
     print(f"User ... are created successfuly")
     add_log_atm(conn, f"User ... are created successfuly")
     
@@ -302,11 +308,19 @@ def login_user(conn, attempts=3):
             if dct_users[user]["password"] != pwd:
                 raise UserLogonFalliedError(f"        Sorry. Entered password for user: {user} are wrong")
 
+            db_user_info = dct_users[user]    
+            # user login success
+            # define N session to user
+            print("test", get_db_max_session4user_id(conn, db_user_info["id"])) 
+            session_id = get_db_max_session4user_id(conn, db_user_info["id"]) + 1
+            # append N session to db_user_info
+            db_user_info["id_session"] = session_id
+
             #handler admin 
-            if dct_users[user]["permision"] & 1 == 1:
+            if db_user_info["permision"] & 1 == 1:
                 print("        logon ADMIN Success")
                 add_log_atm(conn, "Begin Administrator session.")
-                admin_workflow(conn, dct_users[user])
+                admin_workflow(conn, db_user_info)
                 print("        logout ADMIN")
                 add_log_atm(conn, "End Administrator session.")
                 return
@@ -314,7 +328,7 @@ def login_user(conn, attempts=3):
                 # simple user
                 print("        logon USER Success")
                 add_log_atm(conn, f"Begin User:{user} session.")
-                user_workflow(conn, dct_users[user])
+                user_workflow(conn, db_user_info)
                 print(f"        logout USER {user}")
                 return
 
@@ -327,7 +341,8 @@ def login_user(conn, attempts=3):
             add_log_atm(conn, f"attempt: {attempt + 1}. You Fallied to Login. user: {user}")
             continue
         except Exception as ex:
-            print("Unhandled.", ex)
+            traceback.print_exc()
+            # print("Unhandled.", ex.line_number, sys.exc_info(), ex)
             add_log_atm(conn, f"attempt: {attempt + 1}. Unknown error {ex}")
     
     print("        You spent all attempts to login. Try again later. Press any key...")
@@ -341,52 +356,62 @@ def admin_workflow(conn, db_user_info):
     # В подальшому можливо вставити сюди меню для вибору із 
     # більше ніж 1 варіанта дії, зараз дія одна тому просто
     # її запускаємо
-    change_cnt_of_bancnotes(conn, db_user_info)
+    change_cnt_of_banknotes(conn, db_user_info)
+
+def change_cnt_of_banknotes(conn, db_user_info):
+    """
+    Перегляд модифікація наявності купюр у банкоматі
+    """
+    dct_idx_b_current_state = {
+        str(idx): (nominal, cnt) for idx, (nominal, cnt) in zip(it_count(1), get_db_banknotes(conn).items())
+        }
+    while (choice_char := menu_banknotes(conn, db_user_info, dct_idx_b_current_state)) != "x":
+        nominal, cur_cnt = dct_idx_b_current_state[choice_char]
+        modi_banknote(conn, db_user_info, nominal, cur_cnt)
+        dct_idx_b_current_state = {
+            str(idx): (nominal, cnt) for idx, (nominal, cnt) in zip(it_count(1), get_db_banknotes(conn).items())
+            }
 
 
-def menu_bancnotes(conn):
+def menu_banknotes(conn, db_user_info, dct_idx_b_current_state):
     """
     Формування меню переліку кількості банкнот у банкоматі
+    dct_idx_b_current_state - перелік стану наявних банкнон
     """
-    dct_bancnotes = get_bancnotes(conn)
-    print("dct_bancnotes", dct_bancnotes)
-    prepare = tuple((
-        (f"# {row['idx']:2>}. '{nominal:4>}' -- {row['cnt']}", f"row['idx']", modi_bancnote) 
-        for nominal, row in dct_bancnotes.items()
-        ))
-    print("prepare")
-    print(prepare)
+    cls()
 
-    prepare = tuple(item for item in chain(prepare, ((("# ", None, None), ("# x. Exit", "x", exit_bancnotes)))))
-    print("prepare")
-    print(prepare)
-
-    return choice_menu(
-            f"""## Change Count of bancnotes ATM v 2.0 sqlite3   #
+    print(f"""
+## Change Count of banknotes ATM v 2.0 sqlite3                   #
 #-----------------------------------------------------------------
-""", prepare, """
-#-----------------------------------------------------------------
- Choose one of case ?""")
+# ATM balance is: {get_db_atm_balance(conn):.2f}
+#-----------------------------------------------------------------""")
+    for idx, (nominal, cnt) in dct_idx_b_current_state.items():
+        print(f"# {idx:>3}. {nominal:>5} = {cnt:>4} ")
 
-def modi_bancnote(conn, nominal):
+    print("""#
+#   x. Exit
+#-----------------------------------------------------------------
+ Choose one of them to edit: """)
+    # Перебор вводу від користувача доки не отримаємо із заявленого переліку
+    while (choice_char := wait_key().lower()) not in it_chain(dct_idx_b_current_state.keys(), ("x", )):
+        pass
+
+    return choice_char 
+
+def modi_banknote(conn, db_user_info, nominal, cnt):
     """
     Отримати від користувача потрібну кількість 
     банкнот вказаного моміналу
     Занести отриману кулькість в таблицю
-    """
-    pass
-def exit_bancnotes(conn, tmp):
-    """
-    Вихід із режиму модифікації кількості банснот
-    """
-    add_log_transaction()
-    return
 
-def change_cnt_of_bancnotes(conn, db_user_info)
+    nominal, cnt = який номінал змінювати, поточне значення
     """
-    Перегляд модифікація наявності купюр у банкоматі
-    """
-   choice = menu_bancnotes(conn) 
+    try:
+        value = input_int(f"Present {cnt} banknotes for nominal \"{nominal}\". Enter new value: ")
+        set_db_banknote_cnt(conn, db_user_info, nominal, value)
+    except ValueError:
+        pass
+
 
 def user_workflow(conn, db_user_info):
     """
@@ -477,6 +502,10 @@ def prepare_db(db_file_name):
             	"INSERT INTO users (id, name, password, balance, permision) VALUES (?,?,?,?,?)", 
             	((1, "admin", "admin", 0.0, 1), )
             )
+            helper_DML(conn, 
+                "INSERT INTO users (id, name, password, balance, permision) VALUES (?,?,?,?,?)", 
+                ((2, "a", "a", 0.0, 1), )
+            )
             # Наповнюємо класифікатор наявних номіналів банкнот
             prepare_banknotes = ((item, 0) for item in (10, 20, 50, 100, 200, 500, 1000))
             helper_DML(conn, "INSERT INTO atm_banknotes (nominal, cnt) VALUES (?, ?)", 
@@ -491,21 +520,22 @@ def add_log_atm(conn, message):
         conn.execute("INSERT INTO log_atm (date_time, message) VALUES (?, ?)", (datetime.now(), message))
     except Error as ex:
         print("Error insert into log_atm. Details are:")
-        print(ex)
 
-def add_log_transaction(conn, user_id, session_id, message):
+def add_log_transaction(conn, db_user_info, message):
     """
     Ведення логу роботи із банкоматом по користувачу
     """
     try:
         conn.execute(
             """INSERT INTO log_transactions (id_user, id_session, date_time, message) 
-            VALUES (?, ?, ?. ?)""", (user_id, session_id, datetime.now(), message)
+            VALUES (?, ?, ?, ?)""", (db_user_info["id"], db_user_info["id_session"], datetime.now(), message)
             )
     except Error as ex:
         print("Error. Problem insert message to transaction users log. Delails are:")
-        prine(ex)
-        add_log_atm(f"Error insert log message for user:{get_user_4_id(user_id)}, session:{session_id}  to transaction users log")
+        print(ex)
+        add_log_atm(conn, f"Error insert log message for user:{db_user_info['name']}, session:{db_user_info['id_session']}  to transaction users log")
+        add_log_atm(conn, f"Exception message: {ex}")
+        add_log_atm(conn, f"#")
 
 
 # Допоміжні функції отриманна даних із БД
@@ -570,6 +600,9 @@ def helper_DML(conn, sql, args = None):
             None - відсутні аргументи, - виконати без підстановки
             len(args) == 1 - тільки 1 рядок
             інакше надано рядків більше 1го 
+    Return:
+        None - якщо виконалось без помилок
+        вивід повідомлення та reraise Exception - якщо виникла проблема
     """
     try:
         cur = conn.cursor()
@@ -585,7 +618,7 @@ def helper_DML(conn, sql, args = None):
             print(f"Error. Execution {sql}")
         else:
             print(f"Error. Execution {sql} with params: {args}")
-        raise
+        raise 
 
 # getter DB value(s)
 def get_db_users(conn):
@@ -594,39 +627,62 @@ def get_db_users(conn):
     Return:
         dict of dict: dct["user"]{dct info about user}
     """
-    rows = helper_select_rows_gen(conn, 
+    rows = helper_select_rows(conn, 
         "SELECT id, name, password, balance, permision FROM users", 
         "Trouble select all from users"
         )
     return {row["name"]: {key: value for key, value in zip(row.keys(), row)} for row in rows}
 
-def get_bancnotes(conn):
+def get_db_banknotes(conn):
     """
     Отримання переліку банкнот та їх кількості
     Return:
-        dict:  of dict dct["<nominal>"]{idx, cnt}
+        dict:  dct["<nominal>"] = cnt
     """
-    rows = helper_select_rows_gen(conn, 
+    rows = helper_select_rows(conn, 
         "SELECT nominal, cnt FROM atm_banknotes ORDER BY nominal", 
         "Trouble select all from atm_banknotes"
         )
-    return {row["nominal"]: {"idx": idx+1, "cnt": row["cnt"]} for idx, row in enumerate(rows)}
+    return {row["nominal"]: row["cnt"] for row in rows}
 
-def get_max_id_users(conn):
+def set_db_banknote_cnt(conn, user_info, nominal, value):
+    """
+    Поновити значення кількості банкнот вкзаного nominal
+    """
+    try:
+        helper_DML(conn, "UPDATE atm_banknotes SET cnt=? WHERE nominal=?", ((value, nominal), ))
+    except Error as ex:
+        add_log_transaction(conn, user_info, "Appear SQL problem to UPDATE count of atm banknote")        
+        add_log_transaction(conn, user_info, str(traceback.format_exc()))        
+    except Exception as ex:
+        add_log_transaction(conn, user_info, "Appear problem to UPDATE count of atm banknote")
+        add_log_transaction(conn, user_info, str(traceback.format_exc()))        
+    else:
+        add_log_transaction(conn, user_info, f"Change count of banknotes {nominal} to {value} performed successfuly")
+
+
+def get_db_atm_balance(conn):
+    """
+    Обчислення балансу банкомата
+    """
+    return float(helper_select_value(conn, "SELECT sum(nominal * cnt) as balance FROM atm_banknotes"))
+
+def get_db_max_id_users(conn):
     """
     Отримати максимальний існуючий id
     """
     return helper_select_value(conn, "SELECT max(id) FROM users", err_msg="Trouble select max(id) from users")
 
-def get_max_session4user_id(conn, user_id):
+def get_db_max_session4user_id(conn, user_id):
     """
     Отримати максимальний існуючий id_session для id_user в log_transactions
     """
-    return helper_select_value(conn, 
+    result = helper_select_value(conn, 
         "SELECT max(id_session) FROM log_transactions WHERE id_user=?", 
         (user_id, ),
         "Trouble select max(id_session) from log_transactions for user_id:{user_id}"
         )
+    return 0 if result is None else result 
 
 
 
