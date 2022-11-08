@@ -9,30 +9,32 @@ HT 9
      вас не виникне проблем швидко адаптувати її до нових вимог.
   - на старті додати можливість залогінитися або створити нового користувача
    (при створенні нового користувача, перевіряється відповідність логіну і
-   	паролю мінімальним вимогам.
-   	Для перевірки створіть окремі функції)
+    паролю мінімальним вимогам.
+    Для перевірки створіть окремі функції)
   - в таблиці з користувачами також має бути створений унікальний
-  	користувач-інкасатор, який матиме розширені можливості (домовимось,
-  	що логін/пароль будуть admin/admin щоб нам було простіше перевіряти)
+    користувач-інкасатор, який матиме розширені можливості (домовимось,
+    що логін/пароль будуть admin/admin щоб нам було простіше перевіряти)
   - банкомат має власний баланс
-  - кількість купюр в банкоматі обмежена (тобто має зберігатися номінал та кількість).
-  	Номінали купюр - 10, 20, 50, 100, 200, 500, 1000
+  - кількість купюр в банкоматі обмежена (тобто має зберігатися номінал та 
+        кількість).
+    Номінали купюр - 10, 20, 50, 100, 200, 500, 1000
   - змінювати вручну кількість купюр або подивитися їх залишок в банкоматі
-  	може лише інкасатор
+    може лише інкасатор
   - користувач через банкомат може покласти на рахунок лише суму кратну
-  	мінімальному номіналу що підтримує банкомат.
-  	В іншому випадку - повернути "здачу" (наприклад при поклажі 1005 -->
-  		повернути 5).
-  	Але це не має впливати на баланс/кількість купюр банкомату, лише збільшується
-  		баланс користувача (моделюємо наявність двох незалежних касет в банкоматі -
-  		одна на прийом, інша на видачу)
-  - зняти можна лише в межах власного балансу, але не більше ніж є всього в банкоматі.
-  - при неможливості виконання якоїсь операції - вивести повідомлення з причиною:
-  	  * невірний логін/пароль,
-  	  * недостатньо коштів на рахунку,
-  	  * неможливо видати суму наявними купюрами тощо.
-  - файл бази даних з усіма створеними таблицями і даними також додайте в репозиторій,
-  	що б ми могли його використати
+    мінімальному номіналу що підтримує банкомат.
+    В іншому випадку - повернути "здачу" (наприклад при поклажі 1005 -->
+    повернути 5).
+        Але це не має впливати на баланс/кількість купюр банкомату, лише 
+    збільшується баланс користувача (моделюємо наявність двох незалежних касет 
+    в банкоматі - одна на прийом, інша на видачу)
+  - зняти можна лише в межах власного балансу, але не більше ніж є всього в 
+        банкоматі.
+  - при неможливості виконання якоїсь операції - вивести причинe повідомлення:
+      * невірний логін/пароль,
+      * недостатньо коштів на рахунку,
+      * неможливо видати суму наявними купюрами тощо.
+  - файл бази даних з усіма створеними таблицями і даними також додайте в 
+    репозиторій, що б ми могли його використати
 """
 
 import os
@@ -46,17 +48,15 @@ from datetime import datetime
 from itertools import chain as it_chain, count as it_count
 
 
-
 class UserLogonFalliedError(Exception):
     """
     Виключна ситуація - проблема входу в банкомат
     """
 
 
-
 # Thirdh side class for implementation cross platform analogue
 # getch() - function
-def wait_key(message = "Press any key ..."):
+def wait_key(message="Press any key ..."):
     ''' Wait for a key press on the console and return it. '''
     result = None
     if message is not None:
@@ -83,7 +83,6 @@ def wait_key(message = "Press any key ..."):
     return result
 
 
-
 # Раніше розроблена ф-ія перевіркм імені та пароля
 class NameIncorrectException(Exception):
     """
@@ -95,7 +94,7 @@ class PasswordIncorrectException(Exception):
     """
     Виключна ситуація - неправильне ім'я користувача
     """
-
+  
 
 def validations_name_password(name, pwd):
     """
@@ -121,23 +120,28 @@ def validations_name_password(name, pwd):
     if len(name) > 50:
         raise NameIncorrectException(f"Your name '{name}' is too long")
     if len(set(name) - set(valid_name_chars)) != 0:
-        raise NameIncorrectException(f"Your name '{name}' contain incorrect symbols")
+        raise NameIncorrectException(
+            f"Your name '{name}' contain incorrect symbols")
     if name[0] in digits:
-        raise NameIncorrectException(f"Your name '{name}' begins from incorrect symbols")
+        raise NameIncorrectException(
+            f"Your name '{name}' begins from incorrect symbols")
 
     if len(pwd) < 8:
         raise PasswordIncorrectException(f"Your password '{pwd}' is short")
     if len(set(pwd) - set(digits)) == len(set(pwd)):
-        raise PasswordIncorrectException(f"Your password '{pwd}' must contain least one digit")
+        raise PasswordIncorrectException(
+            f"Your password '{pwd}' must contain least one digit")
     if len(set(pwd) - set(valid_pwd_chars)) != 0:
-        raise PasswordIncorrectException(f"Your password '{pwd}' contain incorrect symbols")
+        raise PasswordIncorrectException(
+            f"Your password '{pwd}' contain incorrect symbols")
     if len(set(pwd) - set(lower_lets)) == len(set(pwd)):
         raise PasswordIncorrectException(
-            f"Your password '{pwd}' must contain least one char in lower registry")
+            f"Your password '{pwd}' must contain least one char in lower \
+registry")
     if len(set(pwd) - set(upper_lets)) == len(set(pwd)):
         raise PasswordIncorrectException(
-            f"Your password '{pwd}' must contain least one char in UPPER registry")
-
+            f"Your password '{pwd}' must contain least one char in UPPER \
+registry")
 
 
 # SET of UI function
@@ -145,7 +149,7 @@ def clear_screen():
     """
     Функція очистки екрана
     """
-    os.system('cls' if os.name=='nt' else 'clear')
+    os.system('cls' if os.name == 'nt' else 'clear')
 
 
 def get_terminal_size():
@@ -168,13 +172,16 @@ def input_int(msg, attempts=3):
 
     Return:
         int - введене приведене число
-        Exception (ValueError) - якщо не вдалося отримати адекватні дані від користувача
+        Exception (ValueError) - якщо не вдалося отримати адекватні дані від 
+            користувача
     """
     accetable_symbs = tuple(str(i) for i in range(10))
     for attempt in range(attempts):
         try:
             text = input(f"{attempt}. {msg}")
-            replaced = "".join((char if char in accetable_symbs else " " for char in text))
+            replaced = "".join(
+                (char if char in accetable_symbs else " " for char in text)
+                )
             lst = replaced.split()
             if len(lst) == 0:
                 raise ValueError(f"You Enter wrong integer number: {text}")
@@ -184,7 +191,8 @@ def input_int(msg, attempts=3):
             wait_key()
             continue
 
-    raise ValueError(f"Error. Sorry your: {attempts} attempts of input are wrong.")
+    raise ValueError(
+        f"Error. Sorry your: {attempts} attempts of input are wrong.")
 
 
 def input_float(msg, attempts=3):
@@ -200,12 +208,15 @@ def input_float(msg, attempts=3):
 
     Return:
         float - введене приведене число
-        Exception (ValueError) - якщо не вдалося отримати адекватні дані від користувача
+        Exception (ValueError) - якщо не вдалося отримати адекватні дані від 
+            користувача
     """
     accetable_symbs = tuple(it_chain((".", "-"), (str(i) for i in range(10))))
     for attempt in range(attempts):
         text = input(f"{attempt + 1}. {msg}")
-        replaced = "".join((char if char in accetable_symbs else " " for char in text))
+        replaced = "".join(
+            (char if char in accetable_symbs else " " for char in text)
+            )
         lst = replaced.split()
         if len(lst) == 0:
             print(f"You Enter wrong float number: {text}")
@@ -215,10 +226,12 @@ def input_float(msg, attempts=3):
             value = round(float(lst[0]), 2)
             return value
         except ValueError as ex:
-            print(f"Error. Your entered number: {lst[0]} is not a float. Reason: {ex}")
+            print(f"Error. Your entered number: {lst[0]} is not a float. \
+Reason: {ex}")
             continue
 
-    raise ValueError(f"Error. Sorry your: {attempts} attempts of input float number are wrong.")
+    raise ValueError(f"Error. Sorry your: {attempts} attempts of input float \
+number are wrong.")
 
 
 def output_lines(value):
@@ -279,14 +292,12 @@ def menu_1_level(conn):
 #      ATM balance is: {get_db_atm_balance(conn):.2f}
 #-----------------------------------------
 # key | Description
-#-----------------------------------------""",
-(
-    ("#  1. | Create new user", "1", create_new_user),
-    ("#  2. | Login to ATM", "2", login_user),
-    ("# ", None, None),
-    ("#  x. | Exit", "x", exit_atm)
-), """#-----------------------------------------""")
-
+#-----------------------------------------""", (
+        ("#  1. | Create new user", "1", create_new_user),
+        ("#  2. | Login to ATM", "2", login_user),
+        ("# ", None, None),
+        ("#  x. | Exit", "x", exit_atm)
+    ), """#-----------------------------------------""")
 
 
 # SET functions of buissnes logic
@@ -305,19 +316,27 @@ def create_new_user(conn):
         validations_name_password(user_name, pwd)
         set_db_new_user(conn, user_name, pwd)
     except NameIncorrectException as ex:
-        add_log_atm(conn, f"Atention your user name '{user_name}' is inappropriate. Reason: {ex}")
-        print(f"Atention your user name '{user_name}' is inappropriate. Reason: {ex}")
+        add_log_atm(conn, f"Atention your user name '{user_name}' is \
+inappropriate. Reason: {ex}")
+        print(f"Atention your user name '{user_name}' is inappropriate. \
+Reason: {ex}")
     except PasswordIncorrectException as ex:
-        add_log_atm(conn, f"Atention your password '{pwd}' is inappropriate. Reason: {ex}")
-        print(f"Atention your user password '{pwd}' is inappropriate. Reason: {ex}")
+        add_log_atm(conn, f"Atention your password '{pwd}' is inappropriate. \
+Reason: {ex}")
+        print(f"Atention your user password '{pwd}' is inappropriate. \
+Reason: {ex}")
     except Error as ex:
-        add_log_atm(conn, f"Atention this user '{user_name}' cannot be applied. Reason: {ex}")
-        print(f"Atention this user '{user_name}' cannot be applied. Reason: {ex}")
+        add_log_atm(conn, f"Atention this user '{user_name}' cannot be \
+applied. Reason: {ex}")
+        print(f"Atention this user '{user_name}' cannot be applied. \
+Reason: {ex}")
     except Exception as ex:
         add_log_atm(conn, f"Unknown unhandled error. Reason: {ex}")
         print("You are have Unknown error.", ex)
     else:
-        add_log_atm(conn, f"User {user_name}/{pwd} created successfuly and ready to use")
+        add_log_atm(
+            conn, 
+            f"User {user_name}/{pwd} created successfuly and ready to use")
         print(f"User {user_name}/{pwd} created successfuly and ready to use")
 
     wait_key()
@@ -331,7 +350,9 @@ def exit_atm(conn):
     print("Exit from ATM")
 
 
-def input_logon(attempt, msg_input="Enter user and password separated by space"):
+def input_logon(
+        attempt, 
+        msg_input="Enter user and password separated by space"):
     """
     Спроба ввести користувача та пароль
 
@@ -360,7 +381,8 @@ def login_user(conn, attempts=3):
     clear_screen()
     dct_users = get_db_users(conn)
     avialible_users = ",".join(
-        user if user not in ("admin", "alex") else f"{user}/{dct_users[user]['password']}"
+        user if user not in ("admin", "alex") 
+        else f"{user}/{dct_users[user]['password']}"
         for user in dct_users
         )
     print(f"""
@@ -383,13 +405,11 @@ def login_user(conn, attempts=3):
 
             db_user_info = dct_users[user]
             # user login success
-            # define N session to user
-            # print("test", get_db_max_session4user_id(conn, db_user_info["id"]))
-            session_id = get_db_max_session4user_id(conn, db_user_info["id"]) + 1
-            # append N session to db_user_info
+            session_id = \
+                get_db_max_session4user_id(conn, db_user_info["id"]) + 1
             db_user_info["id_session"] = session_id
 
-            #handler admin
+            # handler admin
             if db_user_info["permision"] & 1 == 1:
                 print("        logon ADMIN Success")
                 add_log_atm(conn, "Begin Administrator session.")
@@ -407,21 +427,24 @@ def login_user(conn, attempts=3):
 
         except ValueError as ex:
             print(ex)
-            add_log_atm(conn, f"attempt: {attempt + 1}. You Fallied to Login. user: {ex}")
+            add_log_atm(
+                conn, 
+                f"attempt: {attempt + 1}. You Fallied to Login. user: {ex}")
             continue
         except UserLogonFalliedError as ex:
             print(ex)
-            add_log_atm(conn, f"attempt: {attempt + 1}. You Fallied to Login. user: {user}")
+            add_log_atm(
+                conn, 
+                f"attempt: {attempt + 1}. You Fallied to Login. user: {user}")
             continue
         except Exception as ex:
             # traceback.print_exc()
             # print("Unhandled.", ex.line_number, sys.exc_info(), ex)
             add_log_atm(conn, f"attempt: {attempt + 1}. Unknown error {ex}")
 
-    print("        You spent all attempts to login. Try again later. Press any key...")
+    print("You spent all attempts to login. Try again later. Press any key...")
     wait_key()
     add_log_atm(conn, "You spent all attempts to login. Try again later.")
-
 
 
 # Функції підтримки роботи адміністратора
@@ -444,7 +467,8 @@ def change_cnt_of_banknotes(conn, db_user_info):
         str(idx): (nominal, cnt) for idx, (nominal, cnt)
         in zip(it_count(1), get_db_banknotes(conn).items())
         }
-    while (choice_char := menu_banknotes(conn, dct_idx_b_current_state)) != "x":
+    while (choice_char := menu_banknotes(conn, dct_idx_b_current_state)) \
+            != "x":
         nominal, cur_cnt = dct_idx_b_current_state[choice_char]
         change_banknote_count(conn, db_user_info, nominal, cur_cnt)
         dct_idx_b_current_state = {
@@ -492,16 +516,19 @@ def change_banknote_count(conn, db_user_info, nominal, cnt):
     try:
         value = input_int(f"Present {cnt} banknotes for nominal \"{nominal}\"\
 . Enter new value: ")
-        add_log_transaction(conn, db_user_info,
+        add_log_transaction(
+            conn, db_user_info,
             f"User enter: {value} new count of banknotes, nominal:{nominal}")
         set_db_banknote_count(conn, db_user_info, nominal, value)
-        add_log_transaction(conn, db_user_info,
-            f"Value of new count: {value} of banknotes nominal:{nominal}, commit in DB")
+        add_log_transaction(
+            conn, db_user_info,
+            f"Value of new count: {value} of banknotes nominal:{nominal}, \
+commit in DB")
     except ValueError:
-        add_log_transaction(conn, db_user_info,
+        add_log_transaction(
+            conn, db_user_info,
             f"The user could not enter the correct amount of banknotes, \
 nominal:{nominal}")
-
 
 
 # Функції підтримки роботи простого користувача
@@ -513,18 +540,20 @@ def user_workflow(conn, db_user_info):
     # key = wait_key()
     menu_result = ("", "0", None)
 
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"User {db_user_info['name']} begin session to work with ATM")
     while menu_result[1] != "x":
         menu_result = menu_user_level(conn, db_user_info)
         if menu_result[2] is not None:
             menu_result[2](conn, db_user_info)
-            # поновлення даних по користувачу (зберігаємо №сесії між поновленнями)
+            # поновлення даних по користувачу (save №сесії між поновленнями)
             current_session_id = db_user_info["id_session"]
             db_user_info = get_db_user_info(conn, db_user_info["id"])
             db_user_info["id_session"] = current_session_id
 
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"User {db_user_info['name']} ended session to work with ATM")
 
 
@@ -538,12 +567,12 @@ def menu_user_level(conn, db_user_info):
 # ATM balance is: {get_db_atm_balance(conn):.2f}
 # Welcome {db_user_info['name']} your balance is: {db_user_info['balance']:.2f}
 #---------------------------------------------------------""",
-(
-    ("# 1. Deposit to your account", "1", user_deposit_acc),
-    ("# 2. Withdraw funds", "2", user_withdraw_funds),
-    ("# ", None, None),
-    ("# x. Exit", "x", user_exit)
-), """
+            (
+                ("# 1. Deposit to your account", "1", user_deposit_acc),
+                ("# 2. Withdraw funds", "2", user_withdraw_funds),
+                ("# ", None, None),
+                ("# x. Exit", "x", user_exit)
+            ), """
 #---------------------------------------------------------""")
 
 
@@ -556,27 +585,32 @@ def user_deposit_acc(conn, db_user_info):
     min_nominals = min(item for item in get_db_banknotes(conn).keys())
 
     try:
-        value = input_float("Please enter sum to deposite (float. sample: 125.67): ")
+        value = input_float(
+            "Please enter sum to deposite (float. sample: 125.67): ")
         if value < 0:
-            raise ValueError(f"Sorry value of funds must be larger zero not {value:.2f}")
+            raise ValueError(
+                f"Sorry value of funds must be larger zero not {value:.2f}")
     except ValueError as ex:
         print(ex)
         wait_key()
         return
 
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"User: {db_user_info['name']} want to deposit {value:.2f}$ ")
 
     real_value_to_deposit = (value // min_nominals) * min_nominals
 
     set_db_balance(conn, db_user_info, real_value_to_deposit)
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"for user: {db_user_info['name']}:{db_user_info['balance']:.2f} \
 make accruals {real_value_to_deposit:.2f}$ and change:\
         {round(value - real_value_to_deposit, 2):.2f}")
 
-    print(f"You provided: {value:.2f}$, enrolled: {real_value_to_deposit:.2f}$, \
-change: {round(value - real_value_to_deposit, 2)}$")
+    print(f"You provided: {value:.2f}$, enrolled: \
+        {real_value_to_deposit:.2f}$, change: \
+        {round(value - real_value_to_deposit, 2)}$")
     wait_key()
 
 
@@ -587,9 +621,11 @@ def user_withdraw_funds(conn, db_user_info):
     print("User performs to withdraw money:")
 
     try:
-        value = input_float("Please enter sum to withdraw (float. sample: 125.67): ")
+        value = input_float(
+            "Please enter sum to withdraw (float. sample: 125.67): ")
         if value < 0:
-            raise ValueError(f"Sorry value of funds must be larger zero not {value:.2f}")
+            raise ValueError(
+                f"Sorry value of funds must be larger zero not {value:.2f}")
     except ValueError as ex:
         print(ex)
         input("Press Enter")
@@ -597,28 +633,33 @@ def user_withdraw_funds(conn, db_user_info):
 
     atm_balance = get_db_atm_balance(conn)
     user_balance = db_user_info["balance"]
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"User: {db_user_info['name']} want to withdraw {value:.2f}$. \
 From your account: {user_balance:.2f}$")
     try:
         if value > user_balance:
-            add_log_transaction(conn, db_user_info,
+            add_log_transaction(
+                conn, db_user_info,
                 f"Refused. Withdraw {value:.2f}$. Overbalance your account: \
 {user_balance:.2f}$")
             raise ValueError(f"Sorry. Your balance: {user_balance}$ \
                 does not allow withdraw {value}$")
         if value > atm_balance:
-            add_log_transaction(conn, db_user_info,
+            add_log_transaction(
+                conn, db_user_info,
                 f"Refused. Withdraw {value:.2f}$. Overbalance ATM \
 account: {atm_balance:.2f}$")
             raise ValueError(f"Sorry. ATM has: {atm_balance}$ only does \
 not allow withdraw {value}$")
 
-        add_log_transaction(conn, db_user_info,
+        add_log_transaction(
+            conn, db_user_info,
             f"Accepted. User: {db_user_info['name']} to withdraw {value:.2f}$ \
 from balance: {user_balance:.2f}$")
         set_db_balance(conn, db_user_info, -value)
-        add_log_transaction(conn, db_user_info,
+        add_log_transaction(
+            conn, db_user_info,
             f"User: {db_user_info['name']} new balance: \
 {round(user_balance - value, 2):.2f}$")
 
@@ -629,14 +670,15 @@ from balance: {user_balance:.2f}$")
 
     wait_key()
 
+
 def user_exit(conn, db_user_info):
     """
     Визивається при завершенні роботи користувача з банкоматом
     """
-    add_log_transaction(conn, db_user_info,
+    add_log_transaction(
+        conn, db_user_info,
         f"The user {db_user_info['name']} wanted to quit. Final balance \
 is {db_user_info['balance']}")
-
 
 
 # SET of DB functions
@@ -713,19 +755,20 @@ def prepare_db(db_file_name):
             helper_db_change_data(conn, "DELETE FROM log_atm")
             helper_db_change_data(conn, "DELETE FROM atm_banknotes")
 
-            #first fill begins data - Вставляємо адміна
-            helper_db_change_data(conn,
-            	"INSERT INTO users (id, name, password, balance, permision) VALUES (?,?,?,?,?)",
-            	((1, "admin", "admin", 0.0, 1), )
-            )
-            helper_db_change_data(conn,
-                "INSERT INTO users (id, name, password, balance, permision) VALUES (?,?,?,?,?)",
-                ((2, "a", "a", 0.0, 1), )
-            )
+            # first fill begins data - Вставляємо адміна
+            helper_db_change_data(conn, """
+                INSERT INTO users (id, name, password, balance, permision) 
+                VALUES (?,?,?,?,?)""", ((1, "admin", "admin", 0.0, 1), ))
+            helper_db_change_data(conn, """
+                INSERT INTO users (id, name, password, balance, permision) 
+                VALUES (?,?,?,?,?)""", ((2, "a", "a", 0.0, 1), ))
             # Наповнюємо класифікатор наявних номіналів банкнот
-            prepare_banknotes = ((item, 0) for item in (10, 20, 50, 100, 200, 500, 1000))
-            helper_db_change_data(conn, "INSERT INTO atm_banknotes (nominal, cnt) VALUES (?, ?)",
-            	tuple(prepare_banknotes))
+            avialible_nominals = (10, 20, 50, 100, 200, 500, 1000)
+            prepare_banknotes = ((item, 0) for item in avialible_nominals)
+            helper_db_change_data(
+                conn, 
+                "INSERT INTO atm_banknotes (nominal, cnt) VALUES (?, ?)",	
+                tuple(prepare_banknotes))
 
 
 def add_log_atm(conn, message):
@@ -733,7 +776,8 @@ def add_log_atm(conn, message):
     Ведення логу роботи із банкоматом без прив'язки до користувача
     """
     try:
-        conn.execute("INSERT INTO log_atm (date_time, message) VALUES (?, ?)",
+        conn.execute(
+            "INSERT INTO log_atm (date_time, message) VALUES (?, ?)",
             (datetime.now(), message))
     except Error as ex:
         print("Error insert into log_atm. Reason:", ex)
@@ -745,18 +789,21 @@ def add_log_transaction(conn, db_user_info, message):
     """
     try:
         conn.execute(
-            """INSERT INTO log_transactions (id_user, id_session, date_time, message)
-            VALUES (?, ?, ?, ?)""",
-            (db_user_info["id"], db_user_info["id_session"], datetime.now(), message)
-            )
+            """
+            INSERT INTO log_transactions 
+            (id_user, id_session, date_time, message)
+            VALUES (?, ?, ?, ?)""", 
+            (db_user_info["id"], db_user_info["id_session"], datetime.now(), 
+                message))
     except Error as ex:
-        print("Error. Problem insert message to transaction users log. Delails are:")
-        print(ex)
-        add_log_atm(conn, f"Error insert log message for user:{db_user_info['name']}, \
+        print("Error. Problem insert message to transaction users log.")
+        print("Delails are:", ex)
+        add_log_atm(
+            conn, 
+            f"Error insert log message for user:{db_user_info['name']}, \
 session:{db_user_info['id_session']}  to transaction users log")
         add_log_atm(conn, f"Exception message: {ex}")
         add_log_atm(conn, "#")
-
 
 
 # Допоміжні функції отриманна даних із БД
@@ -815,7 +862,7 @@ def helper_db_select_rows(conn, sql, err_msg):
         raise
 
 
-def helper_db_change_data(conn, sql, args = None):
+def helper_db_change_data(conn, sql, args=None):
     """
     Виконання запиту зміни даних
         conn - об'єкт з'єднання
@@ -852,10 +899,9 @@ def get_db_users(conn):
     Return:
         dict of dict: dct["user"]{dct info about user}
     """
-    rows = helper_db_select_rows(conn,
-        "SELECT id, name, password, balance, permision FROM users",
-        "Trouble select all from users"
-        )
+    rows = helper_db_select_rows(
+        conn, "SELECT id, name, password, balance, permision FROM users", 
+        "Trouble select all from users")
 
     return {row["name"]: dict(zip(row.keys(), row)) for row in rows}
 
@@ -878,8 +924,11 @@ def set_db_balance(conn, db_user_info, real_value_to_deposit):
     """
     Модифікація балансу користувача
     """
-    helper_db_change_data(conn, "UPDATE users set balance=?+? WHERE id=?",
-        ((db_user_info["balance"], real_value_to_deposit, db_user_info["id"]),))
+    helper_db_change_data(
+        conn, 
+        "UPDATE users set balance=?+? WHERE id=?",
+        ((db_user_info["balance"], real_value_to_deposit, db_user_info["id"]),)
+        )
 
 
 def get_db_banknotes(conn):
@@ -888,10 +937,10 @@ def get_db_banknotes(conn):
     Return:
         dict:  dct["<nominal>"] = cnt
     """
-    rows = helper_db_select_rows(conn,
+    rows = helper_db_select_rows(
+        conn,
         "SELECT nominal, cnt FROM atm_banknotes ORDER BY nominal",
-        "Trouble select all from atm_banknotes"
-        )
+        "Trouble select all from atm_banknotes")
     return {row["nominal"]: row["cnt"] for row in rows}
 
 
@@ -900,29 +949,35 @@ def set_db_banknote_count(conn, user_info, nominal, value):
     Поновити значення кількості банкнот вкзаного nominal
     """
     try:
-        helper_db_change_data(conn,
+        helper_db_change_data(
+            conn,
             "UPDATE atm_banknotes SET cnt=? WHERE nominal=?",
             ((value, nominal), ))
     except Error as ex:
-        add_log_transaction(conn, user_info,
+        add_log_transaction(
+            conn, user_info,
             f"Appear SQL problem to UPDATE count of atm banknote. Reason:{ex}")
         add_log_transaction(conn, user_info, str(traceback.format_exc()))
     except Exception as ex:
-        add_log_transaction(conn, user_info,
-            "Appear problem to UPDATE count of atm banknote. Reason:{ex}")
+        add_log_transaction(
+            conn, user_info,
+            F"Appear problem to UPDATE count of atm banknote. Reason:{ex}")
         add_log_transaction(conn, user_info, str(traceback.format_exc()))
     else:
-        add_log_transaction(conn, user_info,
-            f"Change count of banknotes {nominal} to {value} performed successfuly")
+        add_log_transaction(
+            conn, user_info,
+            f"Change count of banknotes {nominal} to {value} performed \
+successfuly")
 
 
 def set_db_new_user(conn, nick, pwd):
     """
     Вставка нового користувача в БД
     """
-    cnt = helper_db_select_value(conn,
-        "SELECT count(*) FROM users WHERE name=?", (nick, ), f"Select count of: {nick}"
-        )
+    cnt = helper_db_select_value(
+        conn,
+        "SELECT count(*) FROM users WHERE name=?", (nick, ), 
+        f"Select count of: {nick}")
     if cnt > 0:
         # user name already present
         raise Error(f"Sorry this user: {nick} already present")
@@ -930,10 +985,11 @@ def set_db_new_user(conn, nick, pwd):
     # id_user = get_db_max_id_users(conn) + 1
 
     try:
-        helper_db_change_data(conn,
-            "INSERT INTO users (name, password, balance, permision) VALUES(?,?, 0.0, 0)",
-            ((nick, pwd), )
-            )
+        helper_db_change_data(
+            conn,
+            """INSERT INTO users (name, password, balance, permision) 
+            VALUES(?,?, 0.0, 0)""",
+            ((nick, pwd), ))
     except Error as ex:
         add_log_atm(conn, "Exception insert new user. Reason: " + ex)
         print("Exception insert new user. Reason: " + ex)
@@ -944,7 +1000,8 @@ def get_db_atm_balance(conn):
     """
     Обчислення балансу банкомата
     """
-    return float(helper_db_select_value(conn,
+    return float(helper_db_select_value(
+        conn,
         "SELECT sum(nominal * cnt) as balance FROM atm_banknotes"))
 
 
@@ -952,17 +1009,17 @@ def get_db_max_session4user_id(conn, user_id):
     """
     Отримати максимальний існуючий id_session для id_user в log_transactions
     """
-    result = helper_db_select_value(conn,
+    result = helper_db_select_value(
+        conn,
         "SELECT max(id_session) FROM log_transactions WHERE id_user=?",
         (user_id, ),
-        "Trouble select max(id_session) from log_transactions for user_id:{user_id}"
-        )
+        "Trouble select max(id_session) from log_transactions for \
+user_id:{user_id}")
     return 0 if result is None else result
 
 
-
-
 CNT_OF_ATTEMPTS = 3
+
 
 def start():
     """
