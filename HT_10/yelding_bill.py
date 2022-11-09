@@ -57,7 +57,7 @@ def remove_non_digit_char(value):
         map(lambda item: item if item.isdigit() else " ", str(value))
         ).split()
 
-    return int(tmp[0])
+    return int(tmp[0]) if len(tmp) > 0 else 0
 
 
 def create_stack_bills(*args, **kwargs):
@@ -70,32 +70,31 @@ def create_stack_bills(*args, **kwargs):
     if len(args) > 0:
         # Передані позиційні параметри
         if isinstance(args[0], Iterable):
-            # Першим параметром передано послідовність - використовуємо тільки 
+            # Першим параметром передано послідовність - використовуємо тільки
             # його, навіть якщо існують інші позиційні
             if isinstance(args[0], dict):
                 # якщо перший параметр словник просто беремо його для роботи
                 params = args[0]
             else:
-                # перший параметр не словник, перетворюємо його у словник 
+                # перший параметр не словник, перетворюємо його у словник
                 # ключі AVIALIBLE_NOMINALS_BILLS
                 params = seqint_to_dict_stack_bills(args[0])
         else:
-            # Перший параметр не послідовність - вважаємо, що отримано перелік 
+            # Перший параметр не послідовність - вважаємо, що отримано перелік
             # позиційних аргументів типу int
             params = seqint_to_dict_stack_bills(args)
     else:
         # Передано іменовані параметри із даними
         print("Pass kwargs arguments")
-        # Осільки іменовані параметри не можуть бути числом, - потрібно їх 
-        # визначити із ключів kwargs видаливши не цифри 
-        params = kwargs
-    print(f"Result: {params=}")
-
+        # Осільки іменовані параметри не можуть бути числом, - потрібно їх
+        # визначити із ключів kwargs видаливши не цифри
+        params = {
+            remove_non_digit_char(key): value for key, value in kwargs.items()}
     # Формування результату
-    # створення структури пустої касети для купюр, яку заповнимо даними 
+    # створення структури пустої касети для купюр, яку заповнимо даними
     # переданих параметрів
     # stack = {nominal: 0 for nominal in AVIALIBLE_NOMINALS_BILLS}
-    stack = dict()
+    stack = {}
     for key in AVIALIBLE_NOMINALS_BILLS:
         stack[key] = params.get(key, 0)
 
@@ -104,7 +103,7 @@ def create_stack_bills(*args, **kwargs):
 
 def yielding_bills(value, nominal, stack_present, stack_output):
     """
-    Функція, що рекурсивно займається підбором суми купюрами, враховуючи 
+    Функція, що рекурсивно займається підбором суми купюрами, враховуючи
     їх наявність
 
     Input:
@@ -120,8 +119,8 @@ def yielding_bills(value, nominal, stack_present, stack_output):
 
 if __name__ == "__main__":
     # Тестування роботи
-    
-    print("перевірка remove_non_digit_char()")
+
+    print("1. перевірка remove_non_digit_char()")
     cases = [
         {
             "message": "1. Правильне число",
@@ -155,6 +154,18 @@ if __name__ == "__main__":
             "message": "5.1 Рядок з літерами спочптку і в кінці",
             "func": remove_non_digit_char, "params": ("lskjf123арррра", ),
             "true_result": 123
+        }, {
+            "message": "6 Рядок з літерами та декілька груп чисел",
+            "func": remove_non_digit_char, "params": ("lf123арр458рр789а", ),
+            "true_result": 123
+        }, {
+            "message": "7 Рядок тільки з літерами",
+            "func": remove_non_digit_char, "params": ("lskjfарррра", ),
+            "true_result": 0
+        }, {
+            "message": "7 Пустий рядок",
+            "func": remove_non_digit_char, "params": ("", ),
+            "true_result": 0
         }
         ]
     for case in cases:
@@ -163,7 +174,7 @@ if __name__ == "__main__":
 
     print("-"*45)
 
-    print("Перевірка create_stack_bills з різними видами параметрів")
+    print("2. Перевірка create_stack_bills з різними видами параметрів")
     print("1 варіант передачі позиційних параметрів")
     result = create_stack_bills(2, 3, 4, 5, 6)
 
@@ -181,9 +192,7 @@ if __name__ == "__main__":
     result = create_stack_bills(p10=2, p50=3, b200=4, f500=5, k1000=6)
     print("-"*45)
 
-    # stack_present = create_empty_stack_bills()
-    # stack_output = create_empty_stack_bills()
-    
-    # # Case #1
+    print("3. Перевірка yielding_bill")
+    print("1 варіант передачі позиційних параметрів")
 
     # yielding_bill(value, nominal, stack_present, stack_output):
