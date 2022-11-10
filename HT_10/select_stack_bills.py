@@ -220,7 +220,7 @@ def prev_nominal(nominal):
     return AVIALIBLE_NOMINALS_BILLS[idx - 1]
 
 
-def yielding_bills(value, stack_atm):
+def form_stack_bills(value, stack_atm):
     """
     Функція, пробує підібрати суму купюрами, враховуючи їх наявність
     різнимим способами
