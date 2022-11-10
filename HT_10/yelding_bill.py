@@ -193,12 +193,12 @@ def greedy_select(value_in, stack_atm, nominal, stack_user_work, value_need, lev
     if value_in == 0:
         # сума підібрана повертаємо результат
         # print("-----------")
-        # print(f"сума підібрана повертаємо результат: {stack_user_work=}, {level=}")
+        # print(f"сума підібрана повертаємо результат: {stack_user_work=}, balans:{get_stack_balance(stack_user_work)} {level=}")
         # print("-----------")
         return stack_user_work
     if nominal == AVIALIBLE_NOMINALS_BILLS[0]:
         # end of recursion
-        if need_bills < stack_atm[nominal]:
+        if need_bills <= stack_atm[nominal]:
             # банкнот достатньо
             stack_user_work[nominal] = need_bills
             return stack_user_work
@@ -210,6 +210,7 @@ def greedy_select(value_in, stack_atm, nominal, stack_user_work, value_need, lev
         if need_bills == 0:
             # пропуск номінала
             stack_result = greedy_select(value_in, stack_atm, prev_nominal(nominal), stack_user_work, value_need, level+1)
+            return stack_result
         else:
             # пробуємо використати номінал
             # print("else rec")
@@ -219,8 +220,10 @@ def greedy_select(value_in, stack_atm, nominal, stack_user_work, value_need, lev
                     stack_user_work[nominal] = cur_cnt_bills
                     stack_result = greedy_select(value_in - nominal * cur_cnt_bills, stack_atm, prev_nominal(nominal), stack_user_work, value_need, level+1)
                     # print("test")
-                    # print(f"Вдалося підібрати банкноти: Сума({value_in}) {stack_user_work} : перевірка({get_stack_balance(stack_user_work)}) {level=}")
-                    return stack_user_work
+                    if get_stack_balance(stack_user_work) == value_need:
+                        # print(f"Вдалося підібрати банкноти: Сума({value_in}) {stack_user_work} : перевірка({get_stack_balance(stack_user_work)}) {level=}")
+                        return stack_user_work
+                    continue
                 except NotPossibleSelectSetBanknotesError as ex:
                     # print(f"greedy_select: - NotPossibleSelectSetBanknotesError======={level}")
                     # print(f"{ex} {level}")
@@ -323,7 +326,7 @@ def yielding_bills(value, stack_atm):
 
 
 if __name__ == "__main__":
-    #  test 110 без 10
+    # test 110 без 10
     value = 110
     print(f"yielding_bills({value}, atm:{create_stack_bills(p20=5, p50=4, p100=2)})")
     result = yielding_bills(value, create_stack_bills(create_stack_bills(p20=5, p50=4, p100=2)))
@@ -340,17 +343,28 @@ if __name__ == "__main__":
     result = yielding_bills(value, create_stack_bills([(1000, 5), (500, 1), (200, 4), (100, 0), (50, 1), (20, 1), (10, 5)]))
     print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
     
-    value = 1100
+    value = 1200
     print(f"yielding_bills({value}, atm:{create_stack_bills([(1000, 5), (500, 1), (200, 4), (100, 0), (50, 1), (20, 1), (10, 5)])})")
     result = yielding_bills(1200, create_stack_bills([(1000, 5), (500, 1), (200, 4), (100, 0), (50, 1), (20, 1), (10, 5)]))
     print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
-    # 
 
     # my find variants
-    value=3990
-    stack_atm=[3, 3, 0, 4, 5, 1, 5]
+    value = 3990
+    stack_atm = [3, 3, 0, 4, 5, 1, 5]
     print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
-    result = yielding_bills(3990, create_stack_bills({10: 3, 20: 3, 50: 0, 100: 4, 200: 5, 500: 1, 1000: 5}))
+    result = yielding_bills(value, create_stack_bills(stack_atm))
+    print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
+
+    value = 4300
+    stack_atm = [5, 1, 2, 0, 1, 2, 4] 
+    print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
+    result = yielding_bills(value, create_stack_bills(stack_atm))
+    print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
+
+    value = 4300
+    stack_atm = [5, 1, 2, 2, 0, 2, 4] 
+    print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
+    result = yielding_bills(value, create_stack_bills(stack_atm))
     print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
 
     print()
