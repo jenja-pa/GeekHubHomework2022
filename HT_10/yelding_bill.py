@@ -15,7 +15,6 @@ class NotEnoughCostInATMError(Exception):
 class NotPossibleSelectSetBanknotesError(Exception):
     """ Виключна ситуація - не вдалося підібрати потрібні купюри """
 
-
 def seqint_to_dict_stack_bills(seq):
     """
     Перетворення послідовності int значень у dict із ключами 
@@ -320,7 +319,7 @@ def yielding_bills(value, stack_atm):
         # print(f"Не вдалося підібрати банкноти для Суми({value}) ATM state:{stack_atm}")
         raise NotPossibleSelectSetBanknotesError(f"Sorry we do not find need combination for :{value} atm_stack:{stack_atm}")
     else:
-        raise NotPossibleSelectSetBanknotesError(f"Attention. ATM does not contain enough cost. Try value {get_stack_balance(stack_atm)} or less")
+        raise NotEnoughCostInATMError(f"Attention. ATM does not contain enough cost. Try value {get_stack_balance(stack_atm)} or less")
 
 
 if __name__ == "__main__":
@@ -347,6 +346,13 @@ if __name__ == "__main__":
     print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
     # 
 
+    # my find variants
+    value=3990
+    stack_atm=[3, 3, 0, 4, 5, 1, 5]
+    print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
+    result = yielding_bills(3990, create_stack_bills({10: 3, 20: 3, 50: 0, 100: 4, 200: 5, 500: 1, 1000: 5}))
+    print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
+
     print()
     print()
     print("Random test:")
@@ -355,15 +361,17 @@ if __name__ == "__main__":
     for idx in range(20):
         value = random.randint(300, 700) * 10
         stack_atm = [random.randint(0,5) for _ in range(7)]
+        print(f"{value=}, {stack_atm=}")
+        print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
         try:
             result = yielding_bills(value, create_stack_bills(stack_atm))
-            print(f"{value=}, {stack_atm=}")
-            print(f"yielding_bills({value}, atm:{create_stack_bills(stack_atm)})")
             print(value, tuple(map(lambda el: (el[1], el[0]), filter(lambda item: item[1], result.items()))))
             print("+"*10)
-        except NotPossibleSelectSetBanknotesError as ex:
+        except NotEnoughCostInATMError:
             pass
-            # print(f"Not variants {ex}")
+        except NotPossibleSelectSetBanknotesError as ex:
+            print(f"Not variants {ex}")
+            print("+"*10)
 
 
 
