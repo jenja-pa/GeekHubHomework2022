@@ -144,6 +144,18 @@ session:{db_user_info['id_session']}  to transaction users log")
         add_log_atm(conn, "#")
 
 
+def get_transaction(conn, db_user_info):
+    """
+    Видача переліку транзакцій по користувачу
+    """
+    rows = helper_db_select_rows(
+        conn, """SELECT ROWID, id_session, date_time, message 
+FROM log_transactions 
+WHERE id_user=?""", 
+        "Does not able SELECT from log_transactions", 
+        (db_user_info["id"], ))
+    return rows
+
 # Допоміжні функції отриманна даних із БД
 def helper_db_select_value(conn, sql, args=None, err_msg="No message"):
     """
@@ -183,16 +195,22 @@ def helper_db_select_row(conn, sql, err_msg):
         raise
 
 
-def helper_db_select_rows(conn, sql, err_msg):
+def helper_db_select_rows(conn, sql, err_msg, args=None):
     """
     Допоміжна функція - повернення
     -переліку рядків за допомогою sql із
-        БД вказаної в conn, err_msg - Повідомлення про помилку
+        БД вказаної в conn, 
+
+    * err_msg - Повідомлення про помилку
+    * args - Можливі аргументи до SQL
     """
     try:
         conn.row_factory = sqlite3.Row
         cur = conn.cursor()
-        cur.execute(sql)
+        if args is None:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, args)
         return cur.fetchall()
     except Error as ex:
         print("Error.", err_msg)

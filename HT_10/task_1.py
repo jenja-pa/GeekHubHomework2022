@@ -13,7 +13,7 @@ task_1.py
 [X] як і раніше, поповнення балансу користувача не впливає на кількість купюр
     Їх кількість може змінювати лише інкасатор.
 
-[ ] обов’язкова реалізація таких дій (назви можете використовувати свої):
+обов’язкова реалізація таких дій (назви можете використовувати свої):
 
   Інтерфейс меню:
     При запуску:
@@ -23,7 +23,7 @@ task_1.py
 
     Для користувача:
        -  Баланс
-       -  Поповнення my: інтерактивне поповнення
+       -  Поповнення [ ] my: інтерактивне поповнення
        -  Зняття
        -  [ ]Історія транзакцій
        -  Вихід на стартове меню
@@ -47,6 +47,7 @@ import sqlite3
 
 from sqlite3 import Error
 from itertools import chain as it_chain, count as it_count
+from datetime import datetime
 
 import utils
 import database as db
@@ -108,7 +109,7 @@ def menu_1_level(conn):
     """
     Формування меню 1го рівня від входу в банкомат
     """
-    return choice_menu(f"""## Welcome to ATM v 2.0 sqlite3 powered ##
+    return choice_menu(f"""## Welcome to ATM v 3.0 sqlite3 powered ##
 #-----------------------------------------
 #      ATM balance is: {db.get_db_atm_balance(conn):.2f}
 #-----------------------------------------
@@ -207,7 +208,7 @@ def login_user(conn, attempts=3):
         for user in dct_users
         )
     print(f"""
-## Login -=- ATM v 2.0 sqlite3 powered                         ##
+## Login -=- ATM v 3.0 sqlite3 powered                         ##
 #        You have try {attempts:>2} attempts to enter                     ##
 -----------------------------------------------------------------
 # Present users: {avialible_users}
@@ -306,7 +307,7 @@ def menu_banknotes(conn, dct_idx_b_current_state):
     utils.clear_screen()
 
     print(f"""
-## Change Count of banknotes ATM v 2.0 sqlite3                   #
+## Change Count of banknotes ATM v 3.0 sqlite3                   #
 #-----------------------------------------------------------------
 # ATM balance is: {db.get_db_atm_balance(conn):.2f}
 #-----------------------------------------------------------------
@@ -383,7 +384,7 @@ def menu_user_level(conn, db_user_info):
     Формування меню простого користувача що зайшов у банкомат
     """
     return choice_menu(
-            f"""## User menu to ATM v 2.0 sqlite3 powered ################
+            f"""## User menu to ATM v 3.0 sqlite3 powered ################
 #---------------------------------------------------------
 # ATM balance is: {db.get_db_atm_balance(conn):.2f}
 # Welcome {db_user_info['name']} your balance is: {db_user_info['balance']:.2f}
@@ -391,6 +392,7 @@ def menu_user_level(conn, db_user_info):
             (
                 ("# 1. Deposit to your account", "1", user_deposit_acc),
                 ("# 2. Withdraw funds", "2", user_withdraw_funds),
+                ("# 3. View our log", "3", user_view_log),
                 ("# ", None, None),
                 ("# x. Exit", "x", user_exit)
             ), """
@@ -518,6 +520,29 @@ to user:{db_user_info['name']}. ATM does not have appropriate banknots to get")
         print("Operation Withdraw_funds - Success")
 
     utils.wait_key()
+
+
+def user_view_log(conn, db_user_info):
+    """
+    Видача логу для даного користувача
+    """
+    utils.clear_screen()
+    print(f"Log transaction for user:{db_user_info['name']}, with \
+id:{db_user_info['id']}")
+    group_session = -1
+    session_date = ""
+    for idx, row in enumerate(db.get_transaction(conn, db_user_info)):
+        if group_session != row['id_session']:
+            group_session = row['id_session']
+            session_date = f"{row['date_time'].split()[0]}"
+            print()
+            print(f'{"-" * 15} {group_session} {session_date} {"-" * 15}')
+
+        print(f"{idx + 1:>5}. \
+{datetime.strptime(row['date_time'], '%Y-%m-%d %H:%M:%S.%f'):%H:%M:%S}\
+ - {row['message']}")
+    print("-" * 40)
+    input("Move scrol up/down to see all log. Exit -> Press Enter")
 
 
 def user_exit(conn, db_user_info):

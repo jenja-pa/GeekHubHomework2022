@@ -51,6 +51,7 @@ class PasswordIncorrectException(Exception):
     Виключна ситуація - неправильне ім'я користувача
     """
   
+  
 # Ф-ія перевіркм правил задання імені та пароля
 def validations_name_password(name, pwd):
     """
