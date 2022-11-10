@@ -274,10 +274,42 @@ def admin_workflow(conn, db_user_info):
     """
     Робочий процес адміністратора
     """
-    # В подальшому можливо вставити сюди меню для вибору із
-    # більше ніж 1 варіанта дії, зараз дія одна тому просто
-    # її запускаємо
-    change_cnt_of_banknotes(conn, db_user_info)
+    menu_result = ("", "0", None)
+
+    db.add_log_transaction(
+        conn, db_user_info,
+        f"Admin {db_user_info['name']} begin session to work with ATM")
+    while menu_result[1] != "x":
+        menu_result = menu_admin_level(conn, db_user_info)
+        if menu_result[2] is not None:
+            menu_result[2](conn, db_user_info)
+            # поновлення даних по користувачу (save №сесії між поновленнями)
+            current_session_id = db_user_info["id_session"]
+            db_user_info = db.get_db_user_info(conn, db_user_info["id"])
+            db_user_info["id_session"] = current_session_id
+
+    db.add_log_transaction(
+        conn, db_user_info,
+        f"Admin {db_user_info['name']} ended session to work with ATM")
+
+
+def menu_admin_level(conn, db_user_info):
+    """
+    Формування меню адміна, що зайшов у банкомат
+    """
+    utils.clear_screen()
+
+    return choice_menu(
+        f"""## Admin menu to ATM v 3.0 sqlite3 powered ################
+#---------------------------------------------------------
+# ATM balance is: {db.get_db_atm_balance(conn):.2f}
+# Welcome {db_user_info['name']} 
+#---------------------------------------------------------""", 
+        (("# 1. Change count of banknotes", "1", change_cnt_of_banknotes),
+            ("# 2. View all ATM log", "2", admin_view_log),
+            ("# ", None, None),
+            ("# x. Exit", "x", user_exit)), """
+#---------------------------------------------------------""")
 
 
 def change_cnt_of_banknotes(conn, db_user_info):
@@ -340,7 +372,7 @@ def change_banknote_count(conn, db_user_info, nominal, cnt):
 \"{nominal}\". Enter new value: ")
         db.add_log_transaction(
             conn, db_user_info,
-            f"User enter: {value} new count of banknotes, nominal:{nominal}")
+            f"Admin enter: {value} new count of banknotes, nominal:{nominal}")
         db.set_db_banknote_count(conn, db_user_info, nominal, value)
         db.add_log_transaction(
             conn, db_user_info,
@@ -349,8 +381,33 @@ commit in DB")
     except ValueError:
         db.add_log_transaction(
             conn, db_user_info,
-            f"The user could not enter the correct amount of banknotes, \
+            f"The admin could not enter the correct amount of banknotes, \
 nominal:{nominal}")
+
+
+def admin_view_log(conn, db_user_info):
+    """
+    Демонстрація повного логу банкомата
+    """
+    utils.clear_screen()
+    print("Admin Log")
+    print("Log transaction for All users and All time")
+    group_session = -1
+    session_date = ""
+    users = db.get_db_users(conn)
+    dct_id_user = {dct_user["id"]: name for name, dct_user in users.items()}
+    for idx, row in enumerate(db.get_full_transaction(conn)):
+        if group_session != row['id_session']:
+            group_session = row['id_session']
+            session_date = f"{row['date_time'].split()[0]}"
+            print()
+            print(f'{"-" * 15} {group_session} {session_date} {"-" * 15}')
+
+        print(f"{idx + 1:>5}. \
+{datetime.strptime(row['date_time'], '%Y-%m-%d %H:%M:%S.%f'):%H:%M:%S}\
+ {dct_id_user[row['id_user']]} - {row['message']}")
+    print("-" * 40)
+    input("Move scrol up/down to see all log. Exit -> Press Enter")
 
 
 # Функції підтримки роботи простого користувача

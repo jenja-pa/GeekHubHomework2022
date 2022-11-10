@@ -7,7 +7,7 @@ utils.py
 import os
 import sys
 import shutil
-from itertools import chain as it_chain, count as it_count
+from itertools import chain as it_chain
 
 
 def wait_key(message="Press any key ..."):

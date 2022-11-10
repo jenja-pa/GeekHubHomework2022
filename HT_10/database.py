@@ -149,12 +149,24 @@ def get_transaction(conn, db_user_info):
     Видача переліку транзакцій по користувачу
     """
     rows = helper_db_select_rows(
-        conn, """SELECT ROWID, id_session, date_time, message 
+        conn, """SELECT ROWID, id_session, id_user, date_time, message 
 FROM log_transactions 
 WHERE id_user=?""", 
         "Does not able SELECT from log_transactions", 
         (db_user_info["id"], ))
     return rows
+
+
+def get_full_transaction(conn):
+    """
+    Видача переліку усіх транзвкцій
+    """
+    rows = helper_db_select_rows(
+        conn, """SELECT ROWID, id_session, id_user, date_time, message 
+FROM log_transactions""", 
+        "Does not able SELECT from log_transactions")
+    return rows
+
 
 # Допоміжні функції отриманна даних із БД
 def helper_db_select_value(conn, sql, args=None, err_msg="No message"):
