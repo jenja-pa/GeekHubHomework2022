@@ -10,7 +10,7 @@ import sqlite3
 from sqlite3 import Error
 from datetime import datetime
 
-import modules.utilites as utilites
+import modules.utilites as utils
 
 
 class UserLogonFalliedError(Exception):
@@ -117,14 +117,19 @@ def add_log_atm(conn, message):
         conn.execute(
             "INSERT INTO log_atm (date_time, message) VALUES (?, ?)",
             (datetime.now(), message))
+        conn.commit()
     except Error as ex:
         print("Error insert into log_atm. Reason:", ex)
+        utils.wait_key()
 
 
 def add_log_transaction(conn, db_user_info, message):
     """
     Ведення логу роботи із банкоматом по користувачу
     """
+    print("db.add_log_transaction")
+    print(f"{conn}, {db_user_info=}, {message=}")
+    utils.wait_key()
     try:
         conn.execute(
             """
@@ -133,9 +138,11 @@ def add_log_transaction(conn, db_user_info, message):
             VALUES (?, ?, ?, ?)""", 
             (db_user_info["id"], db_user_info["id_session"], datetime.now(), 
                 message))
+        conn.commit()
     except Error as ex:
         print("Error. Problem insert message to transaction users log.")
         print("Delails are:", ex)
+        utils.wait_key()
         add_log_atm(
             conn, 
             f"Error insert log message for user:{db_user_info['name']}, \
@@ -162,9 +169,15 @@ def get_full_transaction(conn):
     Видача переліку усіх транзвкцій
     """
     rows = helper_db_select_rows(
-        conn, """SELECT ROWID, id_session, id_user, date_time, message 
-FROM log_transactions""", 
-        "Does not able SELECT from log_transactions")
+        conn, """
+SELECT date_time, message FROM (
+    SELECT date_time, message FROM log_atm
+    UNION
+    SELECT l.date_time, '(' || u.name || '): ' || l.message as message 
+    FROM log_transactions l LEFT OUTER JOIN users u on l.id_user = u.id
+) ORDER BY date_time
+""", "Does not able SELECT from log_* tables")
+    
     return rows
 
 
@@ -288,14 +301,15 @@ def get_db_user_info(conn, id_user):
     raise KeyError(f"Error. user with id:{id_user} Not present in our DB.")
 
 
-def set_db_balance(conn, db_user_info, real_value_to_deposit):
+def set_db_modify_user_balance(conn, db_user_info, value_to_modify_deposit):
     """
     Модифікація балансу користувача
     """
     helper_db_change_data(
         conn, 
-        "UPDATE users set balance=?+? WHERE id=?",
-        ((db_user_info["balance"], real_value_to_deposit, db_user_info["id"]),)
+        "UPDATE users set balance=?+? WHERE id=?", (
+            (db_user_info["balance"], 
+                value_to_modify_deposit, db_user_info["id"]),)
         )
 
 
@@ -361,7 +375,7 @@ def set_db_new_user(conn, nick, pwd):
     except Error as ex:
         add_log_atm(conn, "Exception insert new user. Reason: " + ex)
         print("Exception insert new user. Reason: " + ex)
-        utilites.wait_key()
+        utils.wait_key()
 
 
 def get_db_atm_balance(conn):

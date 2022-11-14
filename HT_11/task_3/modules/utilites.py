@@ -8,6 +8,7 @@ utils.py
 import os
 import sys
 import shutil
+import random
 from itertools import chain as it_chain
 
 
@@ -192,3 +193,18 @@ Reason: {ex}")
     raise ValueError(f"Error. Sorry your: {attempts} attempts of input float \
 number are wrong.")
 
+
+def ring_of_fotune_bonuses(owner, key):
+    """
+    Колесо фортуни - за реєстрацію нового користувача
+
+    Параметри виграшу містяться в owner.bonuses["new_user"] = (chance:float (1.0 .. 0.0), value:float)
+
+    Return
+    ------
+        sum of a bonus from ATM.bonuses["new_user"][1] <- сума бонуса
+    """
+    if random.random() <= owner.bonuses[key][0]:
+        return owner.bonuses[key][1]
+    else:
+        return 0.0

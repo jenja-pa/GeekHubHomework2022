@@ -130,7 +130,8 @@ class MenuStart(Menu):
         self.name = "Welcome"
         self.choice_items = (
             ("  1. | Login to ATM", "1", parent.login_user), 
-            ("  2. | Create new user", "2", parent.create_user))
+            ("  2. | Create new user", "2", parent.create_user),
+            )
 
     def show(self):
         utils.clear_screen()
@@ -155,28 +156,40 @@ class MenuStart(Menu):
         return self.logic()
 
 
-# class InputForm(Menu):
-#     def __init__(self, parent):
-#         super().__init__(parent)
-#         self.name = "Base empty input form"
+class MenuAdmin(Menu):
+    def __init__(self, owner):
+        super().__init__(owner)
+        self.name = "Admin menu"
+        self.owner = owner
+        self.choice_items = (
+            ("  1. | Change count of banknotes", "1", owner.menu_admin_change_cnt_of_banknotes),
+            ("  2. | View all ATM log", "2", owner.menu_admin_view_log),
+            )
 
-#     def show(self):
-#         utils.clear_screen()        
-#         look_title = f"""
-# #  {self.name} -=- {self.parent.version_str} 
-# -----------------------------------------
-# Add info
-# -------
-# Prease enter information (enter x to exit):
-# -------        
-# """.strip()
-#         self.output_look((look_title, "", ""))
-#         return self.logic()
+    def show(self):
+        utils.clear_screen()
+        look_title = f"""
+# {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+  ATM balance is: {db.get_db_atm_balance(self.conn):.2f}
+  Welcome user: {self.owner.user_info['name']} 
+-----------------
+""".strip() 
 
-#     def logic(self):
-#         pass
+        look_user_lst = []
+        for item in self.choice_items:
+            look_user_lst.append(f"{item[0]}")
 
+        look_footer = """ 
+----------------
+  x. | Exit menu
+----------------
+  """.strip()
+
+        self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
     
+
 class InputLoginUser(Menu):
     def __init__(self, parent):
         super().__init__(parent)
@@ -196,13 +209,45 @@ Avalible users: {avialible_users}
 Prease enter user and password separated by space (enter x to exit):
 -------        
 """.strip()
-        self.output_look((look_title, "", ""))
-        return self.logic()
 
-    def logic(self):
+        self.output_look((look_title, "", ""))
         value = input("> ").strip()
 
         return value
+
+
+class InputCreateUser(Menu):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.name = "Create user"
+
+    def show(self):
+        utils.clear_screen()
+        look_title = f"""
+#  {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+Create new user for ATM. You have a chance win a bonuse.
+-------     
+Restriction:
+  user 
+  * must have a length 3..50 chars
+  * contain: 
+    - latin letters, digits, and symbols _ -
+  * do not start from digits   
+  password
+  * must have a length longest 7 chars
+  * contain: 
+    - latin letters, digits, and symbols _
+    - contain least one - digit, latin letters in upper and lower registry
+------
+Prease enter user and password separated by space (enter x to exit):
+------------
+""".strip()
+        self.output_look((look_title, "", ""))
+        value = input("> ").strip()
+
+        return value
+
 
 #     print(f"""
 # ## Login -=- ATM v 3.0 sqlite3 powered                         ##
