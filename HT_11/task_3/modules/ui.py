@@ -8,22 +8,70 @@ from itertools import chain as it_chain
 from collections.abc import Iterable
 
 import modules.database as db
-import modules.utilites as util
+import modules.utilites as utils
 
 
 class Menu:
-    def __init__(self, name="", version_str=""):
-        self.title = f"{name} -=- {version_str}"
-        self.info = ""
-        self.user_items = []
-
-        self.live_data = {}
+    def __init__(self, parent):
+        self.parent = parent
+        self.conn = parent.conn
+        self.name = "Base empty menu"
+        self.choice_items = ()
 
     def show(self):
-        pass
+        utils.clear_screen()
+        look_title = f"""
+#  {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+      ATM balance is: {db.get_db_atm_balance(self.conn):18.2f}   
+-----------------------------------------
+""".strip()
+        
+        look_user_lst = []
+        for item in self.choice_items:
+            look_user_lst.append(f"{item[0]}")
 
-    def refresh(self):
-        pass
+        look_footer = """ 
+----------------
+  x. | Exit menu
+----------------
+  """.strip()
+
+        self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
+
+    def output_look(self, look_items):
+        look_title, look_user_lst, look_footer = look_items        
+        max_len = self.get_max_length_seq(
+            it_chain([
+                look_title, 
+                map(lambda item: item[0], look_user_lst), 
+                look_footer]))
+
+        self.out_prepare_look(look_title, max_len)
+        self.out_prepare_look(look_user_lst, max_len)
+        self.out_prepare_look(look_footer, max_len)
+
+    def logic(self):
+        press_key = None
+        right_keys = list(map(
+            lambda item: item[1], 
+            it_chain(self.choice_items, (("", "x", ""),))))
+
+        attemts = 0
+        while (press_key := utils.wait_key("Select one of the item ...")) \
+                not in right_keys and attemts < 3:
+            print(f"Sorry {press_key} is a wrong key.")
+            attemts += 1
+
+        if attemts >= 3:
+            return ("", "z", "")
+        if press_key.lower() == 'x':
+            return ("", 'x', "")
+        result = tuple(filter(
+            lambda item: item[1] == press_key.lower(), 
+            self.choice_items))
+        return result[0]
 
     def out_prepare_look(self, look, max_length):
         if isinstance(look, str):
@@ -42,7 +90,11 @@ class Menu:
                     dummy = "-" * (max_length - len(line))    
                 else:
                     dummy = " " * (max_length - len(line))
-                print(f"#{line}{dummy}#")
+                
+                if line[0] == "#":
+                    print(f"#{line}{dummy[:-1]}##")
+                else:
+                    print(f"#{line}{dummy}#")                    
         else:
             raise TypeError("Sorry type of parameter must be a string")
 
@@ -63,6 +115,8 @@ class Menu:
             max_len = current_len if current_len > max_len else max_len
         elif isinstance(strings, Iterable):
             for line in strings:
+                if isinstance(line, str) and len(line) == 0:
+                    continue
                 current_len = self.get_max_length_seq(line)
                 max_len = current_len if current_len > max_len else max_len
         else:
@@ -70,21 +124,20 @@ class Menu:
         return max_len
 
 
-class StartMenu(Menu):
-    def __init__(self, conn, name="", version_str="", choice_items=()):
-        self.name = name
-        self.version_str = version_str
-        self.choice_items = choice_items
-        self.conn = conn
+class MenuStart(Menu):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.name = "Welcome"
+        self.choice_items = (
+            ("  1. | Login to ATM", "1", parent.login_user), 
+            ("  2. | Create new user", "2", parent.create_user))
 
     def show(self):
-        util.clear_screen()
+        utils.clear_screen()
         look_title = f"""
-# {self.name} to {self.version_str} 
+#  {self.name} -=- {self.parent.version_str} 
 -----------------------------------------
       ATM balance is: {db.get_db_atm_balance(self.conn):18.2f}   
------------------------------------------
- key | Description
 -----------------------------------------
 """.strip()
         
@@ -98,52 +151,64 @@ class StartMenu(Menu):
 ----------------
   """.strip()
 
-        max_len = self.get_max_length_seq(
-            it_chain([
-                look_title, 
-                map(lambda item: item[0], look_user_lst), 
-                look_footer]))
-
-        self.out_prepare_look(look_title, max_len)
-        self.out_prepare_look(look_user_lst, max_len)
-        self.out_prepare_look(look_footer, max_len)
-
-        press_key = None
-        right_keys = list(map(
-            lambda item: item[1], it_chain(self.choice_items, (("", "x", ""),))))
-
-        attemts = 0
-        while (press_key := 
-               util.wait_key("Select one of the item ...")) not in right_keys and attemts < 3:
-            print(f"Sorry {press_key} is a wrong key.")
-            attemts += 1
-
-        if attemts >= 3:
-            return ("", "z", "")
-        if press_key.lower() == 'x':
-            return ("", 'x', "")
-        result = tuple(filter(
-            lambda item: item[1] == press_key.lower(), 
-            self.choice_items))
-        return result[0]
+        self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
 
 
-class FormLoginMenu:
-    def __init__(self, name="Welcome", version_str=""):
-        pass
+# class InputForm(Menu):
+#     def __init__(self, parent):
+#         super().__init__(parent)
+#         self.name = "Base empty input form"
 
-    # choice_menu(
+#     def show(self):
+#         utils.clear_screen()        
+#         look_title = f"""
+# #  {self.name} -=- {self.parent.version_str} 
+# -----------------------------------------
+# Add info
+# -------
+# Prease enter information (enter x to exit):
+# -------        
+# """.strip()
+#         self.output_look((look_title, "", ""))
+#         return self.logic()
 
-# f"""
-# ## Welcome to ATM v 3.0 sqlite3 powered ##
-# #-----------------------------------------
-# #      ATM balance is: {db.get_db_atm_balance(conn):.2f}
-# #-----------------------------------------
-# # key | Description
-# #-----------------------------------------""", (
-#         ("#  1. | Create new user", "1", create_new_user),
-#         ("#  2. | Login to ATM", "2", login_user),
-#         ("# ", None, None),
-#         ("#  x. | Exit", "x", exit_atm)
-#     ), """#-----------------------------------------""")
+#     def logic(self):
+#         pass
+
+    
+class InputLoginUser(Menu):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.name = "Login user"
+
+    def show(self):
+        utils.clear_screen()
+
+        db_users = db.get_db_users(self.conn)
+        avialible_users = ", ".join(map(lambda item: f'{item["name"]}/{item["password"]}' if item["name"] in ('admin', 'alex') else item["name"], db_users.values()))
+
+        look_title = f"""
+#  {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+Avalible users: {avialible_users}
+-------
+Prease enter user and password separated by space (enter x to exit):
+-------        
+""".strip()
+        self.output_look((look_title, "", ""))
+        return self.logic()
+
+    def logic(self):
+        value = input("> ").strip()
+
+        return value
+
+#     print(f"""
+# ## Login -=- ATM v 3.0 sqlite3 powered                         ##
+# #        You have try {attempts:>2} attempts to enter                     ##
+# -----------------------------------------------------------------
+# # Present users: {avialible_users}
+# #----------------------------------------------------------------
+# """)
 
