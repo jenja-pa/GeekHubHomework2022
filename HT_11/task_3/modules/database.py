@@ -127,9 +127,6 @@ def add_log_transaction(conn, db_user_info, message):
     """
     Ведення логу роботи із банкоматом по користувачу
     """
-    print("db.add_log_transaction")
-    print(f"{conn}, {db_user_info=}, {message=}")
-    utils.wait_key()
     try:
         conn.execute(
             """
@@ -156,11 +153,12 @@ def get_transaction(conn, db_user_info):
     Видача переліку транзакцій по користувачу
     """
     rows = helper_db_select_rows(
-        conn, """SELECT ROWID, id_session, id_user, date_time, message 
+        conn, """
+SELECT id_session, date_time, message 
 FROM log_transactions 
-WHERE id_user=?""", 
-        "Does not able SELECT from log_transactions", 
-        (db_user_info["id"], ))
+WHERE id_user=?
+order by id_session, date_time
+""", "Does not able SELECT from log_transactions", (db_user_info["id"], ))
     return rows
 
 
@@ -170,13 +168,13 @@ def get_full_transaction(conn):
     """
     rows = helper_db_select_rows(
         conn, """
-SELECT date_time, message FROM (
-    SELECT date_time, message FROM log_atm
+SELECT date_time, user_name, message FROM (
+    SELECT date_time, '<ATM>' as user_name, message FROM log_atm
     UNION
-    SELECT l.date_time, '(' || u.name || '): ' || l.message as message 
+    SELECT l.date_time, '(' || u.name || ')' as user_name, l.message as message 
     FROM log_transactions l LEFT OUTER JOIN users u on l.id_user = u.id
 ) ORDER BY date_time
-""", "Does not able SELECT from log_* tables")
+""", "get_full_transaction(conn): Does not able privide SELECT from log_* tables")
     
     return rows
 
@@ -313,7 +311,7 @@ def set_db_modify_user_balance(conn, db_user_info, value_to_modify_deposit):
         )
 
 
-def get_db_banknotes(conn):
+def get_db_bills(conn):
     """
     Отримання переліку банкнот та їх кількості
     Return:
@@ -326,7 +324,7 @@ def get_db_banknotes(conn):
     return {row["nominal"]: row["cnt"] for row in rows}
 
 
-def set_db_banknote_count(conn, user_info, nominal, value):
+def set_db_bills_count(conn, user_info, nominal, value):
     """
     Поновити значення кількості банкнот вкзаного nominal
     """
@@ -348,7 +346,7 @@ def set_db_banknote_count(conn, user_info, nominal, value):
     else:
         add_log_transaction(
             conn, user_info,
-            f"Change count of banknotes {nominal} to {value} performed \
+            f"Change count of banknotes '{nominal}' to {value} performed \
 successfuly")
 
 

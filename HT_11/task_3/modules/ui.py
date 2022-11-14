@@ -12,6 +12,8 @@ import modules.utilites as utils
 
 
 class Menu:
+    seq_keys_items = ("1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g")
+
     def __init__(self, parent):
         self.parent = parent
         self.conn = parent.conn
@@ -65,9 +67,9 @@ class Menu:
             attemts += 1
 
         if attemts >= 3:
-            return ("", "z", "")
+            return ("", "z", "", "")
         if press_key.lower() == 'x':
-            return ("", 'x', "")
+            return ("", 'x', "", "")
         result = tuple(filter(
             lambda item: item[1] == press_key.lower(), 
             self.choice_items))
@@ -162,7 +164,7 @@ class MenuAdmin(Menu):
         self.name = "Admin menu"
         self.owner = owner
         self.choice_items = (
-            ("  1. | Change count of banknotes", "1", owner.menu_admin_change_cnt_of_banknotes),
+            ("  1. | Change count of banknotes", "1", owner.menu_admin_change_cnt_of_bills),
             ("  2. | View all ATM log", "2", owner.menu_admin_view_log),
             )
 
@@ -188,7 +190,43 @@ class MenuAdmin(Menu):
 
         self.output_look((look_title, look_user_lst, look_footer))
         return self.logic()
-    
+
+
+class MenuUser(Menu):
+    def __init__(self, owner):
+        super().__init__(owner)
+        self.name = "User menu"
+        self.owner = owner
+        self.choice_items = (
+                ("  1. | Deposit to your account", "1", owner.menu_user_deposit_account),
+                ("  2. | Withdraw funds", "2", owner.menu_user_withdraw_funds),
+                ("  3. | View our log", "3", owner.menu_user_view_log),
+            )
+
+    def show(self):
+        utils.clear_screen()
+        look_title = f"""
+# {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+  Welcome user: {self.owner.user_info['name']} 
+  ATM balance : {db.get_db_atm_balance(self.conn):.2f}
+  User balance: {self.owner.user_info['balance']}
+-----------------
+""".strip() 
+
+        look_user_lst = []
+        for item in self.choice_items:
+            look_user_lst.append(f"{item[0]}")
+
+        look_footer = """ 
+----------------
+  x. | Exit menu
+----------------
+  """.strip()
+
+        self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
+
 
 class InputLoginUser(Menu):
     def __init__(self, parent):
@@ -249,11 +287,39 @@ Prease enter user and password separated by space (enter x to exit):
         return value
 
 
-#     print(f"""
-# ## Login -=- ATM v 3.0 sqlite3 powered                         ##
-# #        You have try {attempts:>2} attempts to enter                     ##
-# -----------------------------------------------------------------
-# # Present users: {avialible_users}
-# #----------------------------------------------------------------
-# """)
+class MenuChangeCntBills(Menu):
+    def __init__(self, owner):
+        super().__init__(owner)        
+        self.name = "Change count of bills in ATM"
+        self.owner = owner
+
+        self.choice_items = None
+
+    def show(self):
+        utils.clear_screen()
+        look_title = f"""
+# {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+  ATM balance is: {db.get_db_atm_balance(self.conn):.2f}
+-----------------
+ key | Nominal| | Amount
+""".strip() 
+
+        stack_atm = db.get_db_bills(self.conn)
+        self.choice_items = [
+            (f"{key:>3}. | [{nominal:^4}] | | {cnt:>5}", f"{key}", self.owner.menu_admin_operation_change_cnt_of_bills, nominal) 
+            for key, nominal, cnt in zip(self.seq_keys_items, stack_atm, stack_atm.values())
+            ]
+        look_user_lst = []
+        for item in self.choice_items:
+            look_user_lst.append(f"{item[0]}")
+
+        look_footer = """ 
+----------------
+  x. | Exit menu
+----------------
+  """.strip()
+
+        self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
 

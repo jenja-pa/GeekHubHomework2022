@@ -119,6 +119,27 @@ def get_terminal_size():
     return shutil.get_terminal_size()[0]
 
 
+def align_center(line):
+    """Центрування значення line по ширині термінала"""
+    width = get_terminal_size()
+    len_line = len(line)
+    if len_line > width:
+        line = line[:width - 4] + " ..."
+        dummy = ""
+    else:
+        dummy = " " * (((width - len_line) // 2) - 1)
+
+    return f"{dummy}{line}{dummy}"
+
+
+def shorting_string(line):
+    """Обрізування рядка якщо він виходить зе межі вікна термінала"""
+    max_len = get_terminal_size() - 5
+    if len(line) > max_len:
+        return line[:max_len] + " ..."
+    return line 
+
+
 def input_int(msg, attempts=3):
     """
     Функція вводу від користувача цілого числа з обробкою невірного вводу
@@ -147,8 +168,7 @@ def input_int(msg, attempts=3):
                 raise ValueError(f"You Enter wrong integer number: {text}")
             return int(lst[0])
         except ValueError as ex:
-            print("Error.", ex)
-            wait_key()
+            print(f"Error. Input value {text} is not int.", ex)
             continue
 
     raise ValueError(
