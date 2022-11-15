@@ -8,5 +8,6 @@
 from modules.atm import ATM
 
 if __name__ == "__main__":
-    atm = ATM("database.db")
+    bonuses = {"new_user": (0.1, 50.00)}
+    atm = ATM("database.db", bonuses=bonuses)
     atm.start()

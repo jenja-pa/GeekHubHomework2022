@@ -142,8 +142,8 @@ def add_log_transaction(conn, db_user_info, message):
         utils.wait_key()
         add_log_atm(
             conn, 
-            f"Error insert log message for user:{db_user_info['name']}, \
-session:{db_user_info['id_session']}  to transaction users log")
+            f"Error insert log message for user:{db_user_info['name']}, "
+            f"session:{db_user_info['id_session']}  to transaction users log")
         add_log_atm(conn, f"Exception message: {ex}")
         add_log_atm(conn, "#")
 
@@ -174,8 +174,8 @@ SELECT date_time, user_name, message FROM (
     SELECT l.date_time, '(' || u.name || ')' as user_name, l.message as message 
     FROM log_transactions l LEFT OUTER JOIN users u on l.id_user = u.id
 ) ORDER BY date_time
-""", "get_full_transaction(conn): Does not able privide \
-SELECT from log_* tables")
+""", "get_full_transaction(conn): Does not able privide "
+     "SELECT from log_* tables")
     
     return rows
 
@@ -344,11 +344,6 @@ def set_db_bills_count(conn, user_info, nominal, value):
             conn, user_info,
             F"Appear problem to UPDATE count of atm banknote. Reason:{ex}")
         add_log_transaction(conn, user_info, str(traceback.format_exc()))
-#     else:
-#         add_log_transaction(
-#             conn, user_info,
-#             f"Change count of banknotes '{nominal}' to {value} performed \
-# successfuly")
 
 
 def set_db_new_user(conn, nick, pwd):
@@ -394,6 +389,6 @@ def get_db_max_session4user_id(conn, user_id):
         conn,
         "SELECT max(id_session) FROM log_transactions WHERE id_user=?",
         (user_id, ),
-        "Trouble select max(id_session) from log_transactions for \
-user_id:{user_id}")
+        "Trouble select max(id_session) from log_transactions for "
+        "user_id:{user_id}")
     return 0 if result is None else result

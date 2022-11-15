@@ -19,15 +19,15 @@ class ATM:
     """
     version_str = "ATM v 4.0 -=- sqlite, OOP"
     
-    def __init__(self, db_file_name):   
+    def __init__(self, db_file_name, bonuses={}):   
         db.prepare_db(db_file_name)
         self.conn = db.connect_db(db_file_name)
         self.user_info = None
-        self.bonuses = {"new_user": (0.1, 50.00)}
+        self.bonuses = bonuses
         self.add_log("Розпочато роботу з банкоматом") 
 
-        self.add_log(f"Наповнюємоо касету банкомата даними із БД, балас \
-банкомата:{db.get_db_atm_balance(self.conn)}")
+        self.add_log(f"Наповнюємоо касету банкомата даними із БД, балас" 
+                     f"банкомата:{db.get_db_atm_balance(self.conn)}")
         self.stack_atm = match_bills.create_stack_bills(
             db.get_db_bills(self.conn))
         # Ставорюємо касету клієнта (пусту)
@@ -97,8 +97,8 @@ class ATM:
         if len(value) == 0:
             raise ValueError("You entered empty value. Try again")
         if len(value.split()) < 2:
-            raise ValueError("You entered only one values(need two separates \
-by space). Try again")
+            raise ValueError("You entered only one values(need two separates" 
+                             "by space). Try again")
         
         user, pwd, *_ = value.split(" ")
         dct_users = db.get_db_users(self.conn)
@@ -124,8 +124,8 @@ by space). Try again")
                 continue
             
             try:    
-                self.add_log(f"Testing entered user_name and password: \
-({input_value.split()[0]})")
+                self.add_log(f"Testing entered user_name and password:"
+                             f"({input_value.split()[0]})")
                 user_name, pwd = self.create_user_testing(input_value)
 
                 # Дії при успішній перевірці даних нового користувача
@@ -141,12 +141,14 @@ by space). Try again")
                 if bonus:
                     db.set_db_modify_user_balance(
                         self.conn, db_users_info[user_name], bonus)
-                    tmp_message = f"Congradulate. User: {user_name} win \
-a bonus: {bonus:.2f} for registering"
+                    tmp_message = f"Congradulate. User: {user_name} win " \
+                                  f"a bonus: {bonus:.2f} for registering"
                     print(tmp_message)
                     # print(f"{db_users_info=}")
                     db_users_info[user_name]["id_session"] = \
-db.get_db_max_session4user_id(self.conn, db_users_info[user_name]["id"]) + 1
+                        db.get_db_max_session4user_id(
+                            self.conn, 
+                            db_users_info[user_name]["id"]) + 1
                     self.add_user_log(db_users_info[user_name], tmp_message)
                     
                 utils.wait_key()
@@ -175,8 +177,8 @@ db.get_db_max_session4user_id(self.conn, db_users_info[user_name]["id"]) + 1
         if len(value) == 0:
             raise ValueError("You entered empty value. Try again")
         if len(value.split()) < 2:
-            raise ValueError("You entered only one values(need two separates \
-by space).")
+            raise ValueError("You entered only one values(need two separates"
+                             "by space).")
 
         user_name, pwd, *_ = value.split(" ")
 
@@ -212,13 +214,13 @@ by space).")
             try:
                 stack_atm = db.get_db_bills(self.conn)
                 new_cnt = call_method(nominal)
-                self.add_log(f"Змінено кількість банкнот '{nominal}' з \
-{stack_atm[nominal]} на {new_cnt}")
+                self.add_log(f"Змінено кількість банкнот '{nominal}' з "
+                             f"{stack_atm[nominal]} на {new_cnt}")
                 continue
             except ValueError as ex:
                 print(f"Error: {ex}")
-                self.add_log(f"Помилка зміни кількості банкнот '{nominal}' \
-з {stack_atm[nominal]} на {new_cnt}")
+                self.add_log(f"Помилка зміни кількості банкнот '{nominal}' "
+                             f"з {stack_atm[nominal]} на {new_cnt}")
         self.add_log("Кінець роботи зі зміни кількості банкнот.")
 
     def menu_admin_operation_change_cnt_of_bills(self, nominal):
@@ -228,10 +230,10 @@ by space).")
             db.set_db_bills_count(self.conn, self.user_info, nominal, value)
             self.add_log(f"Change count of '{nominal}' bills to {value}")
         except ValueError as ex:
-            self.add_log(f"Проблема зміни кількості банкнот '{nominal}' \
-to {value}. {ex}")
-            print(f"Проблема зміни кількості банкнот '{nominal}' \
-to {value}. {ex}")
+            self.add_log(f"Проблема зміни кількості банкнот '{nominal}' "
+                         f"to {value}. {ex}")
+            print(f"Проблема зміни кількості банкнот '{nominal}' "
+                  f"to {value}. {ex}")
             utils.wait_key()
 
     def menu_admin_view_log(self):
@@ -243,13 +245,13 @@ to {value}. {ex}")
         for row in db.get_full_transaction(self.conn):
             str_date = datetime.strptime(
                 row['date_time'], '%Y-%m-%d %H:%M:%S.%f')
-            prepare_string = f"{str_date:%H:%M:%S} : {row['user_name']} - \
-{row['message']}"
+            prepare_string = f"{str_date:%H:%M:%S} : {row['user_name']} - " \
+                             f"{row['message']}"
             print(utils.shorting_string(prepare_string.strip()))
         print(utils.align_center("-" * (utils.get_terminal_size() - 8)))
 
-        input(utils.align_center('Move scrol up/down to see all log. \
-Exit -> Press Enter'))
+        input(utils.align_center('Move scrol up/down to see all log. '
+                                 'Exit -> Press Enter'))
 
     def workflow_user(self):
         """
@@ -276,29 +278,30 @@ Exit -> Press Enter'))
                 "Please enter sum that you want take to deposite (float): ")
             if value < 0:
                 raise ValueError(
-                    f"Sorry value of funds must be larger zero \
-not {value:.2f}")
+                    f"Sorry value of funds must be larger zero "
+                    f"not {value:.2f}")
         except ValueError as ex:
             print(ex)
             utils.wait_key()
             return
 
-        self.add_log(f"User: {self.user_info['name']} want \
-to deposit {value:.2f}$ ")
+        self.add_log(f"User: {self.user_info['name']} want "
+                     f"to deposit {value:.2f}$ ")
 
         real_value_to_deposit = (value // min_nominals) * min_nominals
 
         db.set_db_modify_user_balance(
             self.conn, self.user_info, real_value_to_deposit)
-        self.add_log(f"for user: {self.user_info['name']}:\
-{self.user_info['balance']:.2f} \
-    make accruals {real_value_to_deposit:.2f}$ and change:\
-            {round(value - real_value_to_deposit, 2):.2f}")
+        self.add_log(f"for user: {self.user_info['name']}:"
+                     f"{self.user_info['balance']:.2f} "
+                     f"make accruals {real_value_to_deposit:.2f}$ "
+                     f"and change: "
+                     f"{round(value - real_value_to_deposit, 2):.2f}")
         self.user_info["balance"] += real_value_to_deposit
 
-        print(f"You provided: {value:.2f}$, enrolled: \
-            {real_value_to_deposit:.2f}$, change: \
-            {round(value - real_value_to_deposit, 2)}$")
+        print(f"You provided: {value:.2f}$, enrolled: "
+              f"{real_value_to_deposit:.2f}$, change: "
+              f"{round(value - real_value_to_deposit, 2)}$")
         utils.wait_key()
 
     def menu_user_withdraw_funds(self):
@@ -307,8 +310,8 @@ to deposit {value:.2f}$ ")
             value = utils.input_float(
                 "Please enter sum that you want to withdraw (float): ")
             if value < 0:
-                raise ValueError(f"Sorry value of funds must be larger \
-zero not {value:.2f}")
+                raise ValueError(f"Sorry value of funds must be larger "
+                                 f"zero not {value:.2f}")
         except ValueError as ex:
             print(ex)
             utils.wait_key()
@@ -322,24 +325,27 @@ zero not {value:.2f}")
         atm_balance = db.get_db_atm_balance(self.conn)
         user_balance = self.user_info["balance"]
         self.add_log(
-            f"User: {self.user_info['name']} want to withdraw {value:.2f}$. \
-    From your account: {user_balance:.2f}$")
+            f"User: {self.user_info['name']} want to withdraw {value:.2f}$. "
+            f"From your account: {user_balance:.2f}$")
         try:
             if value > user_balance:
-                self.add_log(f"Refused. Withdraw {value:.2f}$. \
-Overbalance your account: {user_balance:.2f}$")
-                raise ValueError(f"Sorry. Your balance: {user_balance}$ \
-                    does not allow withdraw {value}$")
+                self.add_log(
+                    f"Refused. Withdraw {value:.2f}$. Overbalance your "
+                    f"account: {user_balance:.2f}$")
+                raise ValueError(
+                    f"Sorry. Your balance: {user_balance}$ does not allow "
+                    f"withdraw {value}$")
             if value > atm_balance:
                 self.add_log(
-                    f"Refused. Withdraw {value:.2f}$. Overbalance ATM \
-    account: {atm_balance:.2f}$")
-                raise ValueError(f"Sorry. ATM has: {atm_balance}$ only does \
-    not allow withdraw {value}$")
+                    f"Refused. Withdraw {value:.2f}$. Overbalance the ATM "
+                    f"account: {atm_balance:.2f}$")
+                raise ValueError(
+                    f"Sorry. ATM has: {atm_balance}$ only does not allow "
+                    f"withdraw {value}$")
 
             self.add_log(
-                f"Accepted to withdraw. User: {self.user_info['name']} \
-    get {value:.2f}$ from balance: {user_balance:.2f}$")
+                f"Accepted to withdraw. User: {self.user_info['name']} "
+                f"get {value:.2f}$ from balance: {user_balance:.2f}$")
             # Провести генераціюб банкнот до видачі
             stack_atm = match_bills.create_stack_bills(
                 db.get_db_bills(self.conn))
@@ -360,18 +366,21 @@ Overbalance your account: {user_balance:.2f}$")
                     f"{cnt}*{nominal}" for nominal, cnt in 
                     filter(lambda item: item[1] > 0,  stack_user.items())]
                 print(", ".join(lst))
-                self.add_log(f"You given: {value} with next bills: \
-[{', '.join(lst)}]")
+                self.add_log(
+                    f"You given: {value} with next bills: [{', '.join(lst)}]")
                 self.user_info["balance"] -= value
                 self.add_log(f"New balance is {self.user_info['balance']:.2f}")
             except match_bills.NotPossibleSelectSetBanknotesError:
-                self.add_log(f"Refused. Withdraw {value:.2f}$ to user:\
-{self.user_info['name']}. ATM does not have appropriate banknots to get")
+                self.add_log(
+                    f"Refused. Withdraw {value:.2f}$ to user:"
+                    f"{self.user_info['name']}. ATM does not have appropriate "
+                    f"bills to get")
             except Exception:
                 print(str(traceback.format_exc()))
 
-            self.add_log(f"User: {self.user_info['name']} new balance: \
-{round(user_balance - value, 2):.2f}$")
+            self.add_log(
+                f"User: {self.user_info['name']} new balance: "
+                f"{round(user_balance - value, 2):.2f}$")
 
         except ValueError as ex:
             print("Error.", ex)
@@ -393,8 +402,8 @@ Overbalance your account: {user_balance:.2f}$")
             prepare_date = datetime.strptime(
                 row['date_time'], '%Y-%m-%d %H:%M:%S.%f')
 
-            print(f"{row['id_session']:4} : {prepare_date:%H:%M:%S} - \
-{row['message']}")
+            print(f"{row['id_session']:4} : {prepare_date:%H:%M:%S} - "
+                  f"{row['message']}")
         print(utils.align_center("-" * (utils.get_terminal_size() - 6)))
         input(utils.align_center(
             "Move scrol up/down to see all log. Exit -> Press Enter"))

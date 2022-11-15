@@ -96,12 +96,12 @@ def validations_name_password(name, pwd):
             f"Your password '{pwd}' contain incorrect symbols")
     if len(set(pwd) - set(lower_lets)) == len(set(pwd)):
         raise PasswordIncorrectException(
-            f"Your password '{pwd}' must contain least one char in lower \
-registry")
+            f"Your password '{pwd}' must contain least one char in lower "
+            f"registry")
     if len(set(pwd) - set(upper_lets)) == len(set(pwd)):
         raise PasswordIncorrectException(
-            f"Your password '{pwd}' must contain least one char in UPPER \
-registry")
+            f"Your password '{pwd}' must contain least one char in UPPER "
+            f"registry")
 
 
 # SET of UI function
@@ -206,12 +206,14 @@ def input_float(msg, attempts=3):
             value = round(float(lst[0]), 2)
             return value
         except ValueError as ex:
-            print(f"Error. Your entered number: {lst[0]} is not a float. \
-Reason: {ex}")
+            print(
+                f"Error. Your entered number: {lst[0]} is not a float. "
+                f"Reason: {ex}")
             continue
 
-    raise ValueError(f"Error. Sorry your: {attempts} attempts of input float \
-number are wrong.")
+    raise ValueError(
+        f"Error. Sorry your: {attempts} attempts of input float number are "
+        f"wrong.")
 
 
 def ring_of_fotune_bonuses(owner, key):
