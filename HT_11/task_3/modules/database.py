@@ -148,7 +148,7 @@ session:{db_user_info['id_session']}  to transaction users log")
         add_log_atm(conn, "#")
 
 
-def get_transaction(conn, db_user_info):
+def get_transaction(conn, user_info):
     """
     Видача переліку транзакцій по користувачу
     """
@@ -158,7 +158,7 @@ SELECT id_session, date_time, message
 FROM log_transactions 
 WHERE id_user=?
 order by id_session, date_time
-""", "Does not able SELECT from log_transactions", (db_user_info["id"], ))
+""", "Does not able SELECT from log_transactions", (user_info["id"], ))
     return rows
 
 
@@ -174,7 +174,8 @@ SELECT date_time, user_name, message FROM (
     SELECT l.date_time, '(' || u.name || ')' as user_name, l.message as message 
     FROM log_transactions l LEFT OUTER JOIN users u on l.id_user = u.id
 ) ORDER BY date_time
-""", "get_full_transaction(conn): Does not able privide SELECT from log_* tables")
+""", "get_full_transaction(conn): Does not able privide \
+SELECT from log_* tables")
     
     return rows
 
@@ -343,11 +344,11 @@ def set_db_bills_count(conn, user_info, nominal, value):
             conn, user_info,
             F"Appear problem to UPDATE count of atm banknote. Reason:{ex}")
         add_log_transaction(conn, user_info, str(traceback.format_exc()))
-    else:
-        add_log_transaction(
-            conn, user_info,
-            f"Change count of banknotes '{nominal}' to {value} performed \
-successfuly")
+#     else:
+#         add_log_transaction(
+#             conn, user_info,
+#             f"Change count of banknotes '{nominal}' to {value} performed \
+# successfuly")
 
 
 def set_db_new_user(conn, nick, pwd):

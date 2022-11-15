@@ -218,7 +218,8 @@ def ring_of_fotune_bonuses(owner, key):
     """
     Колесо фортуни - за реєстрацію нового користувача
 
-    Параметри виграшу містяться в owner.bonuses["new_user"] = (chance:float (1.0 .. 0.0), value:float)
+    Параметри виграшу містяться в owner.bonuses["new_user"] = 
+        (chance:float (1.0 .. 0.0), value:float)
 
     Return
     ------

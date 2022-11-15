@@ -12,7 +12,9 @@ import modules.utilites as utils
 
 
 class Menu:
-    seq_keys_items = ("1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b", "c", "d", "e", "f", "g")
+    seq_keys_items = (
+        "1", "2", "3", "4", "5", "6", "7", "8", "9", "a", "b",
+        "c", "d", "e", "f", "g")
 
     def __init__(self, parent):
         self.parent = parent
@@ -164,7 +166,8 @@ class MenuAdmin(Menu):
         self.name = "Admin menu"
         self.owner = owner
         self.choice_items = (
-            ("  1. | Change count of banknotes", "1", owner.menu_admin_change_cnt_of_bills),
+            ("  1. | Change count of banknotes", "1", 
+                owner.menu_admin_change_cnt_of_bills),
             ("  2. | View all ATM log", "2", owner.menu_admin_view_log),
             )
 
@@ -198,7 +201,8 @@ class MenuUser(Menu):
         self.name = "User menu"
         self.owner = owner
         self.choice_items = (
-                ("  1. | Deposit to your account", "1", owner.menu_user_deposit_account),
+                ("  1. | Deposit to your account", "1", 
+                    owner.menu_user_deposit_account),
                 ("  2. | Withdraw funds", "2", owner.menu_user_withdraw_funds),
                 ("  3. | View our log", "3", owner.menu_user_view_log),
             )
@@ -210,7 +214,7 @@ class MenuUser(Menu):
 -----------------------------------------
   Welcome user: {self.owner.user_info['name']} 
   ATM balance : {db.get_db_atm_balance(self.conn):.2f}
-  User balance: {self.owner.user_info['balance']}
+  User balance: {self.owner.user_info['balance']:.2f}
 -----------------
 """.strip() 
 
@@ -237,7 +241,10 @@ class InputLoginUser(Menu):
         utils.clear_screen()
 
         db_users = db.get_db_users(self.conn)
-        avialible_users = ", ".join(map(lambda item: f'{item["name"]}/{item["password"]}' if item["name"] in ('admin', 'alex') else item["name"], db_users.values()))
+        avialible_users = ", ".join(map(
+            lambda item: f'{item["name"]}/{item["password"]}' 
+            if item["name"] in ('admin', 'alex') else item["name"], 
+            db_users.values()))
 
         look_title = f"""
 #  {self.name} -=- {self.parent.version_str} 
@@ -307,8 +314,10 @@ class MenuChangeCntBills(Menu):
 
         stack_atm = db.get_db_bills(self.conn)
         self.choice_items = [
-            (f"{key:>3}. | [{nominal:^4}] | | {cnt:>5}", f"{key}", self.owner.menu_admin_operation_change_cnt_of_bills, nominal) 
-            for key, nominal, cnt in zip(self.seq_keys_items, stack_atm, stack_atm.values())
+            (f"{key:>3}. | [{nominal:^4}] | | {cnt:>5}", f"{key}", 
+                self.owner.menu_admin_operation_change_cnt_of_bills, nominal) 
+            for key, nominal, cnt in 
+            zip(self.seq_keys_items, stack_atm, stack_atm.values())
             ]
         look_user_lst = []
         for item in self.choice_items:
@@ -322,4 +331,3 @@ class MenuChangeCntBills(Menu):
 
         self.output_look((look_title, look_user_lst, look_footer))
         return self.logic()
-
