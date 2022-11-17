@@ -16,16 +16,26 @@
 #             return sum(inner_lst)
 #     return inner_fun    
 
+# def super_weird_sum(value):
+#     inner_lst = [value]
+
+#     def inner_fun(arg=None):
+#         cases = {None: sum(inner_lst)}
+#         inner_lst.append(arg)
+#         return cases.get(arg, inner_fun)
+
+#     return inner_fun    
+
 def super_weird_sum(value):
-    inner_lst = [value]
+    inner_sum = value
 
     def inner_fun(arg=None):
-        cases = {None: sum(inner_lst)}
-        inner_lst.append(arg)
+        nonlocal inner_sum
+        cases = {None: inner_sum}
+        inner_sum += arg or 0
         return cases.get(arg, inner_fun)
 
     return inner_fun    
-
 
 if __name__ == "__main__":
     print(f"super_weird_sum(5)() = {super_weird_sum(5)()}")
