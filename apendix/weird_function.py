@@ -5,15 +5,25 @@
 #     print(super_weird_sum(5)(3)())        -> 8
 #     print(super_weird_sum(5)(4)(-10)())   -> -1
 
+# def super_weird_sum(value):
+#     inner_lst = [value]
+
+#     def inner_fun(arg=0):
+#         if arg:
+#             inner_lst.append(arg)
+#             return inner_fun
+#         else:
+#             return sum(inner_lst)
+#     return inner_fun    
+
 def super_weird_sum(value):
     inner_lst = [value]
 
-    def inner_fun(*args):
-        if args:
-            inner_lst.append(args[0])
-            return inner_fun
-        else:
-            return sum(inner_lst)
+    def inner_fun(arg=None):
+        cases = {None: sum(inner_lst)}
+        inner_lst.append(arg)
+        return cases.get(arg, inner_fun)
+
     return inner_fun    
 
 
