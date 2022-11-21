@@ -41,5 +41,5 @@ t2 = Triangle(3, 4, 5)
 figures = [r1, r2, s1, s2, t1, t2]
 
 for fig in figures:
-  print(fig.get_pr())  
+  print(fig.get_perimetr())  
   
