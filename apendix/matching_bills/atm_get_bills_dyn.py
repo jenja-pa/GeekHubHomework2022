@@ -8,7 +8,16 @@ AVIALIBLE_NOMINALS_BILLS = (10, 20, 50, 100, 200, 500, 1000)
 
 def form_apropriate_stack_dyn(value, stack_atm):
     """Підбір купюр наявних у банкоматі (stack_atm) для формування необхідної
-     суми value"""
+     суми value
+
+    Input:
+        value - сума яку треба видати
+        stack_atm - набір купюр банкомата у форматі словника:
+            номінал: кількість 
+            {10: 0, 20: 2, 50: 1, 100: 0, 200: 1, 500: 1, 1000: 0} 
+    Return:
+        набір купюр до видачі у форматі словника
+     """
     def combine_tpl_val(tpl, value):
         """Допоміжна внутрішня ф-ія що,
         формує кортеж із існуючого та нового значення"""
@@ -25,6 +34,7 @@ def form_apropriate_stack_dyn(value, stack_atm):
             dct[item] = dct.get(item, 0) + 1
         return dct
 
+    print(f"{stack_atm=}")
     lst_atm = [
         nominal for nominal, cnt in stack_atm.items() for _ in range(cnt)
         ]
@@ -197,6 +207,13 @@ if __name__ == "__main__":
     process_test(1200, create_stack_bills(
         {10: 5, 20: 1, 50: 1, 100: 0, 200: 4, 500: 1, 1000: 5}))
 
+    # жлважвіл
+    # 20 -> 0, 10 -> 2
+    process_test(20, create_stack_bills(
+        {10: 2, 20: 0, 50: 0, 100: 0, 200: 0, 500: 0, 1000: 0}))
+
 # Збійні варіанти
     process_test(760, create_stack_bills(
         {10: 0, 20: 2, 50: 1, 100: 0, 200: 1, 500: 1, 1000: 0}))
+
+
