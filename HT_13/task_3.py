@@ -15,9 +15,12 @@
 # у доларах (сума * курс)
 
 class Transaction:
-    def __init__(
-            self, amount, date, currency="USD", usd_conversion_rate=1.0, 
-            description=None):
+    def __init__(self, 
+                 amount, 
+                 date, 
+                 currency="USD", 
+                 usd_conversion_rate=1.0, 
+                 description=None):
         self._amount = amount
         self._date = date
         self._currency = currency
@@ -48,7 +51,10 @@ class Transaction:
 
     @property
     def usd(self):
-        return float(round(self.amount * self.usd_conversion_rate, 2))
+        if self._currency == "USD":
+            return self._amount
+        else:
+            return float(round(self.amount * self.usd_conversion_rate, 2))
 
 
 if __name__ == "__main__":
