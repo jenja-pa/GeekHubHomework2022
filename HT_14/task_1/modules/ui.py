@@ -135,8 +135,8 @@ class MenuStart(Menu):
         self.choice_items = (
             ("  1. | Login to ATM", "1", parent.login_user), 
             ("  2. | Create new user", "2", parent.create_user),
-            ("  3. | View today currency table NBU", "3", 
-                parent.view_currency_table),
+            ("  3. | View today currency tables", "3", 
+                parent.view_currency_tables),
             )
 
     def show(self):
@@ -159,6 +159,39 @@ class MenuStart(Menu):
   """.strip()
 
         self.output_look((look_title, look_user_lst, look_footer))
+        return self.logic()
+
+
+class MenuCurrencyTables(Menu):
+    def __init__(self, owner):
+        super().__init__(owner)
+        self.name = "Currency tables"
+        self.owner = owner
+        self.choice_items = (
+            ("  1. | NBU", "1", owner.view_currency_nbu_table),
+            ("  2. | PrivatBank", "2", owner.view_currency_pb_table),
+            )
+
+    def show(self):
+        utils.clear_screen()
+        look_title = f"""
+# {self.name} -=- {self.parent.version_str} 
+-----------------------------------------
+  ATM balance is: {db.get_db_atm_balance(self.conn):.2f}
+-----------------
+""".strip() 
+
+        look_footer = """ 
+----------------
+  x. | Exit menu
+----------------
+  """.strip()
+
+        look_work_lst = []
+        for item in self.choice_items:
+            look_work_lst.append(f"{item[0]}")
+
+        self.output_look((look_title, look_work_lst, look_footer))
         return self.logic()
 
 

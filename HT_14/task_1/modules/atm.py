@@ -188,7 +188,19 @@ class ATM:
 
         return (user_name, pwd)
 
-    def view_currency_table(self):
+    def view_currency_tables(self):
+        """Показ доступнгих таблиць курсів валют"""
+        menu_choice = ui.MenuCurrencyTables(self)
+
+        while True:
+            _, choice, call_method, *_ = menu_choice.show()
+            if choice == 'x':
+                break
+            elif choice == 'z':
+                continue
+            call_method()
+
+    def view_currency_nbu_table(self):
         """Показ поточного курсу валют від нацбанку"""
         # В подальшому бажано підключити отримання даних від декількох джерел 
         # - зараз буде тільки НБУ
@@ -213,7 +225,33 @@ class ATM:
             print("-" * 74)
             print()
             mess = "Look information <Enter> to Exit"
-            input(f"{' ' * (len(mess) // 2)}{mess}")
+            input(f"{' ' * ((74 - len(mess)) // 2)}{mess}")
+
+    def view_currency_pb_table(self):
+        """Показ поточного курсу валют від Приват """
+        # В подальшому бажано підключити отримання даних від декількох джерел 
+        # - зараз буде тільки НБУ
+        utils.clear_screen()
+        scrapper = currency_exchange.CurrencyExchangePbScrapper()
+        data_currency = scrapper.currency_exchange_list()
+        if data_currency is None:
+            print("Не вдалося отримати дані. Спробуйте пізніше.")
+            utils.wait_key()
+        else:
+            print()
+            print(f'Курси валют ПриватБанк на {data_currency["date_txt"]}')
+            print("-" * 36)
+            print("|".join(data_currency["header"]))
+            print("-" * 89)
+            for row in data_currency["data"]:
+                # print(f"{row=}")
+                print(f"   {row.int_code:03}  |{row.char_code:^8}|{row.cnt:6}"
+                      f"|{row.description:40}|{row.value:>11.4f}|"
+                      f"{row.value_sale:>11.4f}")
+            print("-" * 89)
+            print()
+            mess = "Look information <Enter> to Exit"
+            input(f"{' ' * ((89 - len(mess)) // 2)}{mess}")
 
     def workflow_admin(self):
         """
