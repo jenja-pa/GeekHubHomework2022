@@ -40,9 +40,14 @@ class CurrencyExchangePbScrapper:
     CSV_DICT = "currency_name.csv"
     # ?json&date=01.12.2008
 
-    def __init__(self):
+    def __init__(self, p_csv_dict=None):
         self._dict_currency_name = {}
-        with open(self.CSV_DICT, encoding="utf-8") as f:
+        
+        f_name_dict = self.CSV_DICT
+        if p_csv_dict is not None:
+            f_name_dict = p_csv_dict
+
+        with open(f_name_dict, encoding="utf-8") as f:
             csv_dict_reader = csv.DictReader(f, delimiter=";")
             for row in csv_dict_reader:
                 self._dict_currency_name[row["char_code"]] = CurrencyName(
@@ -58,8 +63,9 @@ class CurrencyExchangePbScrapper:
         response = requests.get(
             self.HOME_URL, 
             params={"json": "", "date": str_date})
+        # print(f"{dir(response)=}")
         if not response.ok:
-            print(f"Error request, code:{response.code}")
+            print(f"Error request, code:{response.status_code}")
             return
         # print(f"{response.content=}")
         json_data = json.loads(response.content.decode('utf8'))
@@ -155,7 +161,7 @@ if __name__ == "__main__":
     # result = scrapper.get_site_currency_exchange_list()
     # print(result)
 
-    scrapper = CurrencyExchangePbScrapper()
+    scrapper = CurrencyExchangePbScrapper("../currency_name.csv")
     # print(scrapper._dict_currency_name)
-    data = scrapper.currency_exchange_list()
+    data = scrapper.currency_exchange_list(str_date="30.11.2022")
     print(data)
