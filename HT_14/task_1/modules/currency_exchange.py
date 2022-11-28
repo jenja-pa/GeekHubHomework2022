@@ -6,8 +6,9 @@
 можливо буде створено декілька функцій на випадок якщо вз основного 
 джерела отримати дані не вдасться, для керування буде створено диспетчер
 """
-import csv
-from dataclasses import dataclass, fields, astuple
+# import csv
+# from dataclasses import dataclass, fields, astuple
+from dataclasses import dataclass
 from urllib.parse import urljoin
 
 import requests
@@ -35,7 +36,7 @@ class TodayCurrencyExchangeUAnbuScrapper:
             return
 
         page = response.content
-        print("Parse content")
+        # print("Parse content")
         page_soup = BeautifulSoup(page, 'lxml')
 
         date_txt = page_soup.select_one("span#exchangeDate").text
@@ -45,12 +46,10 @@ class TodayCurrencyExchangeUAnbuScrapper:
 
     def get_currency_exchanges(self, table_soup: BeautifulSoup, date_txt: str) -> [dict]:
         # header
-        print(f"get_currency_exchanges(), date:{date_txt}")
         header = []
         header_soup = table_soup.select("thead tr th")
         for item in header_soup:
             header.append(item.text.split("\n")[0])
-        print(f"Process parse header done {header=}")
 
         # data
         data = []

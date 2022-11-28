@@ -9,6 +9,7 @@ import modules.ui as ui
 import modules.utilites as utils
 # import modules.matching_stack_bills as match_bills
 import modules.atm_get_bills_dyn as match_bills
+import modules.currency_exchange as currency_exchange
 
 
 class ATM:
@@ -186,6 +187,33 @@ class ATM:
         utils.validations_name_password(user_name, pwd)
 
         return (user_name, pwd)
+
+    def view_currency_table(self):
+        """Показ поточного курсу валют від нацбанку"""
+        # В подальшому бажано підключити отримання даних від декількох джерел 
+        # - зараз буде тільки НБУ
+        utils.clear_screen()
+        scrapper = currency_exchange.TodayCurrencyExchangeUAnbuScrapper()
+        data_currency = scrapper.get_site_currency_exchange_list()
+        if data_currency is None:
+            print("Не вдалося отримати дані. Спробуйте пізніше.")
+            utils.wait_key()
+        else:
+            print()
+            print(f'Курси валют НБУ на {data_currency["date_txt"]}')
+            print("-" * 29)
+            print(
+                f'{data_currency["header"][0][:7]:7}.|'
+                f'{data_currency["header"][1][:7]:7}.|кільк.|'
+                f'{data_currency["header"][3]:40}|  Грн.')
+            print("-" * 74)
+            for row in data_currency["data"]:
+                print(f"   {row.int_code:03}  |{row.char_code:^8}|{row.cnt:6}"
+                      f"|{row.description:40}|{row.value:>8.4f}")
+            print("-" * 74)
+            print()
+            mess = "Look information <Enter> to Exit"
+            input(f"{' ' * (len(mess) // 2)}{mess}")
 
     def workflow_admin(self):
         """
