@@ -17,14 +17,14 @@ import os.path
 @dataclass
 class Quote:
     text: str
-    author_name: str
+    name: str
     link_author: str
     tags: [str]
 
 
 @dataclass
 class Author:
-    author_name: str
+    name: str
     date_born_str: str
     place_born: str
     description: str
@@ -33,52 +33,50 @@ class Author:
 class QuotesScrapper:
     """Класс для збору інформації із ресурсу quotes.toscrape.com"""
     BASE_URL = "http://quotes.toscrape.com/"
-    CSV_OUTPUT_PATH = ''
+    CSV_OUTPUT_PATH = 'task_3_quotes_10_pages.csv'
 
     def __init__(self):
         self._quotes = []
         self._authors = {}
     
-    def get_quote_pages(self):
-        """Основна обробка сторінок сайту"""
-        print(f"Get: {self.BASE_URL}")
-        response = requests.get(self.BASE_URL)
-        if not response.ok:
-            print(f"Error request, code:{response.code}")
-            return
+    def get_quote_pages(self, cnt_pages: int) -> None:
+        """Основна обробка сторінок сайту 
 
-        while True:
+        Результат:
+            Наповнені даними: 
+             * список цитат
+             * довідник авторів
+            Виводиться прогрес роботи
+        Return:
+            Повідомлення про виконану роботу
+        """
+        for idx in range(cnt_pages):
+            print(f"Get: {urljoin(self.BASE_URL, f'page/{idx + 1}/')}")
+            response = requests.get(urljoin(self.BASE_URL, f"page/{idx + 1}/"))
+            # print(f"{response.ok=}, {response.status_code=}")
+            # if not response.ok:
+            #     print(f"Error request, code:{response.status_code}")
+            #     continue
+
             page = response.content
             page_soup = BeautifulSoup(page, 'lxml')
-            
+                
             # робота із сторінкою
             for quot_soup in page_soup.select(".quote"):
                 data_quote = self.parse_quote_soup(quot_soup)
                 self._quotes.append(data_quote)
-                if data_quote.author_name not in self._authors:
+                if data_quote.name not in self._authors:
                     author_soup = self.get_author_page_soup(
                         data_quote.link_author)
                     data_author = self.parse_author_soup(
                         author_soup.select_one("div.author-details"))
-                    self._authors[data_quote.author_name] = data_author
-
-            # Перевірка, що це остання сторінка
-            if page_soup.select_one(".next") is None:
-                return "Work scraping data ended"
-
-            url_to_next = urljoin(
-                self.BASE_URL, 
-                page_soup.select_one(".next a")["href"])
-            print(f"Get: {url_to_next}")
-            response = requests.get(url_to_next)
-            if not response.ok:
-                print(f"Error request, code:{response.code}")
-                return
+                    self._authors[data_quote.name] = data_author
+        return f"Work of grab {cnt_pages} pages completed."
 
     def parse_quote_soup(self, quot_soup):
         return Quote(
             text=quot_soup.select_one("span.text").text,
-            author_name=quot_soup.select_one("small.author").text,
+            name=quot_soup.select_one("small.author").text,
             link_author=quot_soup.select_one("div span a")["href"],
             tags=[item.text for item in quot_soup.select("div.tags a.tag")]
             )
@@ -95,7 +93,7 @@ class QuotesScrapper:
 
     def parse_author_soup(self, author_soup) -> Author:
         return Author(
-            author_name=author_soup.select_one(".author-title").text.strip(),
+            name=author_soup.select_one(".author-title").text.strip(),
             date_born_str=author_soup.select_one("span.author-born-date").text,
             place_born=author_soup.select_one(
                 "span.author-born-location").text,
@@ -103,30 +101,50 @@ class QuotesScrapper:
                 "div.author-description").text.strip()
             )
 
-    def write_quotes_csv(self, f_name: str) -> None:
-        field_names = [field.name for field in fields(Quote)]
-        f_full_path = os.path.join(self.CSV_OUTPUT_PATH, f_name)
-        with open(f_full_path, 'w', encoding="utf-8") as file:
-            writer = csv.writer(file)
+    def write_csv(self):
+        """Запис зібраних даних у файл"""
+        field_names = [field.name for field in fields(Quote) if field.name not in ("name", "link_author" )]
+        field_names.extend([field.name for field in fields(Author)])
+        
+        # print("write_csv:", field_names)
+        with open(self.CSV_OUTPUT_PATH, 'w', encoding="utf-8") as file:
+            writer = csv.writer(file, delimiter=";", quoting=csv.QUOTE_ALL)
             writer.writerow(field_names)
-            writer.writerows([astuple(quote) for quote in self._quotes])
-        return
+            writer.writerows([(
+                quote.text, 
+                quote.name,
+                self._authors[quote.name].date_born_str,
+                self._authors[quote.name].place_born,
+                self._authors[quote.name].description,
+                " ".join(quote.tags))
+                for quote in self._quotes]
+                )
 
-    def write_authors_csv(self, f_name):
-        field_names = [field.name for field in fields(Author)]
-        f_full_path = os.path.join(self.CSV_OUTPUT_PATH, f_name)
-        with open(f_full_path, 'w', encoding="utf-8") as file:
-            writer = csv.writer(file)
-            writer.writerow(field_names)
-            writer.writerows(
-                [astuple(quote) for quote in self._authors.values()])
-        return
+    # def write_quotes_csv(self, f_name: str) -> None:
+    #     field_names = [field.name for field in fields(Quote)]
+    #     f_full_path = os.path.join(self.CSV_OUTPUT_PATH, f_name)
+    #     with open(f_full_path, 'w', encoding="utf-8") as file:
+    #         writer = csv.writer(file)
+    #         writer.writerow(field_names)
+    #         writer.writerows([astuple(quote) for quote in self._quotes])
+    #     return
+
+    # def write_authors_csv(self, f_name):
+    #     field_names = [field.name for field in fields(Author)]
+    #     f_full_path = os.path.join(self.CSV_OUTPUT_PATH, f_name)
+    #     with open(f_full_path, 'w', encoding="utf-8") as file:
+    #         writer = csv.writer(file)
+    #         writer.writerow(field_names)
+    #         writer.writerows(
+    #             [astuple(quote) for quote in self._authors.values()])
+    #     return
 
 
 if __name__ == "__main__":
     scraper = QuotesScrapper()
-    result = scraper.get_quote_pages()
+    result = scraper.get_quote_pages(10)
     print(result)
     # print(f"{scraper._quotes}")
-    scraper.write_quotes_csv("task_3_quotes.csv")
-    scraper.write_authors_csv("task_3_authors.csv")
+    # scraper.write_quotes_csv("task_3_quotes.csv")
+    # scraper.write_authors_csv("task_3_authors.csv")
+    scraper.write_csv()
