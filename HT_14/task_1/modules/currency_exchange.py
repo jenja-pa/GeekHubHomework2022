@@ -67,10 +67,7 @@ class CurrencyExchangePbScrapper:
         if not response.ok:
             print(f"Error request, code:{response.status_code}")
             return
-        # print(f"{response.content=}")
         json_data = json.loads(response.content.decode('utf8'))
-        # print(f"{json_data=}")
-        # print(json_data["exchangeRate"][0])
 
         header = [
             "Числ.Код", 
@@ -114,7 +111,7 @@ class TodayCurrencyExchangeUAnbuScrapper:
         print(f"Get: {self.HOME_URL}")
         response = requests.get(self.HOME_URL)
         if not response.ok:
-            print(f"Error request, code:{response.code}")
+            print(f"Error request, code:{response.status_code}")
             return
 
         page = response.content

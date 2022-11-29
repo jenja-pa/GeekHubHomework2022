@@ -7,7 +7,6 @@ from datetime import datetime
 import modules.database as db
 import modules.ui as ui
 import modules.utilites as utils
-# import modules.matching_stack_bills as match_bills
 import modules.atm_get_bills_dyn as match_bills
 import modules.currency_exchange as currency_exchange
 
@@ -26,7 +25,7 @@ class ATM:
         self.conn = db.connect_db(db_file_name)
         self.user_info = None
         self.bonuses = bonuses
-        self.add_log("Розпочато роботу з банкоматом") 
+        self.add_log("Розпочато роботу з банкоматом") `
 
         self.add_log(f"Наповнюємоо касету банкомата даними із БД, балас" 
                      f"банкомата:{db.get_db_atm_balance(self.conn)}")
