@@ -58,7 +58,8 @@ if __name__ == "__main__":
     str_today_date = dt.now().strftime('%d.%m.%Y')
     app = CurrencyViewerApp()
     print("Отримуємо курси валют за деякий період.")
-    print("Дані отримані від https://bank.gov.ua/ за період з 02.09.1996 по {str_today_date}")
+    print(f"Дані отримані від https://bank.gov.ua/ за період з 02.09.1996 по "
+          f"{str_today_date}")
     # print("Наявні коди валют для вибору:")
     # console.print("/".join(app.get_seq_code_currence()), style="red")
     str_code_currency = Prompt.ask(
@@ -66,14 +67,21 @@ if __name__ == "__main__":
         choices=app.get_seq_code_currence(), 
         default="USD")
 
-    print("Ввести проміжок для аналізу, якщо потрібна одна дата ввести однакові значення.")
-    str_date_beg = DatePromptCurrency.ask("Введіть початкову дату (дд.мм.рррр):", default=str_today_date)
-    str_date_end = DatePromptCurrency.ask("Введіть кінцеву дату (дд.мм.рррр):", default=str_date_beg)
+    print("Ввести проміжок для аналізу, якщо потрібна одна дата ввести "
+          "однакові значення.")
+    str_date_beg = DatePromptCurrency.ask(
+        "Введіть початкову дату (дд.мм.рррр):", 
+        default=str_today_date)
+    str_date_end = DatePromptCurrency.ask(
+        "Введіть кінцеву дату (дд.мм.рррр):", 
+        default=str_date_beg)
 
     date_beg = dt.strptime(str_date_beg, '%d.%m.%Y')
     date_end = dt.strptime(str_date_end, '%d.%m.%Y')
     if date_beg > date_end:
-        raise ValueError(f"Помилкове задання проміжку початок {str_date_beg} повиннен бути раніше за кінець {str_date_end}")
+        raise ValueError(
+            f"Помилкове задання проміжку початок {str_date_beg} "
+            f"повиннен бути раніше за кінець {str_date_end}")
 
     delta = date_end - date_beg   # returns timedelta
 
@@ -82,9 +90,12 @@ if __name__ == "__main__":
         day = date_beg + timedelta(days=i)
         str_date_need = day.strftime("%d.%m.%Y")
         # print(f"Get for date {str_date_need}")        
-        data_need_all = app._get_remote_data.get_site_currency_exchange_list(str_date_need)["data"]
+        data_need_all = app._get_remote_data.get_site_currency_exchange_list(
+            str_date_need)["data"]
         # print(data_need_all)
-        data_need = [item for item in data_need_all if item.char_code == str_code_currency]
+        data_need = [
+            item for item in data_need_all 
+            if item.char_code == str_code_currency]
         analise_data.append((str_date_need, data_need[0]))
 
     print()
@@ -92,6 +103,8 @@ if __name__ == "__main__":
     # Out data
     print(f"Курс '{analise_data[0][1].description}' по відношенню до гривні")
     for date_item, item in analise_data:
-        print(f"{date_item} : 1 {item.char_code} = {item.value / item.cnt:.6f} грн.")
+        print(
+            f"{date_item} : 1 {item.char_code} = {item.value / item.cnt:.6f} "
+            f"грн.")
 
     # app.save_present_data()

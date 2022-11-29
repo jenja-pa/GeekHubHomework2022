@@ -21,10 +21,13 @@ class CurrencyExchangeUAnbuScrapper:
     HOME_URL = urljoin(BASE_URL, 'ua/markets/exchangerates')
 
     def get_site_currency_exchange_list(self, str_date=None) -> [dict]:
-        print(f"Get: {self.HOME_URL} {'' if str_date is None else 'for: ' + str_date}")
-        response = requests.get(self.HOME_URL, {"date": str_date, "period": "daily"})
+        print(
+            f"Get: {self.HOME_URL} "
+            f"{'' if str_date is None else 'for: ' + str_date}")
+        response = requests.get(
+            self.HOME_URL, {"date": str_date, "period": "daily"})
         if not response.ok:
-            print(f"Error request, code:{response.code}")
+            print(f"Error request, code:{response.status_code}")
             return
 
         page = response.content
@@ -43,7 +46,6 @@ class CurrencyExchangeUAnbuScrapper:
             date_txt: str
             ) -> [dict]:
         # header
-        # print(f"get_currency_exchanges(), date:{date_txt}")
         header = []
         header_soup = table_soup.select("thead tr th")
         for item in header_soup:
