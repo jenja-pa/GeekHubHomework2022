@@ -1,11 +1,30 @@
-# 0-stopwatch04.py
+# 0-stopwatch05.py
+from time import monotonic
+
 from textual.app import App, ComposeResult
 from textual.containers import Container
+from textual.reactive import reactive
 from textual.widgets import Button, Header, Footer, Static
 
 
 class TimeDisplay(Static):
     """A widget to display elapsed time."""
+    start_time = reactive(monotonic)
+    time = reactive(0.0)
+
+    def on_mount(self) -> None:
+        """Event handler called when widget is added to the app."""
+        self.set_interval(1 / 60, self.update_time)
+
+    def update_time(self) -> None:
+        """Method to update the time to the current time."""
+        self.time = monotonic() - self.start_time
+
+    def watch_time(self, time: float) -> None:
+        """Called when the time attribute changes."""
+        minutes, seconds = divmod(time, 60)
+        hours, minutes = divmod(minutes, 60)
+        self.update(f"{hours:02,.0f}:{minutes:02.0f}:{seconds:05.2f}")
 
 
 class Stopwatch(Static):
@@ -28,7 +47,7 @@ class Stopwatch(Static):
 class StopwatchApp(App):
     """A Textual app to manage stopwatches."""
 
-    CSS_PATH = "0-stopwatch04.css"
+    CSS_PATH = "0-stopwatch05.css"
     BINDINGS = [("d", "toggle_dark", "Toggle dark mode")]
 
     def compose(self) -> ComposeResult:
