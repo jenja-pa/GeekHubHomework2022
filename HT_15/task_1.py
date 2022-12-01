@@ -8,36 +8,51 @@
 # (звичайно ураховуючи пагінацію). 
 # Всі отримані значення зберегти в CSV файл.
 
+# UserViewer %KDt4uLZE%L3.ct  
+
 import requests
 from bs4 import BeautifulSoup
 from os.path import exists
-from os import os_listdir, os_remove 
+from os import listdir, remove 
+from rich.prompt import Prompt
+from dataclasses import dataclass #, fields, astuple
+
 
 class ScraperSite:
     BASE_URL = "https://www.expireddomains.net/domain-lists/"
     
     def __init__(self):
         self._session = requests.Session()
-        self.domains = self.BASE_URL
-        # self._encoding = None
+        self._domains = []
+        self._sub_domains = {}
+
+        self.scrape_page(self.BASE_URL)
 
     @property
     def domains(self) -> list:
         return self._domains
 
-    @domains.setter
-    def domains(self, url):
-        self._domains = ScraperTitlePage(self, url).present_domain_zones
-    
+    @property
+    def sub_domains(self) -> dict:
+        return self._sub_domains
+
+    def get_sub_domains(self, domain) -> list:
+        return self._sub_domains[domain]
+
+    def scrape_page(self, url):
+        scrapped_data = ScraperTitlePage(self, url).data
+        self._domains = scrapped_data[0]
+        self._sub_domains = scrapped_data[1]
+
     # todo - add other functionality
 
     def close(self):
         self._session.close()
 
     def clear_cache(self):
-        for item in os_listdir():
+        for item in listdir():
             if item.endswith(".cache"):
-                os_remove(item)
+                remove(item)
 
     def __repr__(self):
         return f"""
@@ -89,26 +104,66 @@ class ScraperPageBase:
         return response_content
 
 
+@dataclass
+class SubDomainInfo:
+    text: str
+    url: str
+
+
 class ScraperTitlePage(ScraperPageBase):
     def __init__(self, manager: ScraperSite, url: str):
         super().__init__(manager)
         self._response_content = self.get_response_content(url)
 
     @property
-    def present_domain_zones(self) -> list:
-        lst = []
+    def data(self) -> (list, dict):
+        domains = []
+        sub_domains = {}
         if self._response_content:
             page_soup = BeautifulSoup(self._response_content, 'lxml')
-            box_header_soup = page_soup.select(".box-header")
-            for item in box_header_soup:
-                lst.append(item.text.strip())
-        return lst
+            # box_header_soup = page_soup.select(".box-header")
+            overviews_soup = page_soup.select(".overview")
+            
+            for overview_soup in overviews_soup:
+                header_soup = overview_soup.select_one(".box-header")
+                domain = header_soup.text.strip()
+                domains.append(domain)
+                lst = []
+                for domain_sub_soup in overview_soup.select(".box-content ul li a"):
+                    # print(f"{domain_sub_soup=}")
+                    lst.append(SubDomainInfo(
+                        text=domain_sub_soup.text.strip(),
+                        url=domain_sub_soup["href"]))
+                sub_domains[domain] = lst
+        return (domains, sub_domains)
+
+    # @property
+    # def present_sub_domain(self) -> list:
+    #     lst = []
+    #     if self._response_content:
+    #         page_soup = BeautifulSoup(self._response_content, 'lxml')
+    #         box_header_soup = page_soup.select(".box-header")
+    #         for item in box_header_soup:
+    #             lst.append(item.text.strip())
+    #     return lst
 
 
 if __name__ == "__main__":
     scrape_site = ScraperSite()
     print(f"{scrape_site=}")
-    print(f"{scrape_site.domains=}")
+    # print(f"{scrape_site.domains=}")
+    # print(f"{scrape_site.sub_domains=}")
+
+    domain = Prompt.ask("Enter domain that do you need:", choices=scrape_site.domains, default="GoDaddy")
+    sub_domains = scrape_site.get_sub_domains(domain)
+    # print(f"{sub_domains=}")
+
+    choices = [item.text for item in sub_domains]
+    sub_domain = Prompt.ask("Enter sub domain:", choices=choices, default=choices[0])
+
+    url_to_next = [item.url for item in scrape_site.sub_domains[domain] if item.text == sub_domain][0]
+    print(f"{url_to_next=} next relative link")
+
     scrape_site.close()
 
 
