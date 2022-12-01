@@ -1,0 +1,5 @@
+requests
+beautifulsoup4
+lxml
+rich
+RequestsThrottler==0.2.4

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="referrer" content="same-origin" />
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<title>Expired Domains | Daily Updated Domain Lists for 527 TLDs</title>
+<meta name="description" content="Information about Expired Domain Names. Check the Availability of thousands of Expired Domains every day before they Drop and after. Just pick what you like!" />
+<meta name="keywords" content="expired domains expiring domains dropped domains deleted domains" />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href="https://www.expireddomains.net/" /> 
+<link rel="alternate" type="application/rss+xml" title="Blog: News, Updates and Changes Feed" href="https://www.expireddomains.net/feed/blog/" />
+<link rel="alternate" type="application/rss+xml" title="Help and Explanations Feed" href="https://www.expireddomains.net/feed/help/" />
+<link rel="alternate" type="application/rss+xml" title="Development Information Feed" href="https://www.expireddomains.net/feed/dev/" />
+<link rel="stylesheet" media="all" type="text/css" href="https://static.expireddomains.net/ednet/base.20210305.css" />
+</head>
+
+<body>
+
+<a href="#content" class="sr-only sr-only-focusable">Skip to main content</a>
+
+<noscript><div id="noscript-warning">ExpiredDomains.net works best with javascript enabled!</div></noscript>
+
+<div id="container" class="container">
+
+<ul id="topline">
+<li class="info"><a href="/register/" rel="nofollow" title="Total Number of Domains currently in the Database">Total Domains</a>: <span>550,803,057</span></li>
+<li class="info"><a href="/deleted-domains/">Deleted Domains</a>: <span>493,748,235</span></li>
+<li class="link"><a href="/login/" rel="nofollow">Login</a></li>
+<li class="link"><a href="/register/" rel="nofollow">Sign Up</a></li>
+<li class="link"><a href="/contact/" rel="nofollow">Contact</a></li>
+</ul>
+
+<nav id="navigation" class="navbar navbar-default">
+<div class="container">
+
+<div id="logo">
+<h1><a href="/">Expired <span class="second">Domains</span><span class="tld">.net</span></a></h1>
+<p>Expired Domain Name Search Engine</p>
+</div>
+
+<div class="navbar-header">
+<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse" aria-expanded="false" onclick="displayMenu()">
+<span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+</button>
+</div>
+
+<div class="collapse navbar-collapse" id="navbar-list">
+<form id="navsearch" class="navbar-form navbar-right" action="/login/" role="search">
+<div class="input-group">
+<input type="text" id="navsearchinput" class="form-control sprite ssearch2" autocomplete="off" placeholder="Search for Domain Names" />
+<input type="hidden" name="signup" value="1" />
+<span class="input-group-btn">
+<button type="submit" class="btn btn-default">Search</button>
+</span>
+</div>
+</form>
+
+<div id="mainnav">
+<ul class="nav navbar-nav">
+<li id="homepagelink"><a href="/">&#9751;</a></li>
+<li role="separator" class="divider-vertical"></li>
+<li><a href="/expired-domains/" title="Backorder Expired Domains">Expired Domains</a></li>
+<li role="separator" class="divider-vertical"></li>
+<li><a href="/deleted-domains/" title="Deleted Domains">Deleted Domains</a></li>
+<li role="separator" class="divider-vertical"></li>
+<li><a href="/domain-lists/" title="Domain Lists">Domain Lists</a></li>
+<li role="separator" class="divider-vertical"></li>
+</ul>
+
+<ul class="nav navbar-nav navbar-right">
+<li role="separator" class="divider-vertical"></li>
+<li><a href="/tlds/">TLDs</a></li>
+</ul>
+</div>
+</div>
+</div>
+</nav>
+
+<div id="content">
+
+
+
+<div class="row">
+<div class="col-md-8 col-sm-12">
+<div class="box">
+<div class="box-header">
+<h2><a href="/expired-domains/">Expired Domain Names</a></h2>
+<span class="pull-right"><strong>527</strong> TLDs supported and rising!</span>
+</div>
+<div class="box-content">
+<p>
+Thousands of domain names expire every day. The reasons are different. Some owners forgot to renew the
+domains, some just don't want them anymore or they moved on to other projects.
+For most people these so called <strong>Expired Domains</strong> don't have any value.
+They just see a bunch of Domain Names someone else deleted and move on, but for the people
+who know about SEO or the value of good Backlinks, <strong>Expired Domain Names</strong> are money just
+waiting to get picked up from the street. The only problem is to separate the good ones from the bad ones.
+That is where ExpiredDomains.net comes into play.
+</p>
+<p>
+<strong>ExpiredDomains.net</strong> gathers all the information you need to find good
+<a href="/expired-domains/">Expired Domains</a> that are Pending Delete and you can
+<a href="/article/howto-backorder-expired-domains-15102.html">Backorder</a>.
+Depending on the domain extension you can search through thousands of domains every day before
+they get released to the public and pick what you like.
+ExpiredDomains.net currently supports
+<a href="/tlds/">527 TLDs</a>.
+From the classic gTLDs like .com, .net, .org to Droplists for ccTLDs you can only find here
+and now we even support some of the best new gTLDs like .xyz and .club.
+</p>
+</div>
+</div>
+
+<div class="box">
+<div class="box-header">
+<h3><a href="/deleted-domains/">Dropped Domains</a></h3>
+</div>
+<div class="box-content">
+<p>
+We do not only have Expired Domains, but you can also find lists of
+<a href="/deleted-domains/">Deleted Domains</a> for a lot of TLDs.
+Deleted Domains or <strong>Dropped Domains</strong> are available for registration and can be picked up
+for just the normal regfee at your preferred domain registrar!
+All Domains have the typical SEO relevant data, like Number of Backlinks, Archive.org Birth Date
+and a lot more.<br />
+Just look through the thousands of Expired Domain Names dropping every day and pick what you like. :)
+You can use our numerous Filters and sort the lists as you like or use our Watchlist to keep track
+of Expired Domains after they dropped.
+</p>
+<p>
+You can go through the lists you are interested in and look for Domains you like or you can use
+our super fast <a href="/domain-name-search/">Domain Name Search</a> to search all
+Domain Lists at once. Whatever you choose to do, you can use numerous filters to drill down the number of domains,
+so you find exactly what you are looking for!
+</p>
+</div>
+</div>
+
+<div class="box">
+<div class="box-header">
+<h2>Supported Expired Domain TLDs</h2>
+</div>
+<div class="box-content">
+<div>
+These TLDs are currently supported Expired Domain TLDs.
+<ul>
+    <li>Bold TLDs have a Deleted Domain List. You can find available Domains after they dropped.</li>
+    <li>Green TLDs currently have Pending Delete Domains you can Backorder.</li>
+    <li>White TLDs currently don't have any Pending Delete Domains.</li>
+</ul>
+
+</div>
+
+
+<div class="supportedtlds">
+<h4 class="dotted">Original gTLDs</h4>
+<div class="clearfix"><strong><a title="514,969 pending delete .com domains" style="background-color:#AFFFAF;" href="/tld/com/">.com</a></strong><strong><a title="32,227 pending delete .net domains" style="background-color:#AFFFAF;" href="/tld/net/">.net</a></strong><strong><a title="140,954 pending delete .org domains" style="background-color:#AFFFAF;" href="/tld/org/">.org</a></strong><strong><a title="24,373 pending delete .biz domains" style="background-color:#AFFFAF;" href="/tld/biz/">.biz</a></strong><strong><a title="80,535 pending delete .info domains" style="background-color:#AFFFAF;" href="/tld/info/">.info</a></strong><strong><a title="5,825 pending delete .mobi domains" style="background-color:#AFFFAF;" href="/tld/mobi/">.mobi</a></strong><a href="/tld/name/">.name</a><strong><a title="26,808 pending delete .eu domains" style="background-color:#AFFFAF;" href="/tld/eu/">.eu</a></strong><strong><a title="1,079 pending delete .cat domains" style="background-color:#AFFFAF;" href="/tld/cat/">.cat</a></strong><strong><a title="95 pending delete .aero domains" style="background-color:#AFFFAF;" href="/tld/aero/">.aero</a></strong><strong><a title="185 pending delete .travel domains" style="background-color:#AFFFAF;" href="/tld/travel/">.travel</a></strong><strong><a title="747 pending delete .asia domains" style="background-color:#AFFFAF;" href="/tld/asia/">.asia</a></strong><strong><a href="/tld/xxx/">.xxx</a></strong><strong><a title="2,582 pending delete .pro domains" style="background-color:#AFFFAF;" href="/tld/pro/">.pro</a></strong><strong><a title="319 pending delete .tel domains" style="background-color:#AFFFAF;" href="/tld/tel/">.tel</a></strong><strong><a title="42 pending delete .jobs domains" style="background-color:#AFFFAF;" href="/tld/jobs/">.jobs</a></strong></div>
+
+<h4 class="dotted">ccTLDs - Country Code TLDs</h4>
+<div class="clearfix"><strong><a title="199 pending delete .ac domains" style="background-color:#AFFFAF;" href="/tld/ac/">.ac</a></strong><strong><a title="1,703 pending delete .ae domains" style="background-color:#AFFFAF;" href="/tld/ae/">.ae</a></strong><strong><a title="11 pending delete .af domains" style="background-color:#AFFFAF;" href="/tld/af/">.af</a></strong><strong><a title="146 pending delete .ag domains" style="background-color:#AFFFAF;" href="/tld/ag/">.ag</a></strong><strong><a title="1,493 pending delete .ai domains" style="background-color:#AFFFAF;" href="/tld/ai/">.ai</a></strong><strong><a title="530 pending delete .am domains" style="background-color:#AFFFAF;" href="/tld/am/">.am</a></strong><strong><a title="2,195 pending delete .ar domains" style="background-color:#AFFFAF;" href="/tld/ar/">.ar</a></strong><strong><a href="/tld/as/">.as</a></strong><strong><a title="7,020 pending delete .at domains" style="background-color:#AFFFAF;" href="/tld/at/">.at</a></strong><strong><a title="30,956 pending delete .au domains" style="background-color:#AFFFAF;" href="/tld/au/">.au</a></strong><strong><a href="/tld/aw/">.aw</a></strong><strong><a title="32 pending delete .ax domains" style="background-color:#AFFFAF;" href="/tld/ax/">.ax</a></strong><strong><a title="8,296 pending delete .be domains" style="background-color:#AFFFAF;" href="/tld/be/">.be</a></strong><strong><a title="499 pending delete .bg domains" style="background-color:#AFFFAF;" href="/tld/bg/">.bg</a></strong><strong><a title="26 pending delete .bi domains" style="background-color:#AFFFAF;" href="/tld/bi/">.bi</a></strong><strong><a href="/tld/bj/">.bj</a></strong><strong><a href="/tld/bn/">.bn</a></strong><strong><a href="/tld/bo/">.bo</a></strong><strong><a href="/tld/br/">.br</a></strong><strong><a href="/tld/bw/">.bw</a></strong><strong><a href="/tld/by/">.by</a></strong><strong><a title="265 pending delete .bz domains" style="background-color:#AFFFAF;" href="/tld/bz/">.bz</a></strong><strong><a title="3,088 pending delete .ca domains" style="background-color:#AFFFAF;" href="/tld/ca/">.ca</a></strong><strong><a title="4,800 pending delete .cc domains" style="background-color:#AFFFAF;" href="/tld/cc/">.cc</a></strong><strong><a title="16,997 pending delete .ch domains" style="background-color:#AFFFAF;" href="/tld/ch/">.ch</a></strong><strong><a title="66 pending delete .ci domains" style="background-color:#AFFFAF;" href="/tld/ci/">.ci</a></strong><strong><a title="10,739 pending delete .cl domains" style="background-color:#AFFFAF;" href="/tld/cl/">.cl</a></strong><strong><a title="9,435 pending delete .cn domains" style="background-color:#AFFFAF;" href="/tld/cn/">.cn</a></strong><strong><a title="98,661 pending delete .co domains" style="background-color:#AFFFAF;" href="/tld/co/">.co</a></strong><strong><a title="85 pending delete .cr domains" style="background-color:#AFFFAF;" href="/tld/cr/">.cr</a></strong><strong><a title="259 pending delete .cx domains" style="background-color:#AFFFAF;" href="/tld/cx/">.cx</a></strong><strong><a title="14,331 pending delete .cz domains" style="background-color:#AFFFAF;" href="/tld/cz/">.cz</a></strong><strong><a title="98,068 pending delete .de domains" style="background-color:#AFFFAF;" href="/tld/de/">.de</a></strong><strong><a title="58,778 pending delete .dk domains" style="background-color:#AFFFAF;" href="/tld/dk/">.dk</a></strong><strong><a title="3 pending delete .dm domains" style="background-color:#AFFFAF;" href="/tld/dm/">.dm</a></strong><strong><a title="139 pending delete .do domains" style="background-color:#AFFFAF;" href="/tld/do/">.do</a></strong><a title="203 pending delete .ec domains" style="background-color:#AFFFAF;" href="/tld/ec/">.ec</a><strong><a title="1,714 pending delete .ee domains" style="background-color:#AFFFAF;" href="/tld/ee/">.ee</a></strong><strong><a title="8,470 pending delete .es domains" style="background-color:#AFFFAF;" href="/tld/es/">.es</a></strong><strong><a title="3,425 pending delete .fi domains" style="background-color:#AFFFAF;" href="/tld/fi/">.fi</a></strong><strong><a title="204 pending delete .fm domains" style="background-color:#AFFFAF;" href="/tld/fm/">.fm</a></strong><strong><a title="130 pending delete .fo domains" style="background-color:#AFFFAF;" href="/tld/fo/">.fo</a></strong><strong><a title="46,118 pending delete .fr domains" style="background-color:#AFFFAF;" href="/tld/fr/">.fr</a></strong><strong><a title="30 pending delete .gd domains" style="background-color:#AFFFAF;" href="/tld/gd/">.gd</a></strong><strong><a title="394 pending delete .gg domains" style="background-color:#AFFFAF;" href="/tld/gg/">.gg</a></strong><strong><a href="/tld/gi/">.gi</a></strong><strong><a title="23 pending delete .gl domains" style="background-color:#AFFFAF;" href="/tld/gl/">.gl</a></strong><strong><a title="87 pending delete .gs domains" style="background-color:#AFFFAF;" href="/tld/gs/">.gs</a></strong><strong><a title="26 pending delete .gy domains" style="background-color:#AFFFAF;" href="/tld/gy/">.gy</a></strong><strong><a title="1,531 pending delete .hk domains" style="background-color:#AFFFAF;" href="/tld/hk/">.hk</a></strong><strong><a title="39 pending delete .hn domains" style="background-color:#AFFFAF;" href="/tld/hn/">.hn</a></strong><strong><a title="338 pending delete .hr domains" style="background-color:#AFFFAF;" href="/tld/hr/">.hr</a></strong><strong><a title="22 pending delete .ht domains" style="background-color:#AFFFAF;" href="/tld/ht/">.ht</a></strong><strong><a title="7,150 pending delete .hu domains" style="background-color:#AFFFAF;" href="/tld/hu/">.hu</a></strong><strong><a title="10,125 pending delete .id domains" style="background-color:#AFFFAF;" href="/tld/id/">.id</a></strong><strong><a title="2,386 pending delete .ie domains" style="background-color:#AFFFAF;" href="/tld/ie/">.ie</a></strong><strong><a title="1,795 pending delete .il domains" style="background-color:#AFFFAF;" href="/tld/il/">.il</a></strong><strong><a title="45 pending delete .im domains" style="background-color:#AFFFAF;" href="/tld/im/">.im</a></strong><strong><a title="62,490 pending delete .in domains" style="background-color:#AFFFAF;" href="/tld/in/">.in</a></strong><strong><a title="12,432 pending delete .io domains" style="background-color:#AFFFAF;" href="/tld/io/">.io</a></strong><strong><a title="6 pending delete .iq domains" style="background-color:#AFFFAF;" href="/tld/iq/">.iq</a></strong><strong><a title="1 pending delete .ir domains" style="background-color:#AFFFAF;" href="/tld/ir/">.ir</a></strong><strong><a title="595 pending delete .is domains" style="background-color:#AFFFAF;" href="/tld/is/">.is</a></strong><strong><a title="31,071 pending delete .it domains" style="background-color:#AFFFAF;" href="/tld/it/">.it</a></strong><strong><a title="28 pending delete .je domains" style="background-color:#AFFFAF;" href="/tld/je/">.je</a></strong><strong><a title="8,212 pending delete .jp domains" style="background-color:#AFFFAF;" href="/tld/jp/">.jp</a></strong><strong><a title="1,815 pending delete .ke domains" style="background-color:#AFFFAF;" href="/tld/ke/">.ke</a></strong><strong><a title="221 pending delete .kg domains" style="background-color:#AFFFAF;" href="/tld/kg/">.kg</a></strong><strong><a title="1 pending delete .ki domains" style="background-color:#AFFFAF;" href="/tld/ki/">.ki</a></strong><strong><a title="4,028 pending delete .kr domains" style="background-color:#AFFFAF;" href="/tld/kr/">.kr</a></strong><strong><a title="16 pending delete .ky domains" style="background-color:#AFFFAF;" href="/tld/ky/">.ky</a></strong><strong><a title="2,880 pending delete .kz domains" style="background-color:#AFFFAF;" href="/tld/kz/">.kz</a></strong><strong><a href="/tld/la/">.la</a></strong><strong><a title="89 pending delete .lc domains" style="background-color:#AFFFAF;" href="/tld/lc/">.lc</a></strong><strong><a title="555 pending delete .li domains" style="background-color:#AFFFAF;" href="/tld/li/">.li</a></strong><strong><a title="1,889 pending delete .lt domains" style="background-color:#AFFFAF;" href="/tld/lt/">.lt</a></strong><strong><a title="642 pending delete .lu domains" style="background-color:#AFFFAF;" href="/tld/lu/">.lu</a></strong><strong><a title="1,291 pending delete .lv domains" style="background-color:#AFFFAF;" href="/tld/lv/">.lv</a></strong><strong><a title="265 pending delete .ly domains" style="background-color:#AFFFAF;" href="/tld/ly/">.ly</a></strong><strong><a href="/tld/ma/">.ma</a></strong><strong><a title="345 pending delete .md domains" style="background-color:#AFFFAF;" href="/tld/md/">.md</a></strong><strong><a title="7,387 pending delete .me domains" style="background-color:#AFFFAF;" href="/tld/me/">.me</a></strong><strong><a title="81 pending delete .mg domains" style="background-color:#AFFFAF;" href="/tld/mg/">.mg</a></strong><strong><a title="197 pending delete .mk domains" style="background-color:#AFFFAF;" href="/tld/mk/">.mk</a></strong><strong><a title="297 pending delete .mn domains" style="background-color:#AFFFAF;" href="/tld/mn/">.mn</a></strong><strong><a title="65 pending delete .ms domains" style="background-color:#AFFFAF;" href="/tld/ms/">.ms</a></strong><strong><a title="18 pending delete .mu domains" style="background-color:#AFFFAF;" href="/tld/mu/">.mu</a></strong><strong><a title="11,089 pending delete .mx domains" style="background-color:#AFFFAF;" href="/tld/mx/">.mx</a></strong><strong><a title="46,763 pending delete .nl domains" style="background-color:#AFFFAF;" href="/tld/nl/">.nl</a></strong><strong><a title="30 pending delete .nc domains" style="background-color:#AFFFAF;" href="/tld/nc/">.nc</a></strong><strong><a title="1 pending delete .nf domains" style="background-color:#AFFFAF;" href="/tld/nf/">.nf</a></strong><strong><a title="6,668 pending delete .ng domains" style="background-color:#AFFFAF;" href="/tld/ng/">.ng</a></strong><strong><a title="1,511 pending delete .no domains" style="background-color:#AFFFAF;" href="/tld/no/">.no</a></strong><strong><a title="2,783 pending delete .nu domains" style="background-color:#AFFFAF;" href="/tld/nu/">.nu</a></strong><strong><a title="4,401 pending delete .nz domains" style="background-color:#AFFFAF;" href="/tld/nz/">.nz</a></strong><strong><a title="23 pending delete .om domains" style="background-color:#AFFFAF;" href="/tld/om/">.om</a></strong><strong><a title="1,438 pending delete .pe domains" style="background-color:#AFFFAF;" href="/tld/pe/">.pe</a></strong><strong><a href="/tld/pf/">.pf</a></strong><strong><a title="56,986 pending delete .pl domains" style="background-color:#AFFFAF;" href="/tld/pl/">.pl</a></strong><strong><a href="/tld/pm/">.pm</a></strong><strong><a title="2 pending delete .pr domains" style="background-color:#AFFFAF;" href="/tld/pr/">.pr</a></strong><strong><a title="5,627 pending delete .pt domains" style="background-color:#AFFFAF;" href="/tld/pt/">.pt</a></strong><strong><a title="8,506 pending delete .pw domains" style="background-color:#AFFFAF;" href="/tld/pw/">.pw</a></strong><strong><a title="213 pending delete .qa domains" style="background-color:#AFFFAF;" href="/tld/qa/">.qa</a></strong><strong><a href="/tld/re/">.re</a></strong><strong><a title="7,212 pending delete .ro domains" style="background-color:#AFFFAF;" href="/tld/ro/">.ro</a></strong><strong><a title="1,139 pending delete .rs domains" style="background-color:#AFFFAF;" href="/tld/rs/">.rs</a></strong><strong><a href="/tld/ru/">.ru</a></strong><strong><a title="230 pending delete .rw domains" style="background-color:#AFFFAF;" href="/tld/rw/">.rw</a></strong><strong><a title="9 pending delete .sb domains" style="background-color:#AFFFAF;" href="/tld/sb/">.sb</a></strong><strong><a title="48 pending delete .sc domains" style="background-color:#AFFFAF;" href="/tld/sc/">.sc</a></strong><strong><a title="17,091 pending delete .se domains" style="background-color:#AFFFAF;" href="/tld/se/">.se</a></strong><strong><a title="1,324 pending delete .sg domains" style="background-color:#AFFFAF;" href="/tld/sg/">.sg</a></strong><strong><a title="296 pending delete .sh domains" style="background-color:#AFFFAF;" href="/tld/sh/">.sh</a></strong><strong><a title="1,064 pending delete .si domains" style="background-color:#AFFFAF;" href="/tld/si/">.si</a></strong><strong><a title="5,354 pending delete .sk domains" style="background-color:#AFFFAF;" href="/tld/sk/">.sk</a></strong><strong><a title="2 pending delete .sm domains" style="background-color:#AFFFAF;" href="/tld/sm/">.sm</a></strong><strong><a title="28 pending delete .sn domains" style="background-color:#AFFFAF;" href="/tld/sn/">.sn</a></strong><strong><a title="17 pending delete .so domains" style="background-color:#AFFFAF;" href="/tld/so/">.so</a></strong><strong><a title="73 pending delete .st domains" style="background-color:#AFFFAF;" href="/tld/st/">.st</a></strong><strong><a href="/tld/su/">.su</a></strong><strong><a title="42 pending delete .sx domains" style="background-color:#AFFFAF;" href="/tld/sx/">.sx</a></strong><strong><a title="50 pending delete .tc domains" style="background-color:#AFFFAF;" href="/tld/tc/">.tc</a></strong><strong><a href="/tld/tf/">.tf</a></strong><strong><a title="272 pending delete .th domains" style="background-color:#AFFFAF;" href="/tld/th/">.th</a></strong><strong><a title="13 pending delete .tl domains" style="background-color:#AFFFAF;" href="/tld/tl/">.tl</a></strong><strong><a href="/tld/tn/">.tn</a></strong><strong><a title="507 pending delete .to domains" style="background-color:#AFFFAF;" href="/tld/to/">.to</a></strong><strong><a href="/tld/tr/">.tr</a></strong><strong><a href="/tld/tv/">.tv</a></strong><strong><a title="5,933 pending delete .tw domains" style="background-color:#AFFFAF;" href="/tld/tw/">.tw</a></strong><strong><a href="/tld/ua/">.ua</a></strong><strong><a title="56 pending delete .ug domains" style="background-color:#AFFFAF;" href="/tld/ug/">.ug</a></strong><strong><a title="169,969 pending delete .uk domains" style="background-color:#AFFFAF;" href="/tld/uk/">.uk</a></strong><strong><a title="43,823 pending delete .us domains" style="background-color:#AFFFAF;" href="/tld/us/">.us</a></strong><strong><a href="/tld/uy/">.uy</a></strong><strong><a title="424 pending delete .uz domains" style="background-color:#AFFFAF;" href="/tld/uz/">.uz</a></strong><strong><a title="405 pending delete .vc domains" style="background-color:#AFFFAF;" href="/tld/vc/">.vc</a></strong><a title="89 pending delete .vg domains" style="background-color:#AFFFAF;" href="/tld/vg/">.vg</a><strong><a href="/tld/wf/">.wf</a></strong><strong><a href="/tld/yt/">.yt</a></strong><strong><a title="9,717 pending delete .za domains" style="background-color:#AFFFAF;" href="/tld/za/">.za</a></strong></div>
+
+</div>
+
+<h4 class="dotted">New gTLDs</h4>
+Also we currently support <strong>369</strong> new gTLDs.
+You can find a complete list on the <a href="/tlds/">Supported TLDs</a> page.
+</div>
+</div>
+
+<div class="box hidden-xs">
+<div class="box-header">
+<h3><a href="/domain-lists/">Domain Lists</a></h3>
+<span class="pull-right"><strong>34</strong>
+Domain Lists</span>
+</div>
+<div class="box-content">
+<div class="row">
+
+<div class="col-xs-12 col-sm-4 col-md-6 col-lg-4">
+<ul>
+<li><a href="/expired-domains/" title="Pending Delete Domains">Pending Delete Domains</a></li>
+<li><a href="/godaddy-closeout-domains/" title="GoDaddy Closeout Domains with Buy Now">GoDaddy Closeout Domains</a></li>
+<li><a href="/godaddy-expired-domains/" title="GoDaddy Expired Domains">GoDaddy Expired Domains</a></li>
+<li><a href="/godaddy-domain-auctions-with-bids/" title="All GoDaddy Auctions with Bids">GoDaddy Auctions With Bids</a></li>
+<li><a href="/godaddy-buynow-domains/" title="All GoDaddy TDNAM Domains you can buy now for a fixed price">GoDaddy Buy Now Domains</a></li>
+<li><a href="/godaddy-makeoffer-domains/" title="All GoDaddy TDNAM Domains with Auction Type Offer and Offer/Buy Now">GoDaddy Make Offer Domains</a></li>
+<li><a href="/godaddy-featured-domains/" title="GoDaddy special Featured Domains">GoDaddy Featured Domains</a></li>
+<li><a href="/godaddy-traffic-domains/" title="GoDaddy Domains that received Traffic">GoDaddy Traffic Domains</a></li>
+<li><a href="/godaddy-most-active-domains/" title="GoDaddy Domains with Bids on them">GoDaddy Most Active Domains</a></li>
+<li><a href="/godaddy-tdnam-domains/" title="All GoDaddy TDNAM Domains ending in 60 days or less">GoDaddy TDNAM</a></li>
+<li><a href="/sedo-auction-domains/" title="Sedo Auction Domains">Sedo Auction Domains</a></li>
+<li><a href="/sedo-bargains/" title="Sedo Bargain Domains">Sedo Bargain Domains</a></li>
+</ul>
+</div>
+
+<div class="col-xs-12 col-sm-4 col-md-6 col-lg-4">
+<ul>
+<li><a href="/sedo-buy-now-com-domains/" title="Sedo Buy Now .com Domains">Sedo Buy Now .com Doma...</a></li>
+<li><a href="/sedo-buy-now-de-domains/" title="Sedo Buy Now .de Domains">Sedo Buy Now .de Domai...</a></li>
+<li><a href="/sedo-buy-now-domains/" title="Sedo Buy Now Domains">Sedo Buy Now Domains</a></li>
+<li><a href="/sedo-make-offer-com-domains/" title="Sedo Make Offer .com Domains">Sedo Make Offer .com D...</a></li>
+<li><a href="/sedo-make-offer-de-domains/" title="Sedo Make Offer .de Domains">Sedo Make Offer .de Do...</a></li>
+<li><a href="/sedo-make-offer-domains/" title="Sedo Make Offer Domains">Sedo Make Offer Domain...</a></li>
+<li><a href="/sedo-expired-domains/" title="Sedo Expiring Domains">Sedo Expiring Domains</a></li>
+<li><a href="/namecheap-auction-domains/" title="Namecheap Auction Domains">Namecheap Auction Doma...</a></li>
+<li><a href="/dynadot-expired-domains/" title="Dynadot Expired Domains">Dynadot Expired Domain...</a></li>
+<li><a href="/dan-buy-now-com-domains/" title="Dan Buy Now .com Domains">Dan Buy Now .com Domai...</a></li>
+<li><a href="/dan-buy-now-de-domains/" title="Dan Buy Now .de Domains">Dan Buy Now .de Domain...</a></li>
+</ul>
+</div>
+
+<div class="col-xs-12 col-sm-4 col-md-6 col-lg-4">
+<ul>
+<li><a href="/dan-buy-now-domains/" title="Dan Buy Now Domains">Dan Buy Now Domains</a></li>
+<li><a href="/dan-make-offer-com-domains/" title="Dan Make Offer .com Domains">Dan Make Offer .com Do...</a></li>
+<li><a href="/dan-make-offer-de-domains/" title="Dan Make Offer .de Domains">Dan Make Offer .de Dom...</a></li>
+<li><a href="/dan-make-offer-domains/" title="Dan Make Offer Domains">Dan Make Offer Domains</a></li>
+<li><a href="/catched-com-auction-domains/" title="Catched.com Auction Domains">Catched.com Auction Do...</a></li>
+<li><a href="/pbn-seo-domains/" title="PBN Domains from Seo.Domains">Domain from Seo.Domain...</a></li>
+<li><a href="/domainmarket-domains/" title="Domainmarket Domains">Domainmarket Domains</a></li>
+<li><a href="/dropcatch-auctions-domains/" title="DropCatch Auctions Domains">DropCatch Auctions Dom...</a></li>
+<li><a href="/epik-marketplace-domains/" title="Epik Marketplace Domains">Epik Marketplace Domai...</a></li>
+<li><a href="/epik-daily-diamonds/" title="Epik Daily Diamonds">Epik Daily Diamonds</a></li>
+<li><a href="/name-liquidate-reverse-domains/" title="NameLiquidate Reverse Domains">NameLiquidate Reverse ...</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+
+<div class="box">
+<div class="box-header">
+<h3>ExpiredDomains.net Statistics</h3>
+</div>
+<div class="box-content">
+<p>
+You can currently find the following domains in the database.
+The lists are updated regularly and new domains are added to the database.
+</p>
+
+
+<ul>
+<li>
+550,803,057 Domains are currently in the database
+</li>
+<li>
+493,748,235 Deleted Domains,
+3,623,716 Expired Domains and
+50,184,813 Marketplace Domains
+</li>
+<li>1,089,397 Domains were added in the last 24 hours</li>
+</ul>
+
+<ul>
+<li>6,262,387 Domains with Majestic CitationFlow >= 10</li>
+<li>7,386,468 Domains with Majectis TrustFlow >= 5</li>
+
+<li>2,432,811 Domains linked from Wikipedia.org</li>
+
+<li>234,634,700 Domains have records in the Wayback Machine (Archive.org)</li>
+<li>94,556,013 Domains have a Wayback Machine Record 10 Years or older</li>
+<li>37,491,131 Domains with Backlinks</li>
+<li>27,627,411 Domains with SeoKicks DomainPop</li>
+<li>91,589,764 Domains with Searchvolume Stats</li>
+<li>218,299,492 Domains that are in the English Dictionary</li>
+<li>1,760,097 Domains that are in the Majestic Million</li>
+<li>1,491,598 Domains with Yandex SQI</li>
+</ul>
+
+<ul>
+<li>43,906 GoDaddy Expired Domains will end today</li>
+<li>65,396 GoDaddy TDNAM Auctions will end today</li>
+<li>1,741 GoDaddy Most Active Auctions will end today</li>
+<li>6,126 NameJet PreRelease Auctions will end today</li>
+<li>5,597 SnapNames PreRelease Auctions will end today</li>
+</ul>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 col-sm-12">
+<div class="box">
+<div class="box-header">
+<h2>Research Lists</h2>
+</div>
+
+<div class="box-content">
+
+<ul>
+<li><a href="/majestic-million/" title="Majestic.com Top 1 Million Domains">Majestic Million</a></li>
+<li><a href="/alexa-top-websites/" title="Alexa.com Top Websites">Alexa Top Websites</a></li>
+<li><a href="/dmoz/" title="Dmoz - Last Save">Dmoz</a></li>
+<li><a href="/yandex-catalog/" title="Yandex Catalog - Last Save">Yandex Catalog</a></li>
+</ul>
+</div>
+</div>
+
+
+<div class="box">
+<div class="box-header">
+<h2><a href="/dev/">Latest Development</a></h2>
+<span class="pull-right"><a href="https://www.expireddomains.net/feed/dev/" target="_blank">RSS</a></span>
+</div>
+<div class="box-content">
+<strong>2022-11-18</strong><br />
+<p>New Pinyin Word Combination Filter<br />
+</p>
+<strong>2022-11-07</strong><br />
+<p>New DNS Status TLD Columns for .xyz and .cz<br />
+</p>
+<strong>2022-10-25</strong><br />
+<p>Droptime for Expired .uk Domains<br />
+The .uk registry is now publishing the exact drop time for expired .uk domains. 
+You can find the drop time for expired .uk domains by hovering over the end date in the pending delete list or on the domain details page.
+</p>
+<strong>2022-07-29</strong><br />
+<p>Renamed Adwords to Google Ads<br /></p>
+<strong>2022-07-28</strong><br />
+<p>Removed Adwords Country Based Data Points<br />
+Country based data points (DE, US, UK) are not possible anymore.<br>
+The global search volume data will still be available.
+</p>
+<strong>2022-07-27</strong><br />
+<p>Removed Adwords Category Filter<br />The new google ads api doesn't provide a categorization model anymore.</p>
+<strong>2022-07-25</strong><br />
+<p>Fixed the wikipedia import<br /></p>
+<strong>2022-05-08</strong><br />
+<p>Adwords search volume data (search volume, competition, cpc)<br />
+The adwords api is gone now and the google ads api replacement does not provide the same features.
+At the moment it looks like I'm able to keep providing global search volume data, however the country based data points (DE, US, UK) are not possible anymore and will be removed.
+There is also no categorization model, so the "Adwords Products & Services Category" will also be removed.
+</p>
+<strong>2022-05-04</strong><br />
+<p>Alexa.com shut down May 1, 2022<br />
+At the moment the top 1m sites file still exists and is updated daily.
+It is expected that this will work until <strong>December 2022</strong>, however it might shut down earlier.
+The column was removed from the default column list. 
+You can still add it to your listing using the column manager.
+</p>
+<strong>2022-04-26</strong><br />
+<p>Deleted and Pending Delete .ai Domains<br />
+You can now find .ai domains in the pending delete list and there is also a deleted .ai list.
+.ai domains only drop once per month. At the end of the month they are auctioned and 
+around the 5 or 6 of the next month they drop. 
+</p>
+</div>
+</div>
+
+<div class="box">
+<div class="box-header">
+<h3>Recent Blog Posts</h3>
+</div>
+<div class="box-content">
+<ul>
+<li><a href="/article/can-you-add-insert-company-to-your-website-16211.html" title="People ask me for integration of different companies a lot. Here is how it could work.">Can you add &quot;insert company&quot; to your website?</a></li>
+<li><a href="/article/tld-reg-count-research-tool-16210.html" title="Find all registered Domain Names containing your Keyword plus Reg TLD Count">TLD Reg Count</a></li>
+<li><a href="/article/bulk-domain-search-16209.html" title="Check any List of Domains and find out if they are listed here">Bulk Domain Search</a></li>
+<li><a href="/article/find-geo-domains-easier-16208.html" title="3 New Columns to find GEO Domains">GEO Domains</a></li>
+<li><a href="/article/dot-search-multiple-keywords-16207.html" title="Search for up to 30 Keywords at once in all Domainlists">Dot Search with Multiple Keywords</a></li>
+<li><a href="/article/all-in-one-deleted-domain-list-16206.html" title="All Deleted Domains of the last 7 days in one Domain List">All-in-one Deleted Domain List</a></li>
+<li><a href="/article/search-through-all-domains-in-one-go-16205.html" title="Without entering a keyword, just using filters">Search through all Domains in the Database in one go</a></li>
+<li><a href="/article/number-of-related-domains-for-every-domain-name-16204.html" title="New Related Domains Fields and Filters">Number of Related Domains for every Domain Name</a></li>
+<li><a href="/article/expired-domains-with-wikipedia-links-16203.html" title="Find Domain Names linked from Wikipedia.org">Expired Domains with Wikipedia Links</a></li>
+<li><a href="/article/godaddy-auctions-with-bids-16200.html" title="GoDaddy Auctions with Bids and faster Updates for GoDaddy Closeouts">New Domain List and Improved GoDaddy Implementation</a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+<div id="botlinks" class="container">
+<a href="/references/">References</a> |
+<a href="/impressum/">Impressum</a> |
+<a href="/privacyinformation/">Privacy Information</a>
+
+<div class="right">
+<a href="/blog/">Blog</a> |
+<a href="/faq/">FAQ</a> |
+<a href="/help/">Help</a> |
+<a href="/dev/">Dev</a>
+</div>
+</div>
+<script>function displayMenu() {document.getElementById("navbar-list").classList.toggle("show");}</script>
+</body>
+</html>

@@ -16,17 +16,22 @@ from os.path import exists
 from os import listdir, remove 
 from rich.prompt import Prompt
 from dataclasses import dataclass #, fields, astuple
+from urllib.parse import urljoin
+from requests_throttler import BaseThrottler
 
 
 class ScraperSite:
-    BASE_URL = "https://www.expireddomains.net/domain-lists/"
+    BASE_URL = "https://www.expireddomains.net/"
+    BEGIN_URL = "domain-lists/"
     
     def __init__(self):
         self._session = requests.Session()
+        self._bt = BaseThrottler(name='base-throttler', delay=1.5)
         self._domains = []
         self._sub_domains = {}
 
-        self.scrape_page(self.BASE_URL)
+        self._bt.start()
+        self.scrape_title_page(urljoin(self.BASE_URL, self.BEGIN_URL))
 
     @property
     def domains(self) -> list:
@@ -36,10 +41,14 @@ class ScraperSite:
     def sub_domains(self) -> dict:
         return self._sub_domains
 
+    @property
+    def session(self):
+        return self._session
+
     def get_sub_domains(self, domain) -> list:
         return self._sub_domains[domain]
 
-    def scrape_page(self, url):
+    def scrape_title_page(self, url):
         scrapped_data = ScraperTitlePage(self, url).data
         self._domains = scrapped_data[0]
         self._sub_domains = scrapped_data[1]
@@ -48,6 +57,7 @@ class ScraperSite:
 
     def close(self):
         self._session.close()
+        self._bt.shutdown()
 
     def clear_cache(self):
         for item in listdir():
@@ -68,40 +78,51 @@ class ScraperSite:
 
 class ScraperPageBase:
 
-    def __init__(self, manager):
-        self._session = manager._session
-        self._response_content = None
-        self._response_content = self.get_response_content(manager.BASE_URL)
+    def __init__(self, manager: ScraperSite, url_relative: str):
+        self._manager = manager
+        # self._response_content = None
+        self._page_soup = self.get_page_in_soup(urljoin(manager.BASE_URL, url_relative))
+
+        # self.get_response_content(manager.BASE_URL)
         # self._response_encoding = manager.encoding
 
     @staticmethod
     def url_to_file_name(url: str) -> str:
-        f_name = url.replace("://", "__").replace(".", "_").replace("/", "_").strip("_") + ".cache"
+        f_name = url.replace("://", "__").replace(".", "_").replace("/", "_").replace("?","_").strip("_") + ".cache"
+        # todo - Delete after debuging
+        print("-" * 25)
+        print(f"Get url: {url}")
         print(f"Modi url to file: {f_name}")
+        print("-" * 25)
         return f_name
 
-    # @property
-    # def encoding(self) -> str:
-    #     return self._response_encoding
+    @property
+    def manager(self) -> ScraperSite:
+        return self._manager
+    
+    @property
+    def page_soup(self) -> BeautifulSoup:
+        return self._page_soup
 
-    def get_response_content(self, url) -> requests.Response.content:
-        tmp_file_name = ScraperPageBase.url_to_file_name(url)
-        response_content = None
+    def get_page_in_soup(self, url_full) -> None:
+        tmp_file_name = ScraperPageBase.url_to_file_name(url_full)
         if exists(tmp_file_name):
-            print(f"no Get read cached file: {tmp_file_name}")
+            print(f"witout Get read cached file: {tmp_file_name}")
             with open(tmp_file_name, "rb") as f:
                 response_content = f.read()
-        elif not self._response_content:
-            print(f"GET to: {url}")
-            response = self._session.get(url)
-            response_content = response.content
+                page_soup = BeautifulSoup(response_content, 'lxml')
+
+        else:
+            print(f"GET to: {url_full}")
+            response = self.manager.session.get(url_full)
+            # todo - Місце де можливо кусками читати відповідь, щоб це було не дуже швидко
+            page_soup = BeautifulSoup(response.content, 'lxml')
+
             if not exists(tmp_file_name):
                 with open(tmp_file_name, "wb") as f:                                                                                                                                                                                                                                          
-                    f.write(response_content)
-        else:
-            print(f"Sorry problem Get {url} or read cached file {tmp_file_name}")
+                    f.write(response.content)
 
-        return response_content
+        return page_soup
 
 
 @dataclass
@@ -111,18 +132,15 @@ class SubDomainInfo:
 
 
 class ScraperTitlePage(ScraperPageBase):
-    def __init__(self, manager: ScraperSite, url: str):
-        super().__init__(manager)
-        self._response_content = self.get_response_content(url)
+    def __init__(self, manager: ScraperSite, url_relative: str):
+        super().__init__(manager, url_relative)
 
     @property
     def data(self) -> (list, dict):
         domains = []
         sub_domains = {}
-        if self._response_content:
-            page_soup = BeautifulSoup(self._response_content, 'lxml')
-            # box_header_soup = page_soup.select(".box-header")
-            overviews_soup = page_soup.select(".overview")
+        if self.page_soup:
+            overviews_soup = self.page_soup.select(".overview")
             
             for overview_soup in overviews_soup:
                 header_soup = overview_soup.select_one(".box-header")
@@ -137,15 +155,45 @@ class ScraperTitlePage(ScraperPageBase):
                 sub_domains[domain] = lst
         return (domains, sub_domains)
 
-    # @property
-    # def present_sub_domain(self) -> list:
-    #     lst = []
-    #     if self._response_content:
-    #         page_soup = BeautifulSoup(self._response_content, 'lxml')
-    #         box_header_soup = page_soup.select(".box-header")
-    #         for item in box_header_soup:
-    #             lst.append(item.text.strip())
-    #     return lst
+
+class ScraperTablePage(ScraperPageBase):
+    def __init__(self, manager: ScraperSite, url_relative: str):
+        super().__init__(manager, url_relative)
+    
+    @property
+    def data(self) -> list:
+        """ Дані отримані із сторінки """
+        # todo - Створити піготовку даних отриманих із сторінки
+        lst_result = []
+        if self.page_soup:
+            lst_trs_soup = self.page_soup.select("table.base1 tbody tr")
+            for tr_soup in lst_trs_soup:
+                lst_row = []
+                for td_soup in tr_soup.select("td"):
+                    lst_row.append(td_soup.text.strip())
+            lst_result.append(lst_row)
+            return lst_result
+        return None
+
+    @property
+    def headers(self) -> list:
+        """ Заголовки даних отриманих із сторінки """
+        lst_result = []
+        if self.page_soup:
+            lst_a = self.page_soup.select("table.base1 thead tr th a")
+            lst_result = [item.text for item in lst_a]
+            return lst_result
+        return None
+
+    @property
+    def next_url(self) -> str:
+        """Посилання на наступну сторінку 
+        або None якщо сторінка остання"""
+        if self.page_soup:
+            result = self.page_soup.select_one(".next")["href"]
+            print(f"next_url: {result}")
+            return result
+        return None
 
 
 if __name__ == "__main__":
@@ -161,44 +209,35 @@ if __name__ == "__main__":
     choices = [item.text for item in sub_domains]
     sub_domain = Prompt.ask("Enter sub domain:", choices=choices, default=choices[0])
 
-    url_to_next = [item.url for item in scrape_site.sub_domains[domain] if item.text == sub_domain][0]
-    print(f"{url_to_next=} next relative link")
+    next_url_relative = [item.url for item in scrape_site.sub_domains[domain] if item.text == sub_domain][0]
+    print(f"{next_url_relative=} next relative link")
 
+    # Begin process scrape data
+    cnt = 0
+    data = None
+    header = None
+    while True:
+        scrape_page_table = ScraperTablePage(scrape_site, next_url_relative)
+        # receive data from page
+        cnt += 1
+        print(f"scrape_page_table {cnt} next_url_rel: {scrape_page_table.next_url}")
+        print(f"headers: {scrape_page_table.headers}")
+
+        print(f"data[0]: {scrape_page_table.data[0]}")
+        # data = scrape_page_table.data
+        # if header is None:
+        #     header = scrape_page_table.header
+        # next_url = scrape_page_table.next_url
+        # cnt += 1
+        
+        # todo write data to csv
+        # ....
+
+        next_url_relative = scrape_page_table.next_url
+        if next_url_relative is None:
+            break
+        input("Press <Enter> to next...")
+        break
+
+    print(f"Scrape task ended. Processed {cnt} pages.")
     scrape_site.close()
-
-
-# class ExpireddomainsScrappy:
-#     BASE_URL = "https://www.expireddomains.net/domain-lists/"
-
-#     def __init__(self):
-#         self._session = requests.Session()
-#         self._response = get_response(self.BASE_URL)
-#         self._response_encoding = None
-#         self.AVIALIBLE_DOMAIN_ZONES = self.get_list_present_domain_zones()
-
-#     @staticmethod
-#     def url_to_file_name(url: str) -> str:
-#         return url.replace("://", "__").replace(".", "_").replace("", "_") + ".html"
-
-#     def get_response(self, url: str) -> requests.Response:
-#         tmp_file_name = ExpireddomainsScrappy.url_to_file_name(url)
-#         if not self._response:
-#             response = self._session.get(url)
-#             self._response_encoding = response.encoding
-#             if not exsists(tmp_file_name):
-#                 with open(tmp_file_name, "w", encoding=self._response_encoding) as f:
-                                                                                                                                                                                                                                              
-#                     f.write(response)
-#         else:
-#             if exsists(tmp_file_name):
-#                 with open(tmp_file_name, )
-#                 response = 
-#         return response
-
-#     def get_list_present_domain_zones(self) -> list:
-#         lst = []
-#         page_soup = BeautifulSoup(self._response, 'lxml')
-#         box_header_soup = page_soup.select(".box-header")
-#         for item in box_header_soup
-
-
