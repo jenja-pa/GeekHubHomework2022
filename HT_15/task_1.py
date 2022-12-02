@@ -128,7 +128,9 @@ class ScraperPageBase:
                 page_soup = BeautifulSoup(response_content, 'lxml')
 
         else:
-            str_proxy ="""85.162.228.236  80  Armenia 
+            str_proxy ="""185.143.146.171   8080    UA  Ukraine
+            85.162.228.236  80  Armenia 
+            80.48.119.28    8080 Poland
 45.8.106.255    80  Curacao 
 203.30.190.20   80  Belize  
 203.24.103.64   80  Virgin Islands, British 
@@ -139,10 +141,11 @@ class ScraperPageBase:
 203.30.190.152  80  Belize  
 91.226.97.73    80  Belize  
 203.32.121.224  80  Virgin Islands, British"""
-            lst_http_proxy = [lambda row: "".join(("httl://", row.split()[0].strip(), row.split()[1].strip())) for row in str_proxy.split(os.linesep)]
+            lst_http_proxy = ["".join(("http://", row.split()[0].strip(), row.split()[1].strip())) for row in str_proxy.split(os.linesep)]
             print(f"{lst_http_proxy=}")
-            print(f"GET to: {url_full} proxy: ")
-            response = self.manager.session.get(url_full, proxies={"http": lst_http_proxy[0]})
+            sel_proxy = lst_http_proxy[0]
+            print(f"GET to: {url_full} proxy: {sel_proxy}")
+            response = self.manager.session.get(url_full, proxies={"http": sel_proxy})
             if response.ok: 
                 page_soup = BeautifulSoup(response.content, 'lxml')
             else:
