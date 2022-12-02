@@ -6,6 +6,8 @@
 /HT_14/task_3*.csv
 /apendix/hidden_fld/
 /HT_15/*.cache
+/HT_15/*.html
+/HT_15/*.csv
 
 
 # Byte-compiled / optimized / DLL files
