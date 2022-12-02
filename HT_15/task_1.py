@@ -10,19 +10,25 @@
 
 # UserViewer %KDt4uLZE%L3.ct  
 
+import os
+import time
 import requests
 from bs4 import BeautifulSoup
+import csv
 from os.path import exists
 from os import listdir, remove 
-from rich.prompt import Prompt
+from rich.prompt import Prompt, Confirm
 from dataclasses import dataclass #, fields, astuple
 from urllib.parse import urljoin
 from requests_throttler import BaseThrottler
 
 
+
+
 class ScraperSite:
     BASE_URL = "https://www.expireddomains.net/"
     BEGIN_URL = "domain-lists/"
+    FILE_CSV = "task_1_result.csv"
     
     def __init__(self):
         self._session = requests.Session()
@@ -32,6 +38,8 @@ class ScraperSite:
 
         self._bt.start()
         self.scrape_title_page(urljoin(self.BASE_URL, self.BEGIN_URL))
+        if exists(self.FILE_CSV):
+            os.remove(self.FILE_CSV)
 
     @property
     def domains(self) -> list:
@@ -63,6 +71,18 @@ class ScraperSite:
         for item in listdir():
             if item.endswith(".cache"):
                 remove(item)
+ 
+    def write_csv(self, headers, data) -> None:
+        if not exists(self.FILE_CSV):
+            with open(self.FILE_CSV, "w") as file:
+                writer = csv.DictWriter(file, fieldnames=headers)
+                writer.writeheader()
+
+        with open(self.FILE_CSV, "a") as file:
+            writer = csv.DictWriter(file, fieldnames=headers, delimiter=';', quoting=csv.QUOTE_NONNUMERIC)
+            for row in data:
+                dict_row = {name: int(value) if value.isdigit() else value for name, value in zip(headers, row)}
+                writer.writerow(dict_row)
 
     def __repr__(self):
         return f"""
@@ -80,19 +100,14 @@ class ScraperPageBase:
 
     def __init__(self, manager: ScraperSite, url_relative: str):
         self._manager = manager
-        # self._response_content = None
         self._page_soup = self.get_page_in_soup(urljoin(manager.BASE_URL, url_relative))
-
-        # self.get_response_content(manager.BASE_URL)
-        # self._response_encoding = manager.encoding
 
     @staticmethod
     def url_to_file_name(url: str) -> str:
         f_name = url.replace("://", "__").replace(".", "_").replace("/", "_").replace("?","_").strip("_") + ".cache"
         # todo - Delete after debuging
         print("-" * 25)
-        print(f"Get url: {url}")
-        print(f"Modi url to file: {f_name}")
+        print(f"Modi url:{url} to file: {f_name}")
         print("-" * 25)
         return f_name
 
@@ -113,10 +128,25 @@ class ScraperPageBase:
                 page_soup = BeautifulSoup(response_content, 'lxml')
 
         else:
-            print(f"GET to: {url_full}")
-            response = self.manager.session.get(url_full)
-            # todo - Місце де можливо кусками читати відповідь, щоб це було не дуже швидко
-            page_soup = BeautifulSoup(response.content, 'lxml')
+            str_proxy ="""85.162.228.236  80  Armenia 
+45.8.106.255    80  Curacao 
+203.30.190.20   80  Belize  
+203.24.103.64   80  Virgin Islands, British 
+203.32.120.24   80  Virgin Islands, British 
+203.23.104.110  80  Cyprus  
+45.8.107.92 80  Curacao 
+45.8.105.237    80  Curacao 
+203.30.190.152  80  Belize  
+91.226.97.73    80  Belize  
+203.32.121.224  80  Virgin Islands, British"""
+            lst_http_proxy = [lambda row: "".join(("httl://", row.split()[0].strip(), row.split()[1].strip())) for row in str_proxy.split(os.linesep)]
+            print(f"{lst_http_proxy=}")
+            print(f"GET to: {url_full} proxy: ")
+            response = self.manager.session.get(url_full, proxies={"http": lst_http_proxy[0]})
+            if response.ok: 
+                page_soup = BeautifulSoup(response.content, 'lxml')
+            else:
+                raise(f"GET to: {url_full} is not completed. Reason: {response.status_code}")
 
             if not exists(tmp_file_name):
                 with open(tmp_file_name, "wb") as f:                                                                                                                                                                                                                                          
@@ -171,7 +201,7 @@ class ScraperTablePage(ScraperPageBase):
                 lst_row = []
                 for td_soup in tr_soup.select("td"):
                     lst_row.append(td_soup.text.strip())
-            lst_result.append(lst_row)
+                lst_result.append(lst_row)
             return lst_result
         return None
 
@@ -190,54 +220,71 @@ class ScraperTablePage(ScraperPageBase):
         """Посилання на наступну сторінку 
         або None якщо сторінка остання"""
         if self.page_soup:
-            result = self.page_soup.select_one(".next")["href"]
-            print(f"next_url: {result}")
-            return result
+            a_next_soup = self.page_soup.select_one(".next")
+            if a_next_soup is not None:
+                result = a_next_soup["href"]
+                return result
         return None
 
 
 if __name__ == "__main__":
-    scrape_site = ScraperSite()
-    print(f"{scrape_site=}")
-    # print(f"{scrape_site.domains=}")
-    # print(f"{scrape_site.sub_domains=}")
+    try:
+        scrape_site = ScraperSite()
+        print(f"{scrape_site=}")
+        # print(f"{scrape_site.domains=}")
+        # print(f"{scrape_site.sub_domains=}")
 
-    domain = Prompt.ask("Enter domain that do you need:", choices=scrape_site.domains, default="GoDaddy")
-    sub_domains = scrape_site.get_sub_domains(domain)
-    # print(f"{sub_domains=}")
+        domain = Prompt.ask("Enter domain that do you need:", choices=scrape_site.domains, default="GoDaddy")
+        sub_domains = scrape_site.get_sub_domains(domain)
+        # print(f"{sub_domains=}")
 
-    choices = [item.text for item in sub_domains]
-    sub_domain = Prompt.ask("Enter sub domain:", choices=choices, default=choices[0])
+        choices = [item.text for item in sub_domains]
+        sub_domain = Prompt.ask("Enter sub domain:", choices=choices, default=choices[3])
 
-    next_url_relative = [item.url for item in scrape_site.sub_domains[domain] if item.text == sub_domain][0]
-    print(f"{next_url_relative=} next relative link")
+        next_url_relative = [item.url for item in scrape_site.sub_domains[domain] if item.text == sub_domain][0]
+        print(f"{next_url_relative=} next relative link")
 
-    # Begin process scrape data
-    cnt = 0
-    data = None
-    header = None
-    while True:
-        scrape_page_table = ScraperTablePage(scrape_site, next_url_relative)
-        # receive data from page
-        cnt += 1
-        print(f"scrape_page_table {cnt} next_url_rel: {scrape_page_table.next_url}")
-        print(f"headers: {scrape_page_table.headers}")
+        # Begin process scrape data
+        cnt = 0
+        data = None
+        header = None
+        while True:
+            scrape_page_table = ScraperTablePage(scrape_site, next_url_relative)
+            # receive data from page
+            cnt += 1
+            # todo - this is debug case delete in prodaction
+            print(f"scrape_page_table {cnt} next_url_rel: {scrape_page_table.next_url}")
+            # print(f"headers: {scrape_page_table.headers}")
+            # print(f"data: {scrape_page_table.data}")
 
-        print(f"data[0]: {scrape_page_table.data[0]}")
-        # data = scrape_page_table.data
-        # if header is None:
-        #     header = scrape_page_table.header
-        # next_url = scrape_page_table.next_url
-        # cnt += 1
-        
-        # todo write data to csv
-        # ....
+            data = scrape_page_table.data
+            if header is None:
+                headers = scrape_page_table.headers
+            
+            scrape_site.write_csv(headers, data)
 
-        next_url_relative = scrape_page_table.next_url
-        if next_url_relative is None:
-            break
-        input("Press <Enter> to next...")
-        break
+            if scrape_page_table.next_url is None:
+                # todo - need delete last cached file
+                cache_fn = ScraperPageBase.url_to_file_name(urljoin(scrape_site.BASE_URL, next_url_relative))
+                print(f"Remove last cached file: {cache_fn}")
+                try:
+                    os.remove(cache_fn)
+                except OSError as ex:
+                    print(f"Problem to remove: {cache_fn}")
+                    raise
 
-    print(f"Scrape task ended. Processed {cnt} pages.")
-    scrape_site.close()
+                print("You have reached the maximum page limit.")
+                print("For continue wait some time and run this script again with this parameters")
+                break
+            next_url_relative = scrape_page_table.next_url
+
+        print(f"Scrape task ended. Processed {cnt} pages.")
+        print(f"Result placed in {scrape_site.FILE_CSV}.")
+    finally:
+        scrape_site.close()
+        time.sleep(0.05)
+        print()
+        if Confirm.ask("Do you want to clear keeped cache? Cache used for continious next scraping.", default=False):
+            scrape_site.clear_cache()
+        else:
+            print("Warning cache was not cleared, you abble to continue scrap work later.")
