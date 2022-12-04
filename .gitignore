@@ -8,7 +8,7 @@
 /HT_15/*.cache
 /HT_15/*.html
 /HT_15/*.csv
-
+/HT_15/proxy-*_credential.*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
