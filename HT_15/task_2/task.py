@@ -60,7 +60,7 @@ print(f"{data=}")
 
 data_ = {}
 data_["item_id"] = data["data"]["id"]
-data_[""] = data["data"]["title"]
+data_["title"] = data["data"]["title"]
 data_["old_price"] = float(data["data"]["old_price"])
 data_["current_price"] = float(data["data"]["price"])
 data_["href"] = data["data"]["href"]
