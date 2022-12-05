@@ -1,5 +1,5 @@
 # HT 15
-1. Викорисовуючи requests/BeautifulSoup, заходите на ось цей сайт "https://www.expireddomains.net/domain-lists/" <br>
+1. [x] Викорисовуючи requests/BeautifulSoup, заходите на ось цей сайт "https://www.expireddomains.net/domain-lists/" <br>
 (з ним будьте обережні :wink::skull_and_crossbones:), вибираєте будь-яку на ваш вибір доменну зону і парсите список <br> 
 доменів з усіма відповідними колонками - доменів там буде десятки тисяч (звичайно ураховуючи пагінацію). <br>
 Всі отримані значення зберегти в CSV файл.
