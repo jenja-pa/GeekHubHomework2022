@@ -13,9 +13,10 @@
 Всі інші методи, що потрібні для роботи мають бути приватні/захищені.
  * Якщо ID не валідний/немає даних - вивести відповідне повідомлення 
 """
-import requests
-import json
+# import json
 from dataclasses import dataclass
+
+import requests
 
 
 @dataclass
@@ -30,37 +31,18 @@ class Data:
 
 
 class Api:
-    FILE_HEADERS = "headers.json"
     URL_API = "https://rozetka.com.ua/api/product-api/v4/goods/get-main"
-    PARAMS = {"country": "UA", "lang": "ua", "goodsId": ""}
+    PARAMETERS = {"country": "UA", "lang": "ua", "goodsId": ""}
 
     def __init__(self):
         self._session = requests.Session()
-        self.headers = self.FILE_HEADERS
 
-    def _get_headers(self, file_name) -> dict:
-        headers = {}
-        with open(file_name, encoding="utf-8") as file:
-            headers = json.load(file)
-        return headers
-
-    @property
-    def headers(self) -> dict:
-        if self._headers is not None:
-            return self._headers
-        return {}
-
-    @headers.setter
-    def headers(self, f_name):
-        self._headers = self._get_headers(f_name)
-
-    def get_item_data(self, id: str) -> Data:
-        params = dict(self.PARAMS)
-        params["goodsId"] = id
+    def get_item_data(self, item_id: str) -> Data:
+        params = dict(self.PARAMETERS)
+        params["goodsId"] = item_id
         response = self._session.get(
-            self.URL_API, 
-            headers=self.headers, 
-            params=params)
+                 self.URL_API, 
+                 params=params)
         result = None
         if response.ok:
             data = response.json()
@@ -74,8 +56,7 @@ class Api:
                 category=data["data"]["last_category"]["title"],
                 )
         else:
-            print(
-                f"Error getting id:{id} from list of goods in the "
-                f"store rozetka DB")
+            print(f"Error getting id:{item_id} from list of goods in the "
+                  f"store rozetka DB")
 
         return result

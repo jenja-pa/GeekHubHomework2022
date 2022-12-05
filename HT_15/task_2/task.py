@@ -25,22 +25,19 @@
 #  * отримуємо необхідні дані і записуємо їх в базу. 
 #  * Якщо ID не валідний/немає даних - вивести відповідне повідомлення 
 #  * і перейти до наступного.
-from rozetka_api import Api as RozetkaApi
-from data_operations import DataBaseOperations
-from data_operations import CsvOperations
+import data_operations
+import rozetka_api
 
 if __name__ == "__main__":
-    api = RozetkaApi()
-    db = DataBaseOperations()
+    api = rozetka_api.Api()
+    db = data_operations.DataBaseOperations()
 
-    for id in CsvOperations().load():
+    for id in data_operations.CsvOperations().load():
         print(f"From CSV {id=}")
         data = api.get_item_data(id)
         if data is None: 
             # Wrong ID - message output method .get_item_data()
             continue
-        # print(f"{data.item_id=}")
-        # print(f"task: {data=}")
         db.insert(data)
 
     db.close()

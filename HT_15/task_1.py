@@ -7,20 +7,18 @@
 # відповідними колонками - доменів там буде десятки тисяч 
 # (звичайно ураховуючи пагінацію). 
 # Всі отримані значення зберегти в CSV файл.
-
-# UserViewer %KDt4uLZE%L3.ct  
-
 import os
-import requests
-from bs4 import BeautifulSoup
 import csv
 import json
 import time
-from os.path import exists
 from os import listdir, remove 
-from rich.prompt import Prompt, Confirm
+from os.path import exists
 from dataclasses import dataclass
 from urllib.parse import urljoin
+
+import requests
+from bs4 import BeautifulSoup
+from rich.prompt import Prompt, Confirm
 from requests_throttler import BaseThrottler
 
 
@@ -143,7 +141,7 @@ class ScraperPageBase:
     def page_soup(self) -> BeautifulSoup:
         return self._page_soup
 
-    def get_page_in_soup(self, url_full) -> None:
+    def get_page_in_soup(self, url_full) -> BeautifulSoup:
         tmp_file_name = ScraperPageBase.url_to_file_name(url_full)
         if exists(tmp_file_name):
             print(f"witout Get read cached file: {tmp_file_name}")
@@ -200,7 +198,7 @@ class ScraperTitlePage(ScraperPageBase):
                         text=domain_sub_soup.text.strip(),
                         url=domain_sub_soup["href"]))
                 sub_domains[domain] = lst
-        return (domains, sub_domains)
+        return domains, sub_domains
 
 
 class ScraperTablePage(ScraperPageBase):
@@ -210,7 +208,6 @@ class ScraperTablePage(ScraperPageBase):
     @property
     def data(self) -> list:
         """ Дані отримані із сторінки """
-        # todo - Створити піготовку даних отриманих із сторінки
         lst_result = []
         if self.page_soup:
             lst_trs_soup = self.page_soup.select("table.base1 tbody tr")
@@ -274,9 +271,8 @@ if __name__ == "__main__":
                 scrape_site, next_url_relative)
 
             cnt += 1
-            print(
-                f"scrape_page_table {cnt} next_url_rel: "
-                f"{scrape_page_table.next_url}")
+            print(f"scrape_page_table {cnt} next_url_rel: "
+                  f"{scrape_page_table.next_url}")
 
             data = scrape_page_table.data
             if header is None:
@@ -285,7 +281,7 @@ if __name__ == "__main__":
             scrape_site.write_csv(headers, data)
 
             if scrape_page_table.next_url is None:
-                # todo - need delete last cached file
+                # delete last cached file
                 cache_fn = ScraperPageBase.url_to_file_name(
                     urljoin(scrape_site.BASE_URL, next_url_relative))
                 print(f"Remove last cached file: {cache_fn}")
