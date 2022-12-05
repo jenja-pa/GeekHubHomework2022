@@ -30,14 +30,14 @@ import rozetka_api
 
 if __name__ == "__main__":
     api = rozetka_api.Api()
-    db = data_operations.DataBaseOperations()
+    database = data_operations.DataBaseOperations()
 
-    for id in data_operations.CsvOperations().load():
-        print(f"From CSV {id=}")
-        data = api.get_item_data(id)
+    for item_id in data_operations.CsvOperations().load():
+        print(f"From CSV {item_id=}")
+        data = api.get_item_data(item_id)
         if data is None: 
-            # Wrong ID - message output method .get_item_data()
+            # Wrong ID - the message was derived by the method .get_item_data()
             continue
-        db.insert(data)
+        database.insert(data)
 
-    db.close()
+    database.close()
