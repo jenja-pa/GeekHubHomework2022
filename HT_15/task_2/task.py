@@ -25,22 +25,22 @@
 #  * отримуємо необхідні дані і записуємо їх в базу. 
 #  * Якщо ID не валідний/немає даних - вивести відповідне повідомлення 
 #  * і перейти до наступного.
-
-# Дані по товару без назви код 27714809
-# https://common-api.rozetka.com.ua/v2/goods/get-price/?ids=27714809
-# https://common-api.rozetka.com.ua/v2/goods/get-price/?country=UA&lang=ru&ids=27714809&with_show_in_site=1&lng=ru
-# Дані про товар - повна
-# https://rozetka.com.ua/api/product-api/v4/goods/get-main?front-type=xl&country=UA&lang=ru&goodsId=27714809
-# https://rozetka.com.ua/api/product-api/v4/goods/get-main?country=UA&lang=ua&goodsId=27714809
-
-import csv
-from rozetka_api import Api as RozetkaApi # , Data as RozetkaData
-
+from rozetka_api import Api as RozetkaApi
+from data_operations import DataBaseOperations
+from data_operations import CsvOperations
 
 if __name__ == "__main__":
     api = RozetkaApi()
+    db = DataBaseOperations()
 
-    data = api.get_item_data(27714809)
+    for id in CsvOperations().load():
+        print(f"From CSV {id=}")
+        data = api.get_item_data(id)
+        if data is None: 
+            # Wrong ID - message output method .get_item_data()
+            continue
+        # print(f"{data.item_id=}")
+        # print(f"task: {data=}")
+        db.insert(data)
 
-    print(f"task: {data=}")
-
+    db.close()

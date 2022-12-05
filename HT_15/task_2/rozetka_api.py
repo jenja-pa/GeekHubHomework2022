@@ -42,7 +42,7 @@ class Api:
         headers = {}
         with open(file_name, encoding="utf-8") as file:
             headers = json.load(file)
-        return headers["header1"]
+        return headers
 
     @property
     def headers(self) -> dict:
@@ -54,10 +54,13 @@ class Api:
     def headers(self, f_name):
         self._headers = self._get_headers(f_name)
 
-    def get_item_data(self, id: int) -> Data:
+    def get_item_data(self, id: str) -> Data:
         params = dict(self.PARAMS)
         params["goodsId"] = id
-        response = self._session.get(self.URL_API, headers=self.headers, params=params)
+        response = self._session.get(
+            self.URL_API, 
+            headers=self.headers, 
+            params=params)
         result = None
         if response.ok:
             data = response.json()
@@ -71,14 +74,8 @@ class Api:
                 category=data["data"]["last_category"]["title"],
                 )
         else:
-            print(f"Error getting id:{id} from rozetka DB")
+            print(
+                f"Error getting id:{id} from list of goods in the "
+                f"store rozetka DB")
 
-        # todo - debug out data
-        print(f"data_api: {result=}") 
         return result
-
-
-if __name__ == "__main__":
-    api = Api()
-    result = api.get_item_data(27714809)
-    print(f"rozetka_api.py: {result=}")
