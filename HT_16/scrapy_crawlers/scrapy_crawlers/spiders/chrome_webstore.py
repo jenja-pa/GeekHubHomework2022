@@ -1,3 +1,5 @@
+import re
+
 import scrapy
 from scrapy.selector import Selector
 from scrapy.spiders import CrawlSpider, Rule
@@ -14,13 +16,30 @@ class ChromeWebstoreSpider(scrapy.Spider):
         start_url = 'https://chrome.google.com/webstore/sitemap'
         yield scrapy.Request(url=start_url, callback=self.parse_sitemap)
 
+    @staticmethod
+    def get_namespaces(response):
+        """
+        Добування наявних просторів імен із текстового представлення відповіді
+        виду:
+          xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+          xmlns:xhtml="http://www.w3.org/1999/xhtml"
+        return [(name_namespace, url_namespace), ...]
+        """
+        begin_response_text = response.text[:1024]
+        return re.findall(r'xmlns[\:]*(\w*)="([^"]*)"', begin_response_text)
+
     def parse_sitemap(self, response):
         self.log("parse_sitemap = 1")
 
-        # filename = "2_response_loc.txt"
-        lst = response.xpath("//*[name()='loc']/text()").getall()
+        lst_ns = ChromeWebstoreSpider.get_namespaces(response)
+        self.log(f"{lst_ns=}")
+        for name_ns, url_ns in lst_ns:
+            response.selector.register_namespace('d' if name_ns == "" else name_ns, url_ns)
+        # lst = response.xpath("//*[name()='loc']/text()").getall()
         # self.log(f'{lst=}')
-        # self.log(f'2:{response.xpath("//loc/text()").get()}')
+        lst = response.xpath("//d:loc/text()").getall()
+        self.log(f'{lst=}')
+        # filename = "2_response_loc.txt"
         # with open(filename, "w") as file:
         #     for loc in lst:
         #         file.write(f"{loc}\n")
@@ -32,10 +51,10 @@ class ChromeWebstoreSpider(scrapy.Spider):
             yield scrapy.Request(url_next_page, callback=self.parse_shard, cb_kwargs={"n_page": idx})
 
     def parse_shard(self, response, n_page):
-        # self.log("parse_shard = 2")
-        # filename = f"3_shard_loc_{n_page}.txt"
-        # with open(filename, "w") as file:
-        #     file.write(response.text)
-        # self.log(f'Saved file {filename}')
+        self.log("parse_shard = 2")
+        filename = f"3_shard_loc_{n_page}.txt"
+        with open(filename, "w") as file:
+            file.write(response.text)
+        self.log(f'Saved file {filename}')
         pass
 
