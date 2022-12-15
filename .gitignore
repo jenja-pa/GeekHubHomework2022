@@ -10,6 +10,10 @@
 /HT_15/*.csv
 /HT_15/proxy-*_credential.*
 /HT_15/task_2/*.db
+/HT_16/
+*.txt
+*.txt_temp
+
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
