@@ -36,20 +36,12 @@ class ChromeWebstoreSpider(scrapy.Spider):
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
         self.log(f"Response namespaces: {lst_ns=}")
         for name_ns, url_ns in lst_ns:
-            response.selector.register_namespace('d' if name_ns == "" else name_ns, url_ns)
-        # lst = response.xpath("//*[name()='loc']/text()").getall()
-        # self.log(f'{lst=}')
+            response.selector.register_namespace(
+                'd' if name_ns == "" else name_ns, url_ns)
         lst_locs = response.xpath("//d:loc/text()").getall()
-        # self.log(f'{lst=}')
-        # todo debug feature - save response
-        # filename = "2_response_loc.txt"
-        # with open(filename, "w") as file:
-        #     for loc in lst:
-        #         file.write(f"{loc}\n")
-        # self.log(f'Saved file {filename}')
         for idx, url_next_page in enumerate(lst_locs):
             # todo - debug case - partial exit 
-            if idx > 4:
+            if idx > 10:
                 return
             yield scrapy.Request(
                 url_next_page, 
@@ -68,7 +60,7 @@ class ChromeWebstoreSpider(scrapy.Spider):
         lst_locs_webstore = response.xpath("//d:loc/text()").getall()
         for idx, url_target_page in enumerate(lst_locs_webstore):
             # todo - debug case - partial exit
-            if idx > 3:
+            if idx > 10:
                 return
             yield scrapy.Request(
                 url_target_page, 
