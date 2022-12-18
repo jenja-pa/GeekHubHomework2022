@@ -10,9 +10,11 @@
 /HT_15/*.csv
 /HT_15/proxy-*_credential.*
 /HT_15/task_2/*.db
-/HT_16/
-*.txt
-*.txt_temp
+/HT_16/*.txt
+/HT_16/*.txt_temp
+/HT_16/scrapy_crawlers/*.txt
+/HT_16/scrapy_crawlers/*.html
+/HT_16/scrapy_crawlers/*.csv
 
 
 # Byte-compiled / optimized / DLL files
