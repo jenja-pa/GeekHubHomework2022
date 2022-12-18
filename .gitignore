@@ -14,7 +14,7 @@
 /HT_16/*.txt_temp
 /HT_16/scrapy_crawlers/*.txt
 /HT_16/scrapy_crawlers/*.html
-/HT_16/scrapy_crawlers/*.csv
+/HT_16/*.csv
 
 
 # Byte-compiled / optimized / DLL files

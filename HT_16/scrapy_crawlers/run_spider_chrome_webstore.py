@@ -1,30 +1,18 @@
 # run_spider_chrome_webstore.py
-# task_1.py
-import scrapy
-from scrapy.crawler import CrawlerProcess
+import subprocess
+import os
 
-from scrapy_crawlers.spiders.chrome_webstore import ChromeWebstoreSpider
-# class MySpider(scrapy.Spider):
-#     # Your spider definition
-#     ...
 
-# proc = CrawlerProcess(s)
+def run_spider(rel_path):
+    os.chdir(os.path.join(os.getcwd(), rel_path))
+    print("Attention: Wait process begin soon...")
+    subprocess.run([
+        "scrapy", 
+        "crawl", 
+        "chrome_webstore_spider", 
+        "-O", 
+        "../result1.csv"])
 
-# s = proc.get_project_settings()
-# s['FEED_FORMAT'] = 'csv'
-# s['LOG_LEVEL'] = 'INFO'
-# s['FEED_URI'] = 'result.csv'
-# s['LOG_FILE'] = 'result.log'
-def run_spider():
-    process = CrawlerProcess(settings={
-        "FEEDS": {
-            "result.csv": {"format": "csv"},
-        },
-    })
-
-    process.crawl(ChromeWebstoreSpider)
-    process.start()
-    
 
 if __name__ == "__main__":
     run_spider()

@@ -1,9 +1,9 @@
 import re
 
 import scrapy
-from scrapy.selector import Selector
-from scrapy.spiders import CrawlSpider, Rule
-from scrapy.linkextractors import LinkExtractor
+# from scrapy.selector import Selector
+# from scrapy.spiders import CrawlSpider, Rule
+# from scrapy.linkextractors import LinkExtractor
 from scrapy.loader import ItemLoader
 
 from scrapy_crawlers.items import ExtentionItem
@@ -30,6 +30,7 @@ class ChromeWebstoreSpider(scrapy.Spider):
         return re.findall(r'xmlns[\:]*(\w*)="([^"]*)"', begin_response_text)
 
     def parse_sitemap(self, response):
+        # todo debug case
         self.log("parse_sitemap = 1")
 
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
@@ -47,36 +48,40 @@ class ChromeWebstoreSpider(scrapy.Spider):
         #         file.write(f"{loc}\n")
         # self.log(f'Saved file {filename}')
         for idx, url_next_page in enumerate(lst_locs):
-            # todo - debug exit
-            if idx > 2:
+            # todo - debug case - partial exit 
+            if idx > 4:
                 return
-            yield scrapy.Request(url_next_page, callback=self.parse_shard, cb_kwargs={"n_page": idx})
+            yield scrapy.Request(
+                url_next_page, 
+                callback=self.parse_shard, 
+                cb_kwargs={"n_page": idx})
 
     def parse_shard(self, response, n_page):
+        # todo debug case
         self.log(f"parse_shard: {n_page}")
     
-        # todo debug feature - save response
-        # filename = f"3_shard_loc_{n_page}.txt"
-        # with open(filename, "w") as file:
-        #     file.write(response.text)
-        # self.log(f'Saved file {filename}')
-
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
         for name_ns, url_ns in lst_ns:
-            response.selector.register_namespace('d' if name_ns == "" else name_ns, url_ns)
+            response.selector.register_namespace(
+                'd' if name_ns == "" else name_ns, url_ns)
     
         lst_locs_webstore = response.xpath("//d:loc/text()").getall()
         for idx, url_target_page in enumerate(lst_locs_webstore):
-            # todo - debug exit
-            if idx > 1:
+            # todo - debug case - partial exit
+            if idx > 3:
                 return
-            yield scrapy.Request(url_target_page, callback=self.parse_page_webstore, cb_kwargs={"n_page": n_page, "idx_in_page": idx})
+            yield scrapy.Request(
+                url_target_page, 
+                callback=self.parse_page_webstore, 
+                )
     
-    def parse_page_webstore(self, response, n_page, idx_in_page):
+    def parse_page_webstore(self, response):
         item_loader = ItemLoader(item=ExtentionItem(), response=response)
         item_loader.add_value('id_item', response.url.split('/')[-1])
         item_loader.add_css('name', 'h1.e-f-w::text')
-        item_loader.add_xpath('description', '//div[@itemprop="description"]/text()')
+        item_loader.add_xpath(
+            'description', 
+            '//div[@itemprop="description"]/text()'
+            )
 
         return item_loader.load_item()
-        
