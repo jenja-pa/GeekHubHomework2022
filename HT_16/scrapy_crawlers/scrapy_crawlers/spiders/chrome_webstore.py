@@ -4,6 +4,7 @@ import scrapy
 from scrapy.selector import Selector
 from scrapy.spiders import CrawlSpider, Rule
 from scrapy.linkextractors import LinkExtractor
+from scrapy.loader import ItemLoader
 
 from scrapy_crawlers.items import ExtentionItem
 
@@ -72,18 +73,10 @@ class ChromeWebstoreSpider(scrapy.Spider):
             yield scrapy.Request(url_target_page, callback=self.parse_page_webstore, cb_kwargs={"n_page": n_page, "idx_in_page": idx})
     
     def parse_page_webstore(self, response, n_page, idx_in_page):
-        self.log(f"parse_page_webstore: {n_page=}, {idx_in_page=}")
+        item_loader = ItemLoader(item=ExtentionItem(), response=response)
+        item_loader.add_value('id_item', response.url.split('/')[-1])
+        item_loader.add_css('name', 'h1.e-f-w::text')
+        item_loader.add_xpath('description', '//div[@itemprop="description"]/text()')
 
-        # todo debug feature - save response
-        # filename = f"4_p_webstore_{n_page}_{idx_in_page}.txt"
-        # with open(filename, "w", encoding="utf-8") as file:
-        #     file.write(response.text)
-        # self.log(f'Saved file {filename}')
-
-        # todo try get data directly
-        yield ExtentionItem(
-            id_item = response.url.split('/')[-1],
-            name = response.css('h1.e-f-w::text').get(),
-            description = response.xpath('//div[@itemprop="description"]/text()').get()
-            )
+        return item_loader.load_item()
         
