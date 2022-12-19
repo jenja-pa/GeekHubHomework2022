@@ -30,8 +30,15 @@
 
 from scrapy_crawlers.run_spider_rozetka_category import run_spider
 
+sample_categories_list = [
+    "mobile-phones/c80003",
+    "mugskie-vetnamki-shlepantsi-sabo/c4634817/",
+    "sokovarki/c4626796/",
+]
 
-input_parameter = "mobile-phones/c80003/"
+# input_parameter = "mobile-phones/c80003"
+input_parameter = sample_categories_list[1]
+
 
 if __name__ == "__main__":
     run_spider("scrapy_crawlers", input_parameter)
