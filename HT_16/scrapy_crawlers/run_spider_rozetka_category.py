@@ -12,7 +12,8 @@ def run_spider(rel_path, category):
         raise (f"Sorry passed input parameter: {category} is not valid, "
               f"sample: mobile-phones/c80003/")
 
-    print(f"Attention: Wait collection {sub_category}-{category_code} on rozetka.com.ua")
+    print(f"Attention: Wait collection {sub_category}-{category_code} "
+          f"on rozetka.com.ua")
     print(f"Process 'rozetka category spider {category}' run soon...")
 
     subprocess.run([

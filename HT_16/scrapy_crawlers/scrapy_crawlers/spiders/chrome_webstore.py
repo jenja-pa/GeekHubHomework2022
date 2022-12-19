@@ -27,9 +27,6 @@ class ChromeWebstoreSpider(scrapy.Spider):
         return re.findall(r'xmlns[\:]*(\w*)="([^"]*)"', begin_response_text)
 
     def parse_sitemap(self, response):
-        # todo debug case
-        self.log("parse_sitemap = 1")
-
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
         self.log(f"Response namespaces: {lst_ns=}")
         for name_ns, url_ns in lst_ns:
@@ -37,18 +34,12 @@ class ChromeWebstoreSpider(scrapy.Spider):
                 'd' if name_ns == "" else name_ns, url_ns)
         lst_locs = response.xpath("//d:loc/text()").getall()
         for idx, url_next_page in enumerate(lst_locs):
-            # todo - debug case - partial exit
-            if idx > 10:
-                return
             yield scrapy.Request(
                 url_next_page,
                 callback=self.parse_shard,
                 cb_kwargs={"n_page": idx})
 
     def parse_shard(self, response, n_page):
-        # todo debug case
-        self.log(f"parse_shard: {n_page}")
-
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
         for name_ns, url_ns in lst_ns:
             response.selector.register_namespace(
@@ -56,9 +47,6 @@ class ChromeWebstoreSpider(scrapy.Spider):
 
         lst_locs_webstore = response.xpath("//d:loc/text()").getall()
         for idx, url_target_page in enumerate(lst_locs_webstore):
-            # todo - debug case - partial exit
-            if idx > 10:
-                return
             yield scrapy.Request(
                 url_target_page,
                 callback=self.parse_page_webstore,

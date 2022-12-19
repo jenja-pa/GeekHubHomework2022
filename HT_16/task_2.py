@@ -37,7 +37,7 @@ sample_categories_list = [
 ]
 
 # input_parameter = "mobile-phones/c80003"
-input_parameter = sample_categories_list[1]
+input_parameter = sample_categories_list[2]
 
 
 if __name__ == "__main__":
