@@ -34,7 +34,6 @@ class RozetkaItem(scrapy.Item):
     old_price = scrapy.Field()
     href = scrapy.Field()
     name = scrapy.Field()
-    category_id = scrapy.Field()
     docket = scrapy.Field()
     state = scrapy.Field()
     brand = scrapy.Field()
