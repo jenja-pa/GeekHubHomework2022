@@ -1,9 +1,6 @@
 import re
 
 import scrapy
-# from scrapy.selector import Selector
-# from scrapy.spiders import CrawlSpider, Rule
-# from scrapy.linkextractors import LinkExtractor
 from scrapy.loader import ItemLoader
 
 from scrapy_crawlers.items import ExtentionItem
@@ -20,9 +17,9 @@ class ChromeWebstoreSpider(scrapy.Spider):
     @staticmethod
     def get_namespaces(response):
         """
-        Добування наявних просторів імен із текстового представлення відповіді
-        виду:
-          xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" 
+        Добування наявних просторів імен із текстового
+        представлення відповіді виду:
+          xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
           xmlns:xhtml="http://www.w3.org/1999/xhtml"
         return [(name_namespace, url_namespace), ...]
         """
@@ -40,39 +37,39 @@ class ChromeWebstoreSpider(scrapy.Spider):
                 'd' if name_ns == "" else name_ns, url_ns)
         lst_locs = response.xpath("//d:loc/text()").getall()
         for idx, url_next_page in enumerate(lst_locs):
-            # todo - debug case - partial exit 
+            # todo - debug case - partial exit
             if idx > 10:
                 return
             yield scrapy.Request(
-                url_next_page, 
-                callback=self.parse_shard, 
+                url_next_page,
+                callback=self.parse_shard,
                 cb_kwargs={"n_page": idx})
 
     def parse_shard(self, response, n_page):
         # todo debug case
         self.log(f"parse_shard: {n_page}")
-    
+
         lst_ns = ChromeWebstoreSpider.get_namespaces(response)
         for name_ns, url_ns in lst_ns:
             response.selector.register_namespace(
                 'd' if name_ns == "" else name_ns, url_ns)
-    
+
         lst_locs_webstore = response.xpath("//d:loc/text()").getall()
         for idx, url_target_page in enumerate(lst_locs_webstore):
             # todo - debug case - partial exit
             if idx > 10:
                 return
             yield scrapy.Request(
-                url_target_page, 
-                callback=self.parse_page_webstore, 
+                url_target_page,
+                callback=self.parse_page_webstore,
                 )
-    
+
     def parse_page_webstore(self, response):
         item_loader = ItemLoader(item=ExtentionItem(), response=response)
         item_loader.add_value('id_item', response.url.split('/')[-1])
         item_loader.add_css('name', 'h1.e-f-w::text')
         item_loader.add_xpath(
-            'description', 
+            'description',
             '//div[@itemprop="description"]/text()'
             )
 
