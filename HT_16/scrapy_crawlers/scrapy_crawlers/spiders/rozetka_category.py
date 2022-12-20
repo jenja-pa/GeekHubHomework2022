@@ -28,8 +28,8 @@ class RozetkaCategorySpider(scrapy.Spider):
                 .getall()):
             yield scrapy.Request(
                 self.BASE_URL_API_GOOD + "?" + urlencode(
-                    {"lang": "ua", "goodsId": good_id}), 
-                callback=self.parse_good, 
+                    {"lang": "ua", "goodsId": good_id}),
+                callback=self.parse_good,
                 cb_kwargs={"n_page": n_page, "n_good_on_page": idx})
 
         # find possible next page
@@ -47,7 +47,7 @@ class RozetkaCategorySpider(scrapy.Spider):
         cb_kwargs = {"n_page": n_page + 1}
         href_target = f'page={cb_kwargs["n_page"]}'
         yield scrapy.Request(
-            urljoin(self.start_url, href_target), 
+            urljoin(self.start_url, href_target),
             callback=self.parse, cb_kwargs=cb_kwargs)
 
     def parse_good(self, response, n_page, n_good_on_page):
