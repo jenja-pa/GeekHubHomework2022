@@ -16,6 +16,7 @@
 /HT_16/scrapy_crawlers/*.json
 /HT_16/scrapy_crawlers/*.csv
 /HT_16/*.csv
+/HT_17/output/
 
 
 # Byte-compiled / optimized / DLL files
