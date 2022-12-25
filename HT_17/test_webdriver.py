@@ -26,6 +26,12 @@ options.add_argument("--disable-dev-shm-usage")
 options.add_argument("--disable-gpu")
 # options.add_argument("--window-size=800,600")
 
+options.add_experimental_option('excludeSwitches', ['enable-automation'])
+options.add_experimental_option('prefs', {
+                'profile.default_content_setting_values.notifications': 2,
+                'profile.default_content_settings.popups': 0
+            })
+
 # driver = webdriver.Chrome()
 # driver = webdriver.Chrome(ChromeDriverManager().install())
 print(ChromeService(ChromeDriverManager().install()))

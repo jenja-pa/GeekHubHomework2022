@@ -42,17 +42,60 @@ https://www.youtube.com/watch?v=0uvexJyJwxA&ab_channel=Robocorp
      в директорію output.
      Окремо зображення робота зберігати не потрібно. (edited)
     """
+import time
+import os
 
 from csv_operations import CsvUrlReader
 from web_driver_operations import WebDriver
 
 
+class Placer:
+    def __init__(self, driver: WebDriver):
+        self._driver = driver
+        # goto page order from start
+        self._driver.goto_page_order()
+
+    def set_order(self, order):
+        self._driver.set_head(order["Head"])
+        self._driver.set_body(order["Body"])
+        self._driver.set_legs(order["Legs"])
+        self._driver.set_address(order["Address"])
+
+        self._driver.get_preview("preview_robot")
+
+        receipt_number = self._driver.press_order()
+        print(f"Returned {receipt_number=}")
+        os.rename("preview_robot.png", f"output/{receipt_number}_robot.png")
+
+        self._driver.click_to_goto_new_order()
+        time.sleep(1)
+
+    def say_hi(self):
+        print(f"Hi you are in page {self._driver.current_url}")
+
+
+def empty_output_dir():
+    if not os.path.exists("output"):
+        os.makedirs('output')
+    files = os.listdir("output")
+    for file in files:
+        if "file name .format" in file:
+            os.remove(file)
+
+
 def main():
     try:
         url_orders = 'https://robotsparebinindustries.com/orders.csv'
+        empty_output_dir()
         with WebDriver('https://robotsparebinindustries.com/') as driver:
-            for order in CsvUrlReader(url_orders):
-                pass
+            placer = Placer(driver)
+            for idx, order in enumeration(CsvUrlReader(url_orders)):
+                # print(f"{order=}")
+                placer.set_order(order)
+                driver.implicitly_wait(5)
+                # todo debug case
+                if idx > 2:
+                    break
                 # placer = WebDriver(item)
     except Exception:
         raise
