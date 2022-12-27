@@ -6,7 +6,6 @@ from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import Select
@@ -145,7 +144,7 @@ class MyWebDriver:
         btn_order = self._find_element(By.ID, "order", "order robot button")
 
         order_bill_element = None
-        print("Begin attempts to find bill order")
+        print("Begin attempts to find bill order:")
         flag_success_get_bill_element = False
         for i in range(self.cnt_attempt):
             print(f"Attempt: {i + 1}. ", end="")
