@@ -16,6 +16,7 @@
 6. :black_square_button: Для загального розуміння можна переглянути відео https://www.youtube.com/watch?v=0uvexJyJwxA&ab_channel=Robocorp
 
 7. :black_square_button: Додаткове завдання (необов'язково)
+   - :black_square_button:створюємо гілку для роботи над збереженням чеку в PDF файл
    - :black_square_button:окрім збереження номеру чеку збережіть також HTML-код всього чеку
    - :black_square_button:збережіть отриманий код в PDF файл
    - :black_square_button:додайте до цього файлу отримане зображення робота (бажано на одній сторінці, але не принципово)
