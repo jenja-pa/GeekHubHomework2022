@@ -91,7 +91,7 @@ def main():
         with MyWebDriver('https://robotsparebinindustries.com/') as driver:
             placer = Placer(driver)
             for idx, order in enumerate(CsvUrlReader(url_orders)):
-                print(f"{idx}.{order=}")
+                print(f"{idx + 1}.{order=}")
                 placer.set_order(order)
     except Exception:
         raise

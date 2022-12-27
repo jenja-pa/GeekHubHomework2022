@@ -2,8 +2,6 @@
 """
 Операції полегшення роботи з WebDriver
 """
-import time
-
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver import Chrome, ChromeOptions
 from selenium.webdriver.chrome.service import Service as ChromeService
@@ -31,7 +29,7 @@ class MyWebDriver:
             options=self.__options()
             )
         self.cnt_attempt = 10
-        self._wait = WebDriverWait(self._driver, 10)
+        self._wait = WebDriverWait(self._driver, 1)
         self._driver.get(url_start)
 
     def __options(self):
@@ -54,7 +52,7 @@ class MyWebDriver:
         options.add_experimental_option(
             'excludeSwitches', ['enable-automation'])
         options.add_experimental_option(
-            'prefs', 
+            'prefs',
             {
                 'profile.default_content_setting_values.notifications': 2,
                 'profile.default_content_settings.popups': 0
@@ -68,9 +66,6 @@ class MyWebDriver:
     def __exit__(self, exc_type, exc_value, exc_traceback):
         self._driver.quit()
 
-    def current_url(self):
-        return self._driver.current_url()
-
     def save_page_source(self, f_name):
         """
         Допоміжна функція контролю завантаженої сторінки
@@ -79,13 +74,10 @@ class MyWebDriver:
         with open(f_name, "w", encoding="utf-8") as f:
             f.write(self._driver.page_source)
 
-    # def implicitly_wait(self, value):
-    #     self._driver.implicitly_wait(value)
-
     def goto_page_order(self):
         a_element = self._find_element(
-            By.LINK_TEXT, 
-            "Order your robot!", 
+            By.LINK_TEXT,
+            "Order your robot!",
             "Link swith to order robot")
         a_element.click()
 
@@ -93,7 +85,7 @@ class MyWebDriver:
         form_element = self._order_popup_form_wait()
         if self._is_order_popup_form_visible(form_element):
             self._order_popup_form_close(form_element)
-    
+
     def set_head(self, value):
         head_element = self._find_element(By.ID, "head", "input head element")
         select_head_element = Select(head_element)
@@ -101,32 +93,32 @@ class MyWebDriver:
 
     def set_body(self, value):
         body_element = self._find_element(
-            By.CSS_SELECTOR, 
+            By.CSS_SELECTOR,
             f".stacked input[name='body'][value='{value}']",
             "input type body element")
         body_element.click()
-                
+
     def set_legs(self, value):
         legs_element = self._find_element(
-            By.XPATH, 
+            By.XPATH,
             "//div[@class='form-group'][contains(label/text(), 'Legs')]/input",
             "input count of legs element"
             )
-        legs_element.clear()    
+        legs_element.clear()
         legs_element.send_keys(str(value))
 
     def set_address(self, value):
         address_element = self._find_element(
-            By.ID, 
-            "address", 
+            By.ID,
+            "address",
             "input address element")
         address_element.clear()
         address_element.send_keys(str(value))
 
     def get_preview(self, temp_file_name="preview_robot"):
         btn_preview = self._find_element(
-            By.ID, 
-            "preview", 
+            By.ID,
+            "preview",
             "preview robot button")
         btn_preview.click()
 
@@ -154,8 +146,9 @@ class MyWebDriver:
 
         order_bill_element = None
         print("Begin attempts to find bill order")
+        flag_success_get_bill_element = False
         for i in range(self.cnt_attempt):
-            print(f"Attempt: {i + 1}")
+            print(f"Attempt: {i + 1}. ", end="")
             btn_order.click()
             try:
                 order_bill_element = self._wait.until(
@@ -164,19 +157,27 @@ class MyWebDriver:
                     ))
                 if order_bill_element:
                     # Bill order form does found
+                    flag_success_get_bill_element = True
                     break
             except TimeoutException:
-                continue
-                time.sleep(1)
-        
+                print("Attempt wrong. Try again.")
+        # End decor output message
+        if flag_success_get_bill_element:
+            print("Attempt success.")
+        else:
+            print()
+            raise Exception(f"After {self.cnt_attempt} - does not success "
+                            f"getting order bill element, process will be "
+                            f"terminate")
+
         if order_bill_element is None:
             raise Exception(
                 f"Error does not able order_bill_element after "
                 f"{self.cnt_attempt} attempts")
 
         order_number_element = self._find_element(
-            By.XPATH, 
-            "//div[@id='receipt']/p[contains(@class, 'badge-success')]", 
+            By.XPATH,
+            "//div[@id='receipt']/p[contains(@class, 'badge-success')]",
             "order number elenemt")
         print(f"Bill order does found {order_number_element.text}")
         return order_number_element.text
@@ -184,8 +185,8 @@ class MyWebDriver:
     def click_to_goto_new_order(self):
         # Натискаємо на кнопку заказа наступного робота
         btn_new_order = self._find_element(
-            By.ID, 
-            "order-another", 
+            By.ID,
+            "order-another",
             "order another robot button")
         btn_new_order.click()
         # виявляємо та натискаємо на кнопку спливаючого вікна перед заказом
@@ -204,7 +205,6 @@ class MyWebDriver:
         return elements[0]
 
     def _order_popup_form_wait(self):
-        element = None
         element = self._wait.until(
             EC.presence_of_element_located(
                 (By.CLASS_NAME, "modal-body")
@@ -218,14 +218,14 @@ class MyWebDriver:
         if isinstance(order_form_element, WebElement):
             return order_form_element.is_displayed()
         raise NotFoundElementError("Sorry element is not WebElement type")
-        
+
     def _order_popup_form_close(self, order_form_element):
         dialog_buttons = order_form_element.find_elements(
-            By.CSS_SELECTOR, 
+            By.CSS_SELECTOR,
             ".modal-body .alert-buttons .btn-dark")
         if not dialog_buttons:
             raise NotFoundElementError("Sorry not found dialog button")
         elif len(dialog_buttons) > 1:
             raise MultieElementsError(
                 "Sorry multiplie results of need dialog button")
-        dialog_buttons[0].click() 
+        dialog_buttons[0].click()
