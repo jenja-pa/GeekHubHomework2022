@@ -174,12 +174,23 @@ class MyWebDriver:
                 f"Error does not able order_bill_element after "
                 f"{self.cnt_attempt} attempts")
 
+        full_order_element = self._find_element(
+            By.ID,
+            "order-completion",
+            "order element")
+        # todo for debug case only
+        # with open("order_element.html", "w", encoding="utf-8") as file:
+        #     file.write(full_order_element.get_attribute('outerHTML'))
+
         order_number_element = self._find_element(
             By.XPATH,
             "//div[@id='receipt']/p[contains(@class, 'badge-success')]",
             "order number elenemt")
         print(f"Bill order does found {order_number_element.text}")
-        return order_number_element.text
+
+        return (
+            order_number_element.text,
+            full_order_element.get_attribute('outerHTML'))
 
     def click_to_goto_new_order(self):
         # Натискаємо на кнопку заказа наступного робота

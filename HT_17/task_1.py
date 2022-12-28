@@ -51,6 +51,7 @@ import os
 
 from csv_operations import CsvUrlReader
 from web_driver_operations import MyWebDriver
+from html_to_pdf_operations import form_html_order, form_pdf_order
 
 
 class Placer:
@@ -67,10 +68,12 @@ class Placer:
 
         self._driver.get_preview("preview_robot")
 
-        receipt_number = self._driver.press_order()
-        os.rename(
-            "preview_robot.png", 
-            f"output/{receipt_number}_robot.png")
+        receipt_number, part_order_html = self._driver.press_order()
+        form_html_order(part_order_html, "preview_robot.png", receipt_number, f"{receipt_number}_robot.html")
+        form_pdf_order(f"{receipt_number}_robot.html", f"{receipt_number}_robot.pdf")
+        # os.rename(
+        #     "preview_robot.png",
+        #     f"output/{receipt_number}_robot.png")
 
         self._driver.click_to_goto_new_order()
 
@@ -84,6 +87,7 @@ def empty_output_dir():
 
 
 def main():
+    DEBUG_MODE = True
     try:
         url_orders = 'https://robotsparebinindustries.com/orders.csv'
         # todo - return empty_dir back
@@ -91,7 +95,9 @@ def main():
         with MyWebDriver('https://robotsparebinindustries.com/') as driver:
             placer = Placer(driver)
             for idx, order in enumerate(CsvUrlReader(url_orders)):
-                print(f"{idx + 1}.{order=}")
+                if DEBUG_MODE and idx > 0:
+                    break
+                print(f"{idx}.{order=}")
                 placer.set_order(order)
     except Exception:
         raise
