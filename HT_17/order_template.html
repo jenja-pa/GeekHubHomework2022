@@ -9,23 +9,46 @@
   <style>
 .row {
   display: flex; 
+  align-items: stretch;
+  flex-wrap: wrap;
+  justify-content: center;
 }
+
 .col {
-  padding: 1em;
-  border: transparent;
-  flex:1;
+  padding: 0.5em;
+  border: invisible;
+}
+.title {
+  flex-grow: 3;
+  flex-basis: 100%;
+  padding: 0.2em 0em 0.4em;
+  margin: 0 2em 0.5em;
+  font-size: 2em;
+  text-align: center;
+  background-color: #d4edda;
+  color: #155724;
+  border-radius: 15px;
 }
 .text{
-  flex-grow:1;
+  flex-grow: 2;
+  flex-shrink: 1;
+  flex-basis: 10%;  
+  min-width: 30%;
 }
 .image{
-  flex-grow:1;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 20%;
+  min-width: 20%;
+   align-self: center;
 }
-.gap{
-  flex-grow:3;
+.image img {
+  width: 100%;
+  border: 0;
+  clip-path: inset(10px);
 }
 body {
-    background-color: #2e282e;
+    background-color: #ECF6F6;
     color: #fff;
     padding: 1em;
     font-family: "Times New Roman", Times, serif;
@@ -46,14 +69,13 @@ p {
     margin: 1em;
 }
 #order-completion {
-    width: 100%;
-    height: 100%;
     display: block;
-}
+  height: 100%;
+    }
 .alert-success {
-    color: #155724;
-    background-color: #d4edda;
-    border-color: #c3e6cb;
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
     border-radius: 15px;
     height: 100%;
     padding: 1em;
@@ -84,10 +106,11 @@ p {
     color: #fff;
     background-color: #28a745;
 }
+
 .badge {
     display: inline-block;
     padding: 0.35em 0.45em;
-    font-size: 75%;
+    font-size: 70%;
     font-weight: 700;
     line-height: 1;
     text-align: center;
@@ -99,10 +122,10 @@ p {
 </head>
 
 <body>
-  <div class=row>
-    <div class="col text">{template_order}</div>
-    <div class="col image"><img src="{template_src_img}" alt="robot order image"></div>
-    <div class="col gap">&nbsp;</div>
-  </div>
+    <div class=row>
+        <div class="col title">Congradulate you are happy owner excelent robot</div>
+        <div class="col text">{template_order}</div>
+        <div class="col image"><img src="{template_src_img}" alt="robot order image"></div>
+    </div>
 </body>
 </html>

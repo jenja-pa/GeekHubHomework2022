@@ -41,17 +41,16 @@ https://www.youtube.com/watch?v=0uvexJyJwxA&ab_channel=Robocorp
     - збережіть отриманий PDF файл у форматі <номер чеку>_robot
      в директорію output.
      Окремо зображення робота зберігати не потрібно. (edited)
-
-Основне завдання виконано.
-В Понеділок, Вівторок - спробую реалізувати:
-  * лог виконання операцій заказу;
-  * формування PDF чека заказа - файла на основі генерованого HTML;
     """
 import os
 
 from csv_operations import CsvUrlReader
 from web_driver_operations import MyWebDriver
 from html_to_pdf_operations import form_html_order, form_pdf_order
+
+
+# DEBUG_MODE = True
+DEBUG_MODE = False
 
 
 class Placer:
@@ -69,11 +68,21 @@ class Placer:
         self._driver.get_preview("preview_robot")
 
         receipt_number, part_order_html = self._driver.press_order()
-        form_html_order(part_order_html, "preview_robot.png", receipt_number, f"{receipt_number}_robot.html")
-        form_pdf_order(f"{receipt_number}_robot.html", f"{receipt_number}_robot.pdf")
-        # os.rename(
-        #     "preview_robot.png",
-        #     f"output/{receipt_number}_robot.png")
+        form_html_order(
+            part_order_html,
+            "preview_robot.png",
+            receipt_number,
+            f"{receipt_number}_robot.html")
+        form_pdf_order(
+            f"{receipt_number}_robot.html",
+            f"{receipt_number}_robot.pdf")
+
+        os.rename(
+            f"{receipt_number}_robot.pdf",
+            f"output/{receipt_number}_robot.pdf")
+
+        os.remove(f"{receipt_number}_robot.html")
+        os.remove("preview_robot.png")
 
         self._driver.click_to_goto_new_order()
 
@@ -87,7 +96,6 @@ def empty_output_dir():
 
 
 def main():
-    DEBUG_MODE = True
     try:
         url_orders = 'https://robotsparebinindustries.com/orders.csv'
         # todo - return empty_dir back
