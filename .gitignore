@@ -17,6 +17,7 @@
 /HT_16/scrapy_crawlers/*.csv
 /HT_16/*.csv
 /HT_17/output/
+/HT_18/myvenv/
 
 
 # Byte-compiled / optimized / DLL files
