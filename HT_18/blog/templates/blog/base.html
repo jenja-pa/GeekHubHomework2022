@@ -12,7 +12,10 @@
 <body>
     <header class="page-header">
       <div class="container">
-          <h1><a href="/">jenja django Blog :: Blog</a></h1>
+        <a href="{% url 'post_new' %}" class="top-menu">
+            {% include './icons/file-earmark-plus.svg' %}
+        </a>
+        <h1><a href="/">jenja django Blog :: Blog</a></h1>
       </div>
     </header>
     <main class="container">
