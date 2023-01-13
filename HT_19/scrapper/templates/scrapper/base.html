@@ -5,23 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }}</title>
     <style>
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+    body>* {
+        flex-grow: 0 0 auto;
+    }
+    main {
+        flex-grow: 1 0 auto;
+    }
     .row {
         display: flex;
         flex-wrap: wrap;
+        gap: 10px;
     }
     .col {
         flex: 1 1 250px;
         border: 1px solid black;
     }
     .field_input {
+        padding-top: 30px;
         text-align: center;
     }
     .textarea_ids {
-        display: block;
         width: 100%;
-        margin: 5px;
-        resize: 100%;
-
+        box-sizing: border-box;        
     }
     .preview_data {
         border: solid 1px blue;
@@ -32,8 +41,10 @@
     <header class="header">
         <h1 class="nav_header"><a href="">Index</a></h1>
     </header>
+    <main>
         {% block content %}
         {% endblock %}
+    </main>
     <footer>
         <p>Домашнє завдання №19 - Перше Джанго із Скраппером <span class="rozetka_api">Rozetka_api</span></p>
     </footer>
