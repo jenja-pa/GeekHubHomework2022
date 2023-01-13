@@ -1,0 +1,18 @@
+{% extends 'scrapper/base.html' %}
+
+{% block content %}
+    <section class="row">
+        <div class="col field_input">
+            <form action="">
+               <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Input some ids to lookup in rozetka"></textarea> 
+               <button type="submit">Go to looup</button>
+            </form>
+        </div>
+        <div class="col preview_data">
+            <p>Loaded data:</p>
+            {% for item in products %}
+                <a href="">{{ item.title }}</a> 
+            {% endfor %}
+        </div>
+    </section>
+{% endblock %}
