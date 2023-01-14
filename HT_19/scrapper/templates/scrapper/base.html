@@ -6,14 +6,23 @@
     <title>{{ title }}</title>
     <style>
     body {
-        display: flex;
-        flex-direction: column;
+        box-sizing: border-box;    
+            display: flex;
+            flex-direction: column;
+            justify-content: normal;
+            justify-items: stretch;
+        border: 3px solid red;
+        min-height: 100vh;
+        margin: 0;
     }
-    body>* {
-        flex-grow: 0 0 auto;
+    body > * {
+        flex: 0;
+        border: 1px solid pink;
     }
     main {
-        flex-grow: 1 0 auto;
+        flex: 1;
+        overflow-y: scroll;
+        border: 2px solid green;
     }
     .row {
         display: flex;
@@ -34,6 +43,9 @@
     }
     .preview_data {
         border: solid 1px blue;
+    }
+    footer > p {
+        text-align: center;
     }
     </style>
 </head>

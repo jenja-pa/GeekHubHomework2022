@@ -3,9 +3,16 @@
 {% block content %}
     <section class="row">
         <div class="col field_input">
-            <form action="">
+            <form action="" method="POST"> {% csrf_token %}
                <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Input some ids to lookup in rozetka"></textarea> 
                <button type="submit">Go to looup</button>
+               <ol>
+                   <li>27714809</li>
+                    <li>336517495</li>
+                    <li>172762346</li>
+                    <li>316707118</li>
+                    <li>285500098</li>
+               </ol>
             </form>
         </div>
         <div class="col preview_data">
