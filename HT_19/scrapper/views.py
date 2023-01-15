@@ -1,4 +1,5 @@
 import re
+import threading
 
 from django.shortcuts import render, get_object_or_404
 
@@ -25,11 +26,18 @@ def scrape_outer_data(request):
         get_data_from_scraper_and_put_into_db(lst_ids)
 
     products = Product.objects.all()
+    proceses = []
+    for thread in threading.enumerate():
+        print(f"{thread.name=} {thread.daemon=}")
+        if not(thread.name == "MainThread" or thread.daemon):
+            proceses.append(thread)
+
     return render(
         request,
         'scrapper/scrape_data.html',
         {
             "products": products,
+            "proceses": proceses,
             "title": "Scraper page django scrapper :: HT_19"
         }
     )

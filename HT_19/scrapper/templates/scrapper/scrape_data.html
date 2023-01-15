@@ -4,7 +4,7 @@
     <section class="row">
         <div class="col field_input">
             <form action="" method="POST"> {% csrf_token %}
-               <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Input some ids to lookup in rozetka"></textarea> 
+               <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Внести сюди перелік id товарів які необхідно завантажити. роздільники (, \t \n \r)"></textarea> 
                <button type="submit">Go to looup</button>
                <ol>
                    <li>27714809</li>
@@ -16,10 +16,23 @@
             </form>
         </div>
         <div class="col preview_data">
+            proc:{{proceses}}
+            {% if proceses %}
+            <p>Proceses loading data:</p>
+                <ul>
+                {% for process in proceses %}
+                <li>{{ prosess }}</li>
+                {% endfor %}
+                </ul>
+            <hr>  
+            {% endif %}
+
+            {% if products %}
             <p>Loaded data:</p>
-            {% for item in products %}
-                <a href="">{{ item.title }}</a> 
+            {% for product in products %}
+                <p><a href="{% url 'product_detail' pk=product.pk %}">{{ product.title }}</a> </p>
             {% endfor %}
+            {% endif %}
         </div>
     </section>
 {% endblock %}
