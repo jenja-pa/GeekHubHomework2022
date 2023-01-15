@@ -4,7 +4,7 @@ from django.utils import timezone
 
 
 # Create your models here.
-class Products(models.Model):
+class Product(models.Model):
     """
     Дані по продукту отриманому із rozetka_ip
     """
@@ -15,23 +15,9 @@ class Products(models.Model):
     href = models.TextField()
     brand = models.CharField(max_length=50)
     category = models.CharField(max_length=30)
+    url_image_preview = models.TextField(null=True)
+    url_image_big = models.TextField(null=True)
+
 
     def __str__(self):
         return f"{self.title} : {self.current_price:.2f}"
-
-
-# class Post(models.Model):
-#     author = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-#     title = models.CharField(max_length=200)
-#     text = models.TextField()
-#     created_date = models.DateTimeField(
-#             default=timezone.now)
-#     published_date = models.DateTimeField(
-#             blank=True, null=True)
-
-#     def publish(self):
-#         self.published_date = timezone.now()
-#         self.save()
-
-#     def __str__(self):
-#         return self.title

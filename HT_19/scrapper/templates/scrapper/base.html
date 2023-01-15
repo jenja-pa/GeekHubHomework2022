@@ -23,6 +23,10 @@
         flex: 1;
         overflow-y: scroll;
         border: 2px solid green;
+        padding: 5px 5px;
+    }
+    main .product-item{
+        padding: 0px 10px;
     }
     .row {
         display: flex;
@@ -32,6 +36,13 @@
     .col {
         flex: 1 1 250px;
         border: 1px solid black;
+    }
+    .navigation {
+        padding: 13px;
+        font-size: 16pt;
+    }
+    .navigation > span {
+        margin: 0 20px;
     }
     .field_input {
         padding-top: 30px;
@@ -47,18 +58,26 @@
     footer > p {
         text-align: center;
     }
+    .product-item-detail {
+        font-weight: 600;
+    }
+    .item-value {
+        border-bottom: 1px dashed black;
+        font-weight: 400;
+    }
     </style>
 </head>
-<body>
-    <header class="header">
-        <h1 class="nav_header"><a href="">Index</a></h1>
-    </header>
+<body>{% load static %}
+    <nav class="navigation">
+        <span class=""><a href="/">Index</a></span>
+        <span class=""><a href="/products">Products</a></span>
+    </nav>
     <main>
         {% block content %}
         {% endblock %}
     </main>
     <footer>
-        <p>Домашнє завдання №19 - Перше Джанго із Скраппером <span class="rozetka_api">Rozetka_api</span></p>
+        <p>Домашнє завдання №19 - Перше Джанго із Скраппером <span class="rozetka_api"><img src="{% static 'rozetka.svg' %}" width="20" height="20"> Rozetka_api</span></p>
     </footer>
 </body>
 </html>

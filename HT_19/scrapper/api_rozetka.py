@@ -17,7 +17,7 @@ from dataclasses import dataclass
 
 import requests
 
-from .models import Products
+from .models import Product
 
 
 @dataclass
@@ -29,6 +29,8 @@ class Data:
     href: str 
     brand: str 
     category: str 
+    url_image_preview: str
+    url_image_big: str
 
 
 class Api:
@@ -47,6 +49,7 @@ class Api:
         result = None
         if response.ok:
             data = response.json()
+            # print(f'api_rozetka:{data=}')
             result = Data(
                 item_id=int(data["data"]["id"]),
                 title=data["data"]["title"], 
@@ -55,6 +58,8 @@ class Api:
                 href=data["data"]["href"],
                 brand=data["data"]["brand"],
                 category=data["data"]["last_category"]["title"],
+                url_image_preview=data["data"]["images"][0]["preview"]["url"],
+                url_image_big=data["data"]["images"][0]["original"]["url"],               
                 )
         else:
             print(f"Error getting id:{item_id} from list of goods in the "
@@ -70,11 +75,10 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
         if data:
             count_success_requests += 1
             # send data to DB
-            res_find = Products.objects.filter(item_id=data.item_id)
+            res_find = Product.objects.filter(item_id=data.item_id)
             print(res_find)
             if res_find:
-                # Need update
-                print("update")
+                # update
                 res_find.update(
                     title=data.title, 
                     old_price=data.old_price, 
@@ -82,11 +86,12 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
                     href=data.href,
                     brand=data.brand,
                     category=data.category,
+                    url_image_preview = data.url_image_preview,
+                    url_image_big = data.url_image_big,
                     )
             else:
-                # Need insert
-                print("insert")
-                Products.objects.create(
+                # insert
+                Product.objects.create(
                     item_id=data.item_id,
                     title=data.title, 
                     old_price=data.old_price, 
@@ -94,4 +99,6 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
                     href=data.href,
                     brand=data.brand,
                     category=data.category,
+                    url_image_preview = data.url_image_preview,
+                    url_image_big = data.url_image_big,
                     )
