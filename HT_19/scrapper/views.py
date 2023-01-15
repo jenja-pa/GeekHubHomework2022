@@ -7,6 +7,16 @@ from .api_rozetka import get_data_from_scraper_and_put_into_db
 
 # Create your views here.
 def index(request):
+    return render(
+        request,
+        'scrapper/index.html',
+        {
+            "title": "Index page django scrapper :: HT_19"
+        }
+    )
+
+
+def scrape_outer_data(request):
     if request.method == "POST":
         str_need_ids = request.POST["list_ids"]
         lst_ids = re.split(r"[\s,;]+", str_need_ids)
@@ -15,16 +25,15 @@ def index(request):
         get_data_from_scraper_and_put_into_db(lst_ids)
 
     products = Product.objects.all()
-    if len(products) > 0:
-        print(f"{products[0].old_price=}")
     return render(
         request,
-        'scrapper/index.html',
+        'scrapper/scrape_data.html',
         {
             "products": products,
-            "title": "index page project django scrapper :: HT_19"
+            "title": "Scraper page django scrapper :: HT_19"
         }
     )
+
 
 def list_products(request):
     products = Product.objects.all()

@@ -5,8 +5,8 @@
             <h3>Scraped Rozetka data:</h3>
             <hr>
             {% for product in products %}
-                <p class="product-item">{{ product.title }} 
-                    <a href="{% url 'product_detail' pk=product.pk%}">detail</a></p> 
+                <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
+                    <a href="{% url 'product_detail' pk=product.pk %}">detail</a></p> 
             {% endfor %}
         </div>
 {% endblock %}
