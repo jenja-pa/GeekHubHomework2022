@@ -1,12 +1,12 @@
 {% extends 'scrapper/base.html' %}
-
+{% load static %}
 {% block content %}
         <div class="">
-            <h3>Scraped Rozetka data:</h3>
+            <h3>Зібрані продукти із магазину Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
             <hr>
             {% for product in products %}
                 <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
-                    <a href="{% url 'product_detail' pk=product.pk %}">detail</a></p> 
+                    <a href="{% url 'product_detail' pk=product.pk %}">детально...</a></p> 
             {% endfor %}
         </div>
 {% endblock %}

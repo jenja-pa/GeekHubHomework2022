@@ -23,13 +23,29 @@ def scrape_outer_data(request):
         lst_ids = re.split(r"[\s,;]+", str_need_ids)
 
         # get information about list_ids from scrapper
-        get_data_from_scraper_and_put_into_db(lst_ids)
+        print(f"scrape_outer_data {lst_ids=}")
+        if lst_ids and lst_ids[0] != '':
+            # Present ids to load - run thread
+            thread = threading.Thread(
+                target=get_data_from_scraper_and_put_into_db, 
+                name=None, 
+                args=(lst_ids, ), 
+                daemon=None)
+            thread.start()
+            ident = thread.ident
+            # print(f"My_Thread-{ident}")
+            # print("---->", dir(thread))
+            thread.name=f"My_Thread-{ident}"
 
-    products = Product.objects.all()
+    # products = Product.objects.all()
+    # Вибір останніх 10 продуктів із БД
+    last_ten_products = Product.objects.all().order_by('-id')[:10]
+    products = reversed(last_ten_products)
+
     proceses = []
     for thread in threading.enumerate():
-        print(f"{thread.name=} {thread.daemon=}")
-        if not(thread.name == "MainThread" or thread.daemon):
+        # print(f"{thread.name=} {thread.daemon=}")
+        if thread.name.startswith("My_Thread-") :
             proceses.append(thread)
 
     return render(

@@ -76,7 +76,6 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
             count_success_requests += 1
             # send data to DB
             res_find = Product.objects.filter(item_id=data.item_id)
-            print(res_find)
             if res_find:
                 # update
                 res_find.update(

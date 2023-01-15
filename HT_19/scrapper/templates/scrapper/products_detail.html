@@ -1,9 +1,9 @@
 {% extends 'scrapper/base.html' %}
-
+{% load static %}
 {% block content %}
    
         <div class="">
-            <h3>Scraped Rozetka product detail:</h3>
+            <h3>Детальні дані про зібраний продукт отриманого із магазину Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
             <hr>
             <p class="product-item-detail">Код продукта: <span class="item-value">{{ product.item_id }}</span></p> 
             <p class="product-item-detail">Заголовок: <span class="item-value">{{ product.title }}</span> </p> 
@@ -14,5 +14,5 @@
         </div>
 
         <hr>
-        <div><a href="{% url 'list_products' %}">Перегляд продуктів</a></div>
+        <div><a href="{% url 'list_products' %}">Перегянути зібрані продукти</a></div>
 {% endblock %}
