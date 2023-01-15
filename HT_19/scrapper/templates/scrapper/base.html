@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head>{% load static %}
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }}</title>
+    <link rel="stylesheet" href="{% static 'scrapper.css' %}">
     <style>
     body {
         box-sizing: border-box;    
@@ -67,7 +68,7 @@
     }
     </style>
 </head>
-<body>{% load static %}
+<body>
     <nav class="navigation">
         <span class=""><a href="/">Index</a></span>
         <span class=""><a href="/products">Products</a></span>
