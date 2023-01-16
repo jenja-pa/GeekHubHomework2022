@@ -1,15 +1,14 @@
-# rozetka_api.py
 """
-- rozetka_api.py, де створти клас RozetkaAPI, який буде містити 
-метод get_item_data, який на вхід отримує id товара з сайту розетки 
-та повертає словник з такими даними: 
-  * item_id (він же і приймається на вхід), 
-  * title, 
-  * old_price, 
-  * current_price, 
-  * href (лінка на цей товар на сайті), 
-  * brand, 
-  * category. 
+- rozetka_api.py, де створти клас RozetkaAPI, який буде містити
+метод get_item_data, який на вхід отримує id товара з сайту розетки
+та повертає словник з такими даними:
+  * item_id (він же і приймається на вхід),
+  * title,
+  * old_price,
+  * current_price,
+  * href (лінка на цей товар на сайті),
+  * brand,
+  * category.
 Всі інші методи, що потрібні для роботи мають бути приватні/захищені.
  * Якщо ID не валідний/немає даних - вивести відповідне повідомлення 
 """
@@ -18,17 +17,18 @@ from dataclasses import dataclass
 import requests
 
 from .models import Product
+from .models import BackgroundProcessMessage
 
 
 @dataclass
 class Data:
     item_id: int
-    title: str 
-    old_price: float 
-    current_price: float 
-    href: str 
-    brand: str 
-    category: str 
+    title: str
+    old_price: float
+    current_price: float
+    href: str
+    brand: str
+    category: str
     url_image_preview: str
     url_image_big: str
 
@@ -44,22 +44,21 @@ class Api:
         params = dict(self.PARAMETERS)
         params["goodsId"] = item_id
         response = self._session.get(
-                 self.URL_API, 
+                 self.URL_API,
                  params=params)
         result = None
         if response.ok:
             data = response.json()
-            # print(f'api_rozetka:{data=}')
             result = Data(
                 item_id=int(data["data"]["id"]),
-                title=data["data"]["title"], 
+                title=data["data"]["title"],
                 old_price=float(data["data"]["old_price"]),
                 current_price=float(data["data"]["price"]),
                 href=data["data"]["href"],
                 brand=data["data"]["brand"],
                 category=data["data"]["last_category"]["title"],
                 url_image_preview=data["data"]["images"][0]["preview"]["url"],
-                url_image_big=data["data"]["images"][0]["original"]["url"],               
+                url_image_big=data["data"]["images"][0]["original"]["url"],
                 )
         else:
             print(f"Error getting id:{item_id} from list of goods in the "
@@ -67,9 +66,13 @@ class Api:
 
         return result
 
+
 def get_data_from_scraper_and_put_into_db(lst_ids):
     rozetka_api = Api()
     count_success_requests = 0
+    count_wrong_requests = 0
+    count_insert_rows = 0
+    count_update_rows = 0
     for item_id in lst_ids:
         data = rozetka_api.get_item_data(item_id)
         if data:
@@ -78,26 +81,41 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
             res_find = Product.objects.filter(item_id=data.item_id)
             if res_find:
                 # update
+                count_update_rows += 1
                 res_find.update(
-                    title=data.title, 
-                    old_price=data.old_price, 
+                    title=data.title,
+                    old_price=data.old_price,
                     current_price=data.current_price,
                     href=data.href,
                     brand=data.brand,
                     category=data.category,
-                    url_image_preview = data.url_image_preview,
-                    url_image_big = data.url_image_big,
+                    url_image_preview=data.url_image_preview,
+                    url_image_big=data.url_image_big,
                     )
             else:
                 # insert
+                count_insert_rows += 1
                 Product.objects.create(
                     item_id=data.item_id,
-                    title=data.title, 
-                    old_price=data.old_price, 
+                    title=data.title,
+                    old_price=data.old_price,
                     current_price=data.current_price,
                     href=data.href,
                     brand=data.brand,
                     category=data.category,
-                    url_image_preview = data.url_image_preview,
-                    url_image_big = data.url_image_big,
+                    url_image_preview=data.url_image_preview,
+                    url_image_big=data.url_image_big,
                     )
+        else:
+            count_wrong_requests += 1
+
+    bg_mess = BackgroundProcessMessage(
+        value=f"Запитів: "
+              f"Успішних: {count_success_requests}, "
+              f"Збійних: {count_wrong_requests}, "
+              f"Всього: {count_success_requests + count_wrong_requests}."
+              f" Операції з БД. "
+              f"Вставлено {count_insert_rows}/"
+              f"Поновлено {count_update_rows} рядків"
+        )
+    bg_mess.save()

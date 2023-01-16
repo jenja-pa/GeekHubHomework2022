@@ -15,7 +15,7 @@ from . import views
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('scrape/', views.scrape_outer_data, name="scrape_outer_data"),    
+    path('scrape/', views.scrape_outer_data, name="scrape_outer_data"),
     path('products/', views.list_products, name="list_products"),
     path('products/<int:pk>/', views.product_detail, name="product_detail"),
 ]

@@ -3,9 +3,17 @@
 {% block content %}
     <section class="row">
         <div class="col field_input">
+            <p class="title_message">Щоб поновити сторінку натиснути кнопку "Виконати завантаження" з пустим списком</p>
             <form action="" method="POST"> {% csrf_token %}
                <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Внести сюди перелік id товарів які необхідно завантажити. роздільники (, \t \n \r)"></textarea> 
                <button type="submit">Виконати завантаження</button>
+               <div class="title_message">
+                {% if helper_messages %}
+                    {% for message in helper_messages %} 
+                        <div>{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+               </div>
             </form>
         </div>
         <div class="col preview_data">
@@ -13,14 +21,14 @@
             <p>Фонові процеси завантаження даних:</p>
                 <ul>
                 {% for process in proceses %}
-                <li>name:{{ process.name }})</li>
+                <li>name: {{ process.name }}</li>
                 {% endfor %}
                 </ul>
             <hr>  
             {% endif %}
 
             {% if products %}
-            <p>Останні завантажені 10 продуктів:</p>
+            <p>Останні 10 завантажених продуктів:</p>
             {% for product in products %}
                 <p><a href="{% url 'product_detail' pk=product.pk %}">{{ product.title }}</a> </p>
             {% endfor %}
