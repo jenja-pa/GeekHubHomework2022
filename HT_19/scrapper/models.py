@@ -1,6 +1,4 @@
-from django.conf import settings
 from django.db import models
-from django.utils import timezone
 
 
 # Create your models here.
@@ -13,7 +11,7 @@ class Product(models.Model):
     old_price = models.FloatField()
     current_price = models.FloatField()
     href = models.TextField()
-    brand = models.CharField(max_length=50)
+    brand = models.CharField(max_length=50, null=True, blank=True)
     category = models.CharField(max_length=30)
     url_image_preview = models.TextField(null=True)
     url_image_big = models.TextField(null=True)
@@ -28,4 +26,3 @@ class BackgroundProcessMessage(models.Model):
     процесу про його виконання
     """
     value = models.TextField()
-    

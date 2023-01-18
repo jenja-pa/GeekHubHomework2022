@@ -12,7 +12,7 @@
 Всі інші методи, що потрібні для роботи мають бути приватні/захищені.
  * Якщо ID не валідний/немає даних - вивести відповідне повідомлення 
 """
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 import requests
 
@@ -74,40 +74,22 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
     count_insert_rows = 0
     count_update_rows = 0
     for item_id in lst_ids:
-        data = rozetka_api.get_item_data(item_id)
-        if data:
-            count_success_requests += 1
-            # send data to DB
-            res_find = Product.objects.filter(item_id=data.item_id)
-            if res_find:
-                # update
-                count_update_rows += 1
-                res_find.update(
-                    title=data.title,
-                    old_price=data.old_price,
-                    current_price=data.current_price,
-                    href=data.href,
-                    brand=data.brand,
-                    category=data.category,
-                    url_image_preview=data.url_image_preview,
-                    url_image_big=data.url_image_big,
-                    )
-            else:
-                # insert
-                count_insert_rows += 1
-                Product.objects.create(
+        if item_id:
+            data = rozetka_api.get_item_data(item_id)
+            if data:
+                count_success_requests += 1
+
+                # send data to DB
+                _, created = Product.objects.update_or_create(
                     item_id=data.item_id,
-                    title=data.title,
-                    old_price=data.old_price,
-                    current_price=data.current_price,
-                    href=data.href,
-                    brand=data.brand,
-                    category=data.category,
-                    url_image_preview=data.url_image_preview,
-                    url_image_big=data.url_image_big,
+                    defaults=asdict(data)
                     )
-        else:
-            count_wrong_requests += 1
+                if created:
+                    count_insert_rows += 1
+                else:
+                    count_update_rows += 1
+            else:
+                count_wrong_requests += 1
 
     bg_mess = BackgroundProcessMessage(
         value=f"Запитів: "
