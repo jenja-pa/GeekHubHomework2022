@@ -1,0 +1,18 @@
+{% extends 'scrapper/base.html' %}
+{% load static %}
+{% block content %}
+   
+        <div class="">
+            <h3>Детальні дані про зібраний продукт отриманого із магазину Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
+            <hr>
+            <p class="product-item-detail">Код продукта: <span class="item-value">{{ product.item_id }}</span></p> 
+            <p class="product-item-detail">Заголовок: <span class="item-value">{{ product.title }}</span> </p> 
+            <p class="product-item-detail">Категорія: <span class="item-value">{{ product.category }}</span>, Бренд: <span class="item-value">{% if product.brand %}{{ product.brand }} {% else %} {{ '-відсутній-' }}</span></p> 
+            <p class="product-item-detail">Ціна: <span class="item-value">{{ product.current_price }}</span>, стара ціна: <span class="item-value">{% if product.old_price != 0 %} {{ product.old_price }} {% else %} {{ '-не встановлено-' }} {% endif %}</span></p> 
+            <p><a href="{{ product.href }}">Посилання на оригінал</a></p>
+            <img src="{{ product.url_image_preview }}" alt="Зображення продукта">
+        </div>
+
+        <hr>
+        <div><a href="{% url 'list_products' %}">Перегянути зібрані продукти</a></div>
+{% endblock %}
