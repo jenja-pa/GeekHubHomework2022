@@ -28,10 +28,15 @@ main .product-item{
 }
 .navigation {
     padding: 13px;
-    font-size: 16pt;
+    font-size: 14pt;
+    display: flex;
 }
 .navigation > span {
+    display: block;
     margin: 0 20px;
+}
+.navigation > span.basket {
+    align-items: flex-end;
 }
 .title_message{
     font-size: small;

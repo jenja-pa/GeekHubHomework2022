@@ -1,4 +1,4 @@
-{% extends 'scrapper/base.html' %}
+{% extends 'ui/base.html' %}
 
 {% block content %}
     <section class="row">
@@ -30,7 +30,7 @@
             {% if products %}
             <p>Останні 10 завантажених продуктів:</p>
             {% for product in products %}
-                <p><a href="{% url 'product_detail' pk=product.pk %}">{{ product.title }}</a> </p>
+                <p><a href="{% url 'scrapper:product_detail' pk=product.pk %}">{{ product.title }}</a> </p>
             {% endfor %}
             {% endif %}
         </div>

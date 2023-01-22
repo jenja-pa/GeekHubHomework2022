@@ -9,14 +9,6 @@ from .api_rozetka import get_data_from_scraper_and_put_into_db
 
 
 # Create your views here.
-def index(request):
-    return render(
-        request,
-        'scrapper/index.html',
-        {"title": "Index page :: HT_19", }
-    )
-
-
 def scrape_outer_data(request):
     context = {}
     context["title"] = "Scraper page :: HT_19"

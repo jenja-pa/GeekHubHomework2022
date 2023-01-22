@@ -1,4 +1,4 @@
-{% extends 'scrapper/base.html' %}
+{% extends 'ui/base.html' %}
 {% load static %}
 {% block content %}
         <div class="">
@@ -6,7 +6,7 @@
             <hr>
             {% for product in products %}
                 <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
-                    <a href="{% url 'product_detail' pk=product.pk %}">детально...</a></p> 
+                    <a href="{% url 'scrapper:product_detail' pk=product.pk %}">детально...</a></p> 
             {% endfor %}
         </div>
 {% endblock %}
