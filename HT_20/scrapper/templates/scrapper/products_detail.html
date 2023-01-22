@@ -12,7 +12,12 @@
             <p><a href="{{ product.href }}">Посилання на оригінал</a></p>
             <img src="{{ product.url_image_preview }}" alt="Зображення продукта">
         </div>
-
         <hr>
-        <div><a href="{% url 'scrapper:list_products' %}">Перегянути зібрані продукти</a></div>
+        <form action="{% url 'basket:add' %}" method="POST">
+            <div>Занести цей продукт в корзину:</div>
+            {% csrf_token %}
+            {{ form.as_p }}
+            {% if err_message %} <div class="err_message">{{ err_message}}</div>{% endif %}
+            <button type="submit">Add to basket</button>
+        </form>
 {% endblock %}

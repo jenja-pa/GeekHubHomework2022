@@ -3,6 +3,7 @@ import threading
 
 from django.shortcuts import render, get_object_or_404
 
+from .forms import AddProductToBasketForm
 from .models import Product
 from .models import BackgroundProcessMessage
 from .api_rozetka import get_data_from_scraper_and_put_into_db
@@ -10,10 +11,11 @@ from .api_rozetka import get_data_from_scraper_and_put_into_db
 
 # Create your views here.
 def scrape_outer_data(request):
-    context = {}
-    context["title"] = "Scraper page :: HT_19"
+    context = {
+        "title": "Scraper page :: HT_20",
+        "helper_messages": [],
+    }
 
-    context["helper_messages"] = []
     if request.method == "POST":
         str_need_ids = request.POST["list_ids"]
         lst_ids = re.split(r"[\s,;]+", str_need_ids)
@@ -62,15 +64,23 @@ def scrape_outer_data(request):
 
 
 def list_products(request):
-    context = {}
-    context["title"] = "List of scrapered products :: HT_19"
-    context["products"] = Product.objects.all()
+    context = {
+        "title": "List of scrapered products :: HT_20",
+        "products": Product.objects.all(),
+        }
     return render(request, 'scrapper/list_products.html', context)
 
 
 def product_detail(request, pk):
-    context = {}
-    context["title"] = "List of scrapered products :: HT_19"
-    context["product"] = get_object_or_404(Product, pk=pk)
+    context = {
+        "title": "List of scrapered products :: HT_20",
+        "err_message": request.session.get("err_message"),
+        "product": get_object_or_404(Product, pk=pk),
+        'form': AddProductToBasketForm(
+            initial={'product_pk': pk, "quantity": 1}
+            )
+    }
+    request.session["err_message"] = None
+    request.session.save()
     return render(
         request, 'scrapper/products_detail.html', context)

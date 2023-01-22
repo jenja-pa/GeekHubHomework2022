@@ -35,6 +35,9 @@ main .product-item{
     display: block;
     margin: 0 20px;
 }
+.navigation > span.space {
+    flex-grow: 10;
+}
 .navigation > span.basket {
     align-items: flex-end;
 }

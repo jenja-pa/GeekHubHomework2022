@@ -22,22 +22,6 @@ except ImportError:
     print("Please - rename file local_settings.py.ini to local_settings.py for"
           " start work")
     print()
-"""
-    BASE_DIR = Path(__file__).resolve().parent.parent
-    SECRET_KEY = 'please-change-me))))))'
-    DEBUG = True
-    ALLOWED_HOSTS = ['*']
-
-    # Database
-    # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
-"""
-
 
 # Application definition
 
@@ -50,6 +34,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'scrapper',
     'ui',
+    'basket',
 ]
 
 MIDDLEWARE = [
