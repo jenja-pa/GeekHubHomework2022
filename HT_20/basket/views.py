@@ -15,8 +15,14 @@ def view_basket(request):
         products_in_basket = [model_to_dict(product) for product in products]
         for product in products_in_basket:
             product["quantity"] = basket[str(product["id"])]
-            product["form"] = AddProductToBasketForm(initial={'product_pk': product["id"], "quantity": product["quantity"]})
-            product["form_delete_product"] = ProductIdForm(initial={'product_pk': product["id"]})
+            product["form"] = AddProductToBasketForm(
+                initial={
+                    'product_pk': product["id"],
+                    "quantity": product["quantity"],
+                })
+            product["form_delete_product"] = ProductIdForm(
+                initial={'product_pk': product["id"]}
+                )
 
         # Count full cost
         full_cost = sum([
@@ -37,7 +43,11 @@ def add_to_basket(request):
         form = AddProductToBasketForm(request.POST)
         entered_quatity = request.POST["quantity"]
         if not form.is_valid():
-            request.session["err_message"] = f"Помилка. Кількість товару повинна бути 1..20, а не {entered_quatity}"
+            request.session["err_message"] = (
+              f"Помилка. Кількість товару повинна "
+              f"бути 1..20, а не {entered_quatity}"
+            )
+
             request.session.save()
             return redirect(reverse(
                 'scrapper:product_detail',
@@ -66,7 +76,8 @@ def change_basket_quatity(request):
             basket[str(data['product_pk'])] = data["quantity"]
             request.session.save()
         else:
-            print(f"FORM not VALID: quantity:{request.POST['quantity']} is not valid")
+            print(f"FORM not VALID: quantity:{request.POST['quantity']}"
+                  f" is not valid")
 
     return redirect(reverse('basket:view_basket'))
 

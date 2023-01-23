@@ -2,26 +2,48 @@
 
 {% load static %}
 
+{% block ext_style %}
+<style>
+    h2 form {
+        display: inline-block;
+    }
+    .row_action {
+        display: flex;
+        align-items: flex-end;
+    }
+    form input {
+        width: 40px;
+        text-align: right;
+    }
+    .gap {
+        flex: 1;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <h2>Ваша корзина <form action="{% url 'basket:clear_basket' %}" method="POST">{% csrf_token %}<button type="submit">Очистити корзину</button></form></h2>
 <hr>
 {% for product in products_in_basket %}
 <div>
-    <p>Product ID {{ product.item_id }}</p>
-    <p>Title: {{ product.title }}</p>
-    <p>Price: {{ product.current_price }}</p>
-    <p>Added quantity: {{ product.quantity }}</p>
-    <form action="{% url 'basket:change_quantity' %}" method="POST">
-        {% csrf_token %}
-        {{ product.form.as_p }}
-        <button type="submit">Змінити кількість</button>
-    </form>
+    <p>Код продукта ID {{ product.item_id }}</p>
+    <p>Назва: {{ product.title }}</p>
+    <p>Ціна: {{ product.current_price }}</p>
+    <p>Поточна кількість: {{ product.quantity }}</p>
+    <div class="row_action">
+        <form action="{% url 'basket:change_quantity' %}" method="POST">
+            {% csrf_token %}
+            {{ product.form.as_p }}
+            <button type="submit">Змінити кількість</button>
+        </form>
 
-    <form action="{% url 'basket:delete_product' %}" method="POST">
-        {% csrf_token %}
-        {{ product.form_delete_product }}
-        <button type="submit">Видалити продукт</button>
-    </form>
+        <form action="{% url 'basket:delete_product' %}" method="POST">
+            {% csrf_token %}
+            {{ product.form_delete_product }}
+            <button type="submit">Видалити продукт</button>
+        </form>
+        <div class="gap">&nbsp;</div>
+    </div>
 </div>
 <hr> 
 {% empty %}

@@ -6,5 +6,5 @@ def index(request):
     return render(
         request,
         'ui/index.html',
-        {"title": "Index page :: HT_19", }
+        {"title": "Index page :: HT_20", }
     )
