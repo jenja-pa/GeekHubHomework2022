@@ -67,7 +67,6 @@ def change_basket_quatity(request):
             request.session.save()
         else:
             print(f"FORM not VALID: quantity:{request.POST['quantity']} is not valid")
-        # print(f"session:{request.session.items()}")
 
     return redirect(reverse('basket:view_basket'))
 
@@ -87,9 +86,9 @@ def delete_basket_product(request):
 
 @require_http_methods(["POST"])
 def clear_basket(request):
-    print("---===================")
-    print(f"clear_basket: {request=}")
     if request.method == "POST":
-        pass
+        basket = request.session.setdefault('basket', {})
+        del request.session["basket"]
+        request.session.save()
 
     return redirect(reverse('basket:view_basket'))

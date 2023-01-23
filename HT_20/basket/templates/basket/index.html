@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block content %}
-<h2>Ваша корзина</h2>
+<h2>Ваша корзина <form action="{% url 'basket:clear_basket' %}" method="POST">{% csrf_token %}<button type="submit">Очистити корзину</button></form></h2>
 <hr>
 {% for product in products_in_basket %}
 <div>
