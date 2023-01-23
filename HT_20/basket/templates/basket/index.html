@@ -16,6 +16,12 @@
         {{ product.form.as_p }}
         <button type="submit">Змінити кількість</button>
     </form>
+
+    <form action="{% url 'basket:delete_product' %}" method="POST">
+        {% csrf_token %}
+        {{ product.form_delete_product }}
+        <button type="submit">Видалити продукт</button>
+    </form>
 </div>
 <hr> 
 {% empty %}

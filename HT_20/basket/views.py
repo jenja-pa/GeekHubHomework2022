@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect, reverse
 from django.views.decorators.http import require_http_methods
 from django.forms.models import model_to_dict
 
-from scrapper.forms import AddProductToBasketForm
+from scrapper.forms import AddProductToBasketForm, ProductIdForm
 from scrapper.models import Product
 
 
@@ -16,6 +16,7 @@ def view_basket(request):
         for product in products_in_basket:
             product["quantity"] = basket[str(product["id"])]
             product["form"] = AddProductToBasketForm(initial={'product_pk': product["id"], "quantity": product["quantity"]})
+            product["form_delete_product"] = ProductIdForm(initial={'product_pk': product["id"]})
 
         # Count full cost
         full_cost = sum([
@@ -47,7 +48,6 @@ def add_to_basket(request):
         basket.setdefault(str(data['product_pk']), 0)
         basket[str(data['product_pk'])] += data["quantity"]
         request.session.save()
-        # print(f"session:{request.session.items()}")
         return redirect(reverse(
             'scrapper:product_detail',
             kwargs={'pk': data["product_pk"]}
@@ -58,22 +58,38 @@ def add_to_basket(request):
 
 @require_http_methods(["POST"])
 def change_basket_quatity(request):
-    print("---===================")
-    print(f"change_basket_quatity: {request=}")
     if request.method == "POST":
         form = AddProductToBasketForm(request.POST)
         if form.is_valid():
-            # print(f"change_basket_quatity: form valid {form=}")
             data = form.cleaned_data
-            # print(f"clean_data{data=}")
             basket = request.session.setdefault('basket', {})
             basket[str(data['product_pk'])] = data["quantity"]
             request.session.save()
         else:
             print(f"FORM not VALID: quantity:{request.POST['quantity']} is not valid")
         # print(f"session:{request.session.items()}")
-        return redirect(reverse(
-            'basket:view_basket'))
 
-    else:
-        return redirect(reverse('basket:view_basket'))
+    return redirect(reverse('basket:view_basket'))
+
+
+@require_http_methods(["POST"])
+def delete_basket_product(request):
+    if request.method == "POST":
+        form = ProductIdForm(request.POST)
+        form.is_valid()
+        data = form.cleaned_data
+        basket = request.session.setdefault('basket', {})
+        del basket[str(data['product_pk'])]
+        request.session.save()
+
+    return redirect(reverse('basket:view_basket'))
+
+
+@require_http_methods(["POST"])
+def clear_basket(request):
+    print("---===================")
+    print(f"clear_basket: {request=}")
+    if request.method == "POST":
+        pass
+
+    return redirect(reverse('basket:view_basket'))

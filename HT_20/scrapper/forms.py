@@ -10,3 +10,7 @@ class AddProductToBasketForm(forms.Form):
             MinValueValidator(1),
             MaxValueValidator(20)
         ])
+
+
+class ProductIdForm(forms.Form):
+    product_pk = forms.IntegerField(widget=forms.HiddenInput())
