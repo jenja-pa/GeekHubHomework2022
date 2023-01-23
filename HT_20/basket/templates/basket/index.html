@@ -1,5 +1,29 @@
 {% extends 'ui/base.html' %}
+
 {% load static %}
+
 {% block content %}
-<div class="">Basket here</div>
+<h2>Ваша корзина</h2>
+<hr>
+{% for product in products_in_basket %}
+<div>
+    <p>Product ID {{ product.item_id }}</p>
+    <p>Title: {{ product.title }}</p>
+    <p>Price: {{ product.current_price }}</p>
+    <p>Added quantity: {{ product.quantity }}</p>
+    <form action="{% url 'basket:change_quantity' %}" method="POST">
+        {% csrf_token %}
+        {{ product.form.as_p }}
+        <button type="submit">Змінити кількість</button>
+    </form>
+</div>
+<hr> 
+{% empty %}
+    <p>На даний момент корзина порожня</p>
+{% endfor %}
+
+{% if products_in_basket %}
+    <hr>
+    <p>Повна вартість: {{ full_cost|floatformat:2 }}&nbsp;грн.</p>
+{% endif %}
 {% endblock %}

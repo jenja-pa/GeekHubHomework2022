@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
         <div class="">
-            <h3>Зібрані продукти із магазину Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
+            <h3>Наявні продукти - із Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
             <hr>
             {% for product in products %}
                 <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
