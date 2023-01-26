@@ -15,6 +15,7 @@
 from dataclasses import dataclass, asdict
 
 import requests
+from django.contrib import messages
 
 from .models import Product
 from .models import BackgroundProcessMessage
@@ -24,6 +25,7 @@ from .models import BackgroundProcessMessage
 class Data:
     item_id: int
     title: str
+    sell_status: str
     old_price: float
     current_price: float
     href: str
@@ -37,8 +39,9 @@ class Api:
     URL_API = "https://rozetka.com.ua/api/product-api/v4/goods/get-main"
     PARAMETERS = {"country": "UA", "lang": "ua", "goodsId": ""}
 
-    def __init__(self):
+    def __init__(self, name_thread):
         self._session = requests.Session()
+        self._name_thread = name_thread
 
     def get_item_data(self, item_id: str) -> Data:
         params = dict(self.PARAMETERS)
@@ -48,27 +51,31 @@ class Api:
                  params=params)
         result = None
         if response.ok:
-            data = response.json()
+            data = response.json()["data"]
             result = Data(
-                item_id=int(data["data"]["id"]),
-                title=data["data"]["title"],
-                old_price=float(data["data"]["old_price"]),
-                current_price=float(data["data"]["price"]),
-                href=data["data"]["href"],
-                brand=data["data"]["brand"],
-                category=data["data"]["last_category"]["title"],
-                url_image_preview=data["data"]["images"][0]["preview"]["url"],
-                url_image_big=data["data"]["images"][0]["original"]["url"],
+                item_id=int(data["id"]),
+                title=data["title"],
+                sell_status=data["sell_status"],
+                old_price=float(data["old_price"]),
+                current_price=float(data["price"]),
+                href=data["href"],
+                brand=data["brand"],
+                category=data["last_category"]["title"],
+                url_image_preview=data["images"][0]["preview"]["url"],
+                url_image_big=data["images"][0]["original"]["url"],
                 )
         else:
-            print(f"Error getting id:{item_id} from list of goods in the "
-                  f"store rozetka DB")
+            bg_mess = BackgroundProcessMessage(
+                value=(f"{self._name_thread}: Помилка отримання інформації по "
+                       f"id:{item_id} від і-магазина rozetka.com.ua")
+            )
+            bg_mess.save()
 
         return result
 
 
-def get_data_from_scraper_and_put_into_db(lst_ids):
-    rozetka_api = Api()
+def get_data_from_scraper_and_put_into_db(lst_ids, name_thread):
+    rozetka_api = Api(name_thread)
     count_success_requests = 0
     count_wrong_requests = 0
     count_insert_rows = 0
@@ -92,12 +99,14 @@ def get_data_from_scraper_and_put_into_db(lst_ids):
                 count_wrong_requests += 1
 
     bg_mess = BackgroundProcessMessage(
-        value=f"Запитів: "
-              f"Успішних: {count_success_requests}, "
-              f"Збійних: {count_wrong_requests}, "
+        value=f"{name_thread}: Запитів (Успішних/Збійних): "
+              f"({count_success_requests}/{count_wrong_requests}). "
               f"Всього: {count_success_requests + count_wrong_requests}."
-              f" Операції з БД. "
-              f"Вставлено {count_insert_rows}/"
-              f"Поновлено {count_update_rows} рядків"
+        )
+    bg_mess.save()
+    bg_mess = BackgroundProcessMessage(
+        value=f"{name_thread}: Операції з БД. (Вставлено/Поновлено): "
+              f"({count_insert_rows}/{count_update_rows}). "
+              f"Всього: {count_insert_rows + count_update_rows}."
         )
     bg_mess.save()

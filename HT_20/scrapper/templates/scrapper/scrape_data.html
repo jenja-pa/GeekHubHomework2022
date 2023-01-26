@@ -1,5 +1,14 @@
 {% extends 'ui/base.html' %}
-
+{% block ext_style %}
+<style type="text/css">
+    .available {
+        color: green;
+    }
+    .unavailable {
+        color: red;
+    }
+</style>
+{% endblock %}
 {% block content %}
     <section class="row">
         <div class="col field_input">
@@ -8,8 +17,8 @@
                <textarea class="textarea_ids" rows="10" cols="5" name="list_ids" placeholder="Внести сюди перелік id товарів які необхідно завантажити. роздільники (, \t \n \r)"></textarea> 
                <button type="submit">Виконати завантаження</button>
                <div class="title_message">
-                {% if helper_messages %}
-                    {% for message in helper_messages %} 
+                {% if messages %}
+                    {% for message in messages %} 
                         <div>{{ message }}</div>
                     {% endfor %}
                 {% endif %}
@@ -30,7 +39,11 @@
             {% if products %}
             <p>Останні 10 завантажених продуктів:</p>
             {% for product in products %}
-                <p><a href="{% url 'scrapper:product_detail' pk=product.pk %}">{{ product.title }}</a> </p>
+                <p>
+                    <a href="{% url 'scrapper:product_detail' pk=product.pk %}">{{ product.title }}</a>
+                    : <span class="{%if product.is_available%}available{%else%}unavailable{%endif%}">{{ product.str_available }}</span> 
+
+                </p>
             {% endfor %}
             {% endif %}
         </div>

@@ -39,67 +39,61 @@ def view_basket(request):
 
 @require_http_methods(["POST"])
 def add_to_basket(request):
-    if request.method == "POST":
-        form = AddProductToBasketForm(request.POST)
-        entered_quatity = request.POST["quantity"]
-        if not form.is_valid():
-            request.session["err_message"] = (
-              f"Помилка. Кількість товару повинна "
-              f"бути 1..20, а не {entered_quatity}"
-            )
+    form = AddProductToBasketForm(request.POST)
+    entered_quatity = request.POST["quantity"]
+    if not form.is_valid():
+        request.session["err_message"] = (
+          f"Помилка. Кількість товару повинна "
+          f"бути 1..20, а не {entered_quatity}"
+        )
 
-            request.session.save()
-            return redirect(reverse(
-                'scrapper:product_detail',
-                kwargs={'pk': request.POST['product_pk']}
-                ))
-        data = form.cleaned_data
-        basket = request.session.setdefault('basket', {})
-        basket.setdefault(str(data['product_pk']), 0)
-        basket[str(data['product_pk'])] += data["quantity"]
         request.session.save()
         return redirect(reverse(
             'scrapper:product_detail',
-            kwargs={'pk': data["product_pk"]}
+            kwargs={'pk': request.POST['product_pk']}
             ))
-    else:
-        return redirect(reverse('scrapper:list_products'))
+    data = form.cleaned_data
+    basket = request.session.setdefault('basket', {})
+    basket.setdefault(str(data['product_pk']), 0)
+    basket[str(data['product_pk'])] += data["quantity"]
+    request.session.save()
+    return redirect(reverse(
+        'scrapper:product_detail',
+        kwargs={'pk': data["product_pk"]}
+        ))
 
 
 @require_http_methods(["POST"])
 def change_basket_quatity(request):
-    if request.method == "POST":
-        form = AddProductToBasketForm(request.POST)
-        if form.is_valid():
-            data = form.cleaned_data
-            basket = request.session.setdefault('basket', {})
-            basket[str(data['product_pk'])] = data["quantity"]
-            request.session.save()
-        else:
-            print(f"FORM not VALID: quantity:{request.POST['quantity']}"
-                  f" is not valid")
+    form = AddProductToBasketForm(request.POST)
+    if form.is_valid():
+        data = form.cleaned_data
+        basket = request.session.setdefault('basket', {})
+        basket[str(data['product_pk'])] = data["quantity"]
+        request.session.save()
+    else:
+        print(f"FORM not VALID: quantity:{request.POST['quantity']}"
+              f" is not valid")
 
     return redirect(reverse('basket:view_basket'))
 
 
 @require_http_methods(["POST"])
 def delete_basket_product(request):
-    if request.method == "POST":
-        form = ProductIdForm(request.POST)
-        form.is_valid()
-        data = form.cleaned_data
-        basket = request.session.setdefault('basket', {})
-        del basket[str(data['product_pk'])]
-        request.session.save()
+    form = ProductIdForm(request.POST)
+    form.is_valid()
+    data = form.cleaned_data
+    basket = request.session.setdefault('basket', {})
+    del basket[str(data['product_pk'])]
+    request.session.save()
 
     return redirect(reverse('basket:view_basket'))
 
 
 @require_http_methods(["POST"])
 def clear_basket(request):
-    if request.method == "POST":
-        basket = request.session.setdefault('basket', {})
-        del request.session["basket"]
-        request.session.save()
+    request.session.setdefault('basket', {})
+    del request.session["basket"]
+    request.session.save()
 
     return redirect(reverse('basket:view_basket'))

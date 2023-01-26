@@ -1,12 +1,27 @@
 {% extends 'ui/base.html' %}
 {% load static %}
+
+{% block ext_style %}
+<style type="text/css">
+    .available {
+        border-bottom: 1px dotted #DDEEDD;
+    }
+    .unavailable {
+        padding: 0 3px;
+        border: 2px dashed red;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
         <div class="">
             <h3>Наявні продукти - із Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
             <hr>
             {% for product in products %}
                 <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
-                    <a href="{% url 'scrapper:product_detail' pk=product.pk %}">детально...</a></p> 
+                   <span class="{% if product.is_available %}available{% else %}unavailable{% endif %}">{{ product.str_available }}</span> 
+                   <a href="{% url 'scrapper:product_detail' pk=product.pk %}">детально...</a>
+                </p> 
             {% endfor %}
         </div>
 {% endblock %}
