@@ -30,8 +30,18 @@
         <form action="{% url 'basket:add' %}" method="POST">
             <div>Занести цей продукт в корзину:</div>
             {% csrf_token %}
-            {{ form.as_p }}
-            {% if err_message %} <div class="err_message">{{ err_message}}</div>{% endif %}
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    <div>{{ field }}</div>
+                {% else %}
+                  <div>
+                    {{ field.label_tag }}  {{ field }}
+                    {% if field.help_text %}
+                        <span>{{ field.help_text|safe }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+            {% endfor %}
             <button type="submit">Add to basket</button>
         </form>
         {% endif %}

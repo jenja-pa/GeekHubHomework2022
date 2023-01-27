@@ -25,7 +25,6 @@ def scrape_outer_data(request):
         # get information about list_ids from scrapper
         if lst_ids and lst_ids[0] != '':
             # Present ids to load - run thread
-            print(f"before Thread {lst_ids=}")
             name_thread = f"Scrapper_Thread-{str(uuid.uuid4())[:6]}"
             thread = threading.Thread(
                 target=get_data_from_scraper_and_put_into_db,
@@ -33,9 +32,6 @@ def scrape_outer_data(request):
                 args=(lst_ids, name_thread),
                 daemon=None)
             thread.start()
-            print("afetr start")
-            # ident = thread.ident
-            # thread.name = f"My_Thread-{ident}"
     else:
         # Get method - first enter
         messages.info(
@@ -85,6 +81,11 @@ def product_detail(request, pk):
             initial={'product_pk': pk, "quantity": 1}
             )
     }
+    print(f"product_detail: {request.method=}")
+    if request.method == 'POST':
+        form = AddProductToBasketForm(request.POST)
+        context["form"] = form
+
     request.session["err_message"] = None
     request.session.save()
     return render(
