@@ -77,16 +77,18 @@ def product_detail(request, pk):
         "title": "List of scrapered products :: HT_20",
         "err_message": request.session.get("err_message"),
         "product": get_object_or_404(Product, pk=pk),
-        'form': AddProductToBasketForm(
+        'form_add': AddProductToBasketForm(
             initial={'product_pk': pk, "quantity": 1}
             )
     }
-    print(f"product_detail: {request.method=}")
-    if request.method == 'POST':
-        form = AddProductToBasketForm(request.POST)
-        context["form"] = form
+    # Якщо відбувся redirect на цю сторінку і з сесії присутні дані форми, 
+    # що не відповідають обмеженням валідації - (можливо колхоз №2)
+    if "form_add_values" in request.session:
+        form_add = AddProductToBasketForm(request.session["form_add_values"])
+        form_add.is_valid()
+        del request.session["form_add_values"]
+        request.session.save()
+        context["form_add"] = form_add
 
-    request.session["err_message"] = None
-    request.session.save()
     return render(
         request, 'scrapper/products_detail.html', context)

@@ -9,6 +9,13 @@
     .unavailable {
         background-color: lightcoral;
     }
+    .error_add {
+        font-style: italic;
+        font-size: -2pt;
+        color: red;
+        border: 1px dotted #ED365D;
+        padding: 2px;
+    }
 </style>
 {% endblock %}
 
@@ -30,14 +37,21 @@
         <form action="{% url 'basket:add' %}" method="POST">
             <div>Занести цей продукт в корзину:</div>
             {% csrf_token %}
-            {% for field in form %}
+            {% for field in form_add %}
                 {% if field.is_hidden %}
-                    <div>{{ field }}</div>
+                    {{ field }}
                 {% else %}
                   <div>
                     {{ field.label_tag }}  {{ field }}
                     {% if field.help_text %}
                         <span>{{ field.help_text|safe }}</span>
+                    {% endif %}
+                    {% if field.errors %}
+                        {% for error_mess in field.errors %}
+                            <span class="error_add">
+                                {{ error_mess|safe }}
+                            </span>
+                        {% endfor %}
                     {% endif %}
                   </div>
                 {% endif %}

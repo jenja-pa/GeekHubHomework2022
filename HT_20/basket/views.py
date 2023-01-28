@@ -1,7 +1,8 @@
 from django.shortcuts import render, redirect, reverse
 from django.views.decorators.http import require_http_methods
 from django.forms.models import model_to_dict
-
+from django.forms import model_to_dict as form_to_dict
+from django.contrib import messages
 from scrapper.forms import AddProductToBasketForm, ProductIdForm
 from scrapper.models import Product
 
@@ -42,11 +43,12 @@ def add_to_basket(request):
     form = AddProductToBasketForm(request.POST)
     entered_quatity = request.POST["quantity"]
     if not form.is_valid():
-        request.session["err_message"] = (
-          f"Помилка. Кількість товару повинна "
-          f"бути 1..20, а не {entered_quatity}"
-        )
-
+        # Це мій колхоз №2 - по redirect некоректних даних 
+        # на сторінку де воно були введені
+        form_values = {}
+        for name_field in form.declared_fields:
+            form_values[name_field] = form[name_field].value()
+        request.session["form_add_values"] = form_values
         request.session.save()
         return redirect(reverse(
             'scrapper:product_detail',
