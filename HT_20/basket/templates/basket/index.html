@@ -18,6 +18,13 @@
     .gap {
         flex: 1;
     }
+    .error_change {
+        font-style: italic;
+        font-size: -2pt;
+        color: red;
+        border: 1px dotted #ED365D;
+        padding: 2px;
+    }    
 </style>
 {% endblock %}
 
@@ -33,7 +40,27 @@
     <div class="row_action">
         <form action="{% url 'basket:change_quantity' %}" method="POST">
             {% csrf_token %}
-            {{ product.form.as_p }}
+            {% for field in product.form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                  <div>
+                    {{ field.label_tag }}  {{ field }}
+
+                    {% if field.errors %}
+                        {% for error_mess in field.errors %}
+                            <span class="error_change">
+                                {{ error_mess|safe }}
+                            </span>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <span>{{ field.help_text|safe }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+            {% endfor %}
             <button type="submit">Змінити кількість</button>
         </form>
 

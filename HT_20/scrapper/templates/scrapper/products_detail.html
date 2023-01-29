@@ -42,16 +42,16 @@
                     {{ field }}
                 {% else %}
                   <div>
-                    {{ field.label_tag }}  {{ field }}
-                    {% if field.help_text %}
-                        <span>{{ field.help_text|safe }}</span>
-                    {% endif %}
                     {% if field.errors %}
                         {% for error_mess in field.errors %}
                             <span class="error_add">
                                 {{ error_mess|safe }}
                             </span>
                         {% endfor %}
+                    {% endif %}
+                    {{ field.label_tag }}  {{ field }}
+                    {% if field.help_text %}
+                        <span>{{ field.help_text|safe }}</span>
                     {% endif %}
                   </div>
                 {% endif %}
