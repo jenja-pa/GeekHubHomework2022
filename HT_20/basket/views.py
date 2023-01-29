@@ -9,20 +9,23 @@ from scrapper.models import Product
 
 # Create your views here.
 def view_basket(request):
-    basket = request.session.get('basket')
-    print(f"{basket=}")
+    basket = request.session.setdefault('basket', {})
+    basket_modify = request.session.setdefault('basket_modify', {})
+    print(f"{basket=}, {basket_modify=}")
     context = {"products_in_basket": {}}
     if basket:
         products = Product.objects.filter(id__in=basket.keys())
         products_in_basket = [model_to_dict(product) for product in products]
+
         for product in products_in_basket:
-            product["quantity"] = int(basket[str(product["id"])]["quantity"])
-            print(f"{basket[str(product['id'])].keys()=}")
+            sproduct_id = str(product["id"])
+            print(f"{sproduct_id=}, {basket[sproduct_id]=}")
+            product["quantity"] = int(basket[sproduct_id])
+            print(f"{basket[sproduct_id]=}")
             product["form"] = AddProductToBasketForm({
                 "product_pk": product["id"], 
-                "quantity": 1 if "new_quantity" not in basket[str(product["id"])].keys() else int(basket[str(product["id"])]["new_quantity"]),
+                "quantity": basket_modify.get(sproduct_id, basket[sproduct_id]),
                 })
-            # product["form"].is_valid()
 
             product["form_delete_product"] = ProductIdForm(
                 initial={'product_pk': product["id"]}
@@ -43,7 +46,7 @@ def view_basket(request):
 @require_http_methods(["POST"])
 def add_to_basket(request):
     form = AddProductToBasketForm(request.POST)
-    entered_quatity = request.POST["quantity"]
+    # entered_quatity = request.POST["quantity"]
     if not form.is_valid():
         # Це мій колхоз №2 - по redirect некоректних даних 
         # на сторінку де воно були введені
@@ -52,19 +55,22 @@ def add_to_basket(request):
             form_values[name_field] = form[name_field].value()
         request.session["form_add_values"] = form_values
         request.session.save()
+
+        messages.info(request, f"add_to_basket:form is not valid {form['quantity']=}")
+
         return redirect(reverse(
             'scrapper:product_detail',
             kwargs={'pk': request.POST['product_pk']}
             ))
     data = form.cleaned_data
-    basket = request.session.setdefault('basket', {})
-    basket.setdefault(str(data['product_pk']), {})
-    print(f"{basket[str(data['product_pk'])]=}")
-    if not basket[str(data['product_pk'])]:
-        basket[str(data['product_pk'])]['quantity'] = 0
-    print(f"{basket[str(data['product_pk'])]=}")
-    basket[str(data['product_pk'])]['quantity'] += data["quantity"]
-    print(f"{basket[str(data['product_pk'])]=}")
+    str_pk = str(data['product_pk'])
+    basket = request.session.setdefault('basket', {str_pk: 0})
+
+    if basket[str(data['product_pk'])] + data["quantity"] > 20:
+        basket[str(data['product_pk'])] = 20
+        messages.error(request, "Кількість окремої позиції товару в корзині не повинна перевищувати 20 одиниць")
+    else:
+        basket[str(data['product_pk'])] += data["quantity"]
     request.session.save()
     return redirect(reverse(
         'scrapper:product_detail',
@@ -80,7 +86,7 @@ def change_basket_quatity(request):
     basket = request.session.setdefault('basket', {})
     basket[str(data['product_pk'])] = dict(
         new_quantity=int(form['quantity'].value()),
-        quantity=int(basket[str(data['product_pk'])]['quantity'])
+        quantity=int(basket[str(data['product_pk'])])
         )
     request.session.save()
 

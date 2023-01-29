@@ -19,7 +19,7 @@ class Product(models.Model):
 
     def __str__(self):
         return (f"{self.title} : {self.current_price:.2f} : "
-                f"{self.str_available()}")
+                f"{self.str_available}")
 
     @property
     def is_available(self):

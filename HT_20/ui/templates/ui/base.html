@@ -17,6 +17,10 @@
         <span class="basket"><a href="/basket">Корзина</a></span>
     </nav>
     <main>
+        {% for message in messages %}
+        <div class="message"><a href="#" onclick="this.parentElement.style.display='none';" style="font-size: 16pt;">&olcross;</a>{{ message }}</div>
+        {% endfor %}
+        
         {% block content %}
         {% endblock %}
     </main>

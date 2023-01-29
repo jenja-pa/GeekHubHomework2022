@@ -34,6 +34,11 @@
         </div>
         <hr>
         {% if product.is_available %}
+        {% if product_basket_quantity %}
+        <p>В корзині вже {{ product_basket_quantity }} цих товарів</p>
+        {% else %}
+        <p>hello</p>
+        {% endif %}
         <form action="{% url 'basket:add' %}" method="POST">
             <div>Занести цей продукт в корзину:</div>
             {% csrf_token %}
@@ -42,6 +47,7 @@
                     {{ field }}
                 {% else %}
                   <div>
+                    {{ field.label_tag }}  {{ field }}
                     {% if field.errors %}
                         {% for error_mess in field.errors %}
                             <span class="error_add">
@@ -49,7 +55,6 @@
                             </span>
                         {% endfor %}
                     {% endif %}
-                    {{ field.label_tag }}  {{ field }}
                     {% if field.help_text %}
                         <span>{{ field.help_text|safe }}</span>
                     {% endif %}

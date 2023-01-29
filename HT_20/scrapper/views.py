@@ -4,6 +4,7 @@ import uuid
 from pathlib import Path
 
 from django.shortcuts import render, get_object_or_404
+from django.forms.models import model_to_dict
 from django.contrib import messages
 
 from .forms import AddProductToBasketForm
@@ -73,14 +74,19 @@ def list_products(request):
 
 
 def product_detail(request, pk):
+    basket = request.session.setdefault('basket', {})
+    product_basket_quantity = basket.get(str(pk))
+    print(f"product_detail:{basket=}, {pk=}")
     context = {
         "title": "List of scrapered products :: HT_20",
         "err_message": request.session.get("err_message"),
         "product": get_object_or_404(Product, pk=pk),
+        "product_basket_quantity": product_basket_quantity,
         'form_add': AddProductToBasketForm(
             initial={'product_pk': pk, "quantity": 1}
             )
     }
+    print(f"{context['product']=}")
     # Якщо відбувся redirect на цю сторінку і з сесії присутні дані форми, 
     # що не відповідають обмеженням валідації - (можливо колхоз №2)
     if "form_add_values" in request.session:
@@ -89,6 +95,8 @@ def product_detail(request, pk):
         del request.session["form_add_values"]
         request.session.save()
         context["form_add"] = form_add
+
+    # print(f"{messages=}")
 
     return render(
         request, 'scrapper/products_detail.html', context)
