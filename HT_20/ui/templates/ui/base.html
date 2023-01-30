@@ -5,6 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ title }}</title>
     <link rel="stylesheet" href="{% static 'scrapper.css' %}">
+    <style>
+        .message-row{
+            display: flex;
+        }
+        .message-box{
+            background-color: #F4A1ED;
+            margin: 2px;
+            padding: 0 4px 4px 4px;
+            border-radius: 10px;
+            border: 2px outset red;
+        }
+        .message-gap{
+            flex-grow: 1;
+        }
+        .message_close_button{
+            border:1px solid red;
+            font-size: 16pt;
+            padding:0 2px;
+            color:red; 
+            border-radius: 5px;
+        }
+
+    </style>
     {% block ext_style %}
     {% endblock %}
 </head>
@@ -18,7 +41,12 @@
     </nav>
     <main>
         {% for message in messages %}
-        <div class="message"><a href="#" onclick="this.parentElement.style.display='none';" style="font-size: 16pt;">&olcross;</a>{{ message }}</div>
+            {% if not message.extra_tags %}
+            <div class="message-row">
+        <div class="message-box">{{ message }} <span title="Click to hide" href="#" onclick="this.parentElement.style.display='none';" class="message_close_button">&#10006;</span></div>
+        <div class="message-gap">&nbsp;</div>
+        </div>
+            {% endif %}
         {% endfor %}
         
         {% block content %}

@@ -16,6 +16,11 @@
         border: 1px dotted #ED365D;
         padding: 2px;
     }
+    .error_basket {
+        font-style: italic;
+        color: red;
+        border-bottom: 1px dotted #ED365D;
+    }
 </style>
 {% endblock %}
 
@@ -34,11 +39,9 @@
         </div>
         <hr>
         {% if product.is_available %}
-        {% if product_basket_quantity %}
-        <p>В корзині вже {{ product_basket_quantity }} цих товарів</p>
-        {% else %}
-        <p>hello</p>
-        {% endif %}
+            {% if product_basket.quantity %}
+                <p>В корзині: {{ product_basket.quantity }} шт. <span class="error_basket">{{ product_basket.message_err }}</span></p>
+            {% endif %}
         <form action="{% url 'basket:add' %}" method="POST">
             <div>Занести цей продукт в корзину:</div>
             {% csrf_token %}

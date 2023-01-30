@@ -75,19 +75,28 @@ def list_products(request):
 
 def product_detail(request, pk):
     basket = request.session.setdefault('basket', {})
+    # print(f"product_detail:{basket=} {pk=}")
     product_basket_quantity = basket.get(str(pk))
-    print(f"product_detail:{basket=}, {pk=}")
+    # print(f"product_detail:{product_basket_quantity=}")
+    storage_messages = messages.get_messages(request)
+    product_basket_err_message = ""
+    for message in storage_messages:
+        if message.level_tag == 'error' and "basket" in message.extra_tags:
+            product_basket_err_message = message.message
+
     context = {
         "title": "List of scrapered products :: HT_20",
         "err_message": request.session.get("err_message"),
         "product": get_object_or_404(Product, pk=pk),
-        "product_basket_quantity": product_basket_quantity,
+        "product_basket": {
+            "quantity": product_basket_quantity,
+            "message_err": product_basket_err_message
+            },
         'form_add': AddProductToBasketForm(
             initial={'product_pk': pk, "quantity": 1}
             )
     }
-    print(f"{context['product']=}")
-    # Якщо відбувся redirect на цю сторінку і з сесії присутні дані форми, 
+    # Якщо відбувся redirect на цю сторінку і з сесії присутні дані форми,
     # що не відповідають обмеженням валідації - (можливо колхоз №2)
     if "form_add_values" in request.session:
         form_add = AddProductToBasketForm(request.session["form_add_values"])
@@ -95,8 +104,6 @@ def product_detail(request, pk):
         del request.session["form_add_values"]
         request.session.save()
         context["form_add"] = form_add
-
-    # print(f"{messages=}")
-
+    # print(f"product_detail:{context=}")
     return render(
         request, 'scrapper/products_detail.html', context)
