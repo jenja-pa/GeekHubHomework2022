@@ -39,6 +39,7 @@
         </div>
         <hr>
         {% if product.is_available %}
+            {% if request.user.is_authenticated %}
             {% if product_basket.quantity %}
                 <p>В корзині: {{ product_basket.quantity }} шт. <span class="error_basket">{{ product_basket.message_err }}</span></p>
             {% endif %}
@@ -66,5 +67,15 @@
             {% endfor %}
             <button type="submit">Add to basket</button>
         </form>
+        {% endif %}
+        {% endif %}
+        {% if request.user.is_superuser %}
+        <div style="margin-top:10px;border: 1px solid gray;">
+        <p style="padding: 0;margin:0;">Панель керування адміністратора:</p>
+        <form action="#" method="POST">
+            <button type="submit">Edit product</button>
+            <button type="submit">Delete product</button>            
+        </form>
+        </div>
         {% endif %}
 {% endblock %}

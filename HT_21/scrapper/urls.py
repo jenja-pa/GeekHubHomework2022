@@ -19,4 +19,5 @@ urlpatterns = [
     path('scrape/', views.scrape_outer_data, name="scrape_outer_data"),
     path('products/', views.list_products, name="list_products"),
     path('products/<int:pk>/', views.product_detail, name="product_detail"),
+    path('category/<int:pk>/', views.category_list, name="category_list"),
 ]

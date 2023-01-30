@@ -6,14 +6,18 @@ from pathlib import Path
 from django.shortcuts import render, get_object_or_404
 from django.forms.models import model_to_dict
 from django.contrib import messages
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 from .forms import AddProductToBasketForm
 from .models import Product
+from .models import Category
 from .models import BackgroundProcessMessage
 from .api_rozetka import get_data_from_scraper_and_put_into_db
 
 
 # Create your views here.
+@user_passes_test(lambda user: user.is_superuser, login_url='/')
 def scrape_outer_data(request):
     context = {
         "title": "Scraper page :: HT_20",
@@ -66,11 +70,25 @@ def scrape_outer_data(request):
 
 
 def list_products(request):
+    user = User.objects.first()
     context = {
         "title": "List of scrapered products :: HT_20",
         "products": Product.objects.all(),
+        "categories": Category.objects.all(),
         }
     return render(request, 'scrapper/list_products.html', context)
+
+
+def category_list(request, pk):
+    # Вивід продуктів у вказаній категорії
+    target_category = Category.objects.get(pk=pk)
+    print(f"category_list:{target_category=}")
+    context = {
+        "title": f"Наявні товари категорії '{target_category.title}' :: HT_21",
+        "products": Product.objects.filter(category=target_category),
+        }
+    print(f"category_list:{context=}")
+    return render(request, 'scrapper/list_category_products.html', context)
 
 
 def product_detail(request, pk):

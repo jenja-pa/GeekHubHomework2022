@@ -2,6 +2,16 @@ from django.db import models
 
 
 # Create your models here.
+class Category(models.Model):
+    """
+    Категорії продуктів - пов'язана модель
+    """
+    title = models.CharField(max_length=30)
+
+    def __str__(self):
+        return self.title
+
+
 class Product(models.Model):
     """
     Дані по продукту отриманому із rozetka_ip
@@ -13,12 +23,14 @@ class Product(models.Model):
     current_price = models.FloatField()
     href = models.TextField()
     brand = models.CharField(max_length=50, null=True, blank=True)
-    category = models.CharField(max_length=30)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
     url_image_preview = models.TextField(null=True)
     url_image_big = models.TextField(null=True)
 
     def __str__(self):
+        # print(f"---{dir(self)=}")
         return (f"{self.title} : {self.current_price:.2f} : "
+                f"{self.category} : "
                 f"{self.str_available}")
 
     @property
@@ -33,6 +45,7 @@ class Product(models.Model):
             return 'Відсутній'
 
 
+# на видалення
 class BackgroundProcessMessage(models.Model):
     """
     Тимчасове повідомлення від фонового

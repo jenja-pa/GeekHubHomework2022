@@ -18,6 +18,7 @@ import requests
 from django.contrib import messages
 
 from .models import Product
+from .models import Category
 from .models import BackgroundProcessMessage
 
 
@@ -87,9 +88,16 @@ def get_data_from_scraper_and_put_into_db(lst_ids, name_thread):
                 count_success_requests += 1
 
                 # send data to DB
+                dict_data = asdict(data)
+                # Створення/поновлення категорії
+                category, created = Category.objects.update_or_create(
+                    title=dict_data["category"]
+                    )
+                dict_data["category"] = category
+
                 _, created = Product.objects.update_or_create(
                     item_id=data.item_id,
-                    defaults=asdict(data)
+                    defaults=dict_data
                     )
                 if created:
                     count_insert_rows += 1

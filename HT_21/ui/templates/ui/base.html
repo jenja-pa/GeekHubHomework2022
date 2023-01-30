@@ -34,10 +34,18 @@
 <body>
     <nav class="navigation">
         <span class=""><a href="/">Головна</a></span>
-        <span class=""><a href="/scrape">Додати продукти</a></span>
+        {% if request.user.is_superuser %}<span class=""><a href="/scrape">Додати продукти</a></span>{% endif %}
         <span class=""><a href="/products">Мої продукти</a></span>
         <span class="space">&nbsp;</span>
         <span class="basket"><a href="/basket">Корзина</a></span>
+        <span class="user">
+            {% if request.user.is_authenticated %}
+            Hello, {{request.user.username}}
+            <a href="{% url 'admin:logout' %}?next={{request.path}}">LOGOUT</a>
+            {% else %}
+            <a href="{% url 'admin:login' %}?next={{request.path}}">LOGIN</a>
+            {% endif %}
+        </span>
     </nav>
     <main>
         {% for message in messages %}

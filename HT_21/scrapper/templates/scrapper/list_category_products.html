@@ -9,37 +9,19 @@
     .unavailable {
         background-color: lightcoral;
     }
-    .data_row {
-        display: flex;
-    }
-    .categories{
-        flex-grow: 1;
-    }
-    .products{
-        flex-grow: 3;
-    }
 </style>
 {% endblock %}
 
 {% block content %}
         <div class="">
-            <h3>Наявні продукти - із Rozetka:<img src="{% static 'rozetka.svg' %}" width="30" height="30"></h3>
+            <h3>{{ title }}</h3>
             <hr>
-            <div class="data_row">
-                <div class="categories">
-                {% for category in categories %}
-                    <p class="product-item"><a href="{% url 'scrapper:category_list' pk=category.pk %}">{{ category.title }}</a>
-                    </p> 
-                {% endfor %}
-                </div>
-                <div class="products">
                 {% for product in products %}
                     <p class="product-item">{{ product.title }} : {{ product.current_price|floatformat:2 }}&nbsp;грн.
                        <span class="{% if product.is_available %}available{% else %}unavailable{% endif %}">{{ product.str_available }}</span> 
                        <a href="{% url 'scrapper:product_detail' pk=product.pk %}">детально...</a>
                     </p> 
                 {% endfor %}
-                </div>
-            </div>
         </div>
 {% endblock %}
+
