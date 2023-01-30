@@ -20,7 +20,8 @@
 /HT_18/myvenv/
 /HT_18/_token_sample.py
 /HT_20/app/local_settings.py
-
+/HT_21/app/local_settings.py
+local_settings.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
