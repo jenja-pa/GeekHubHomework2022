@@ -60,7 +60,7 @@ def add_to_basket(request):
         # вони були введені, в сесії передаємо
         # введені значення, щоб предметно
         # звучало повідомлення про помилку
-        form_values = {}
+        # form_values = {}
         request.session["form_add_values"] = request.POST
         request.session.save()
 

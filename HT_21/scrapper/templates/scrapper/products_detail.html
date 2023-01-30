@@ -72,8 +72,11 @@
         {% if request.user.is_superuser %}
         <div style="margin-top:10px;border: 1px solid gray;">
         <p style="padding: 0;margin:0;">Панель керування адміністратора:</p>
+        <a href="{% url 'scrapper:product_detail_edit' pk=product.pk %}">
+            <button type="button">Edit product</button>        
+        </a>
         <form action="#" method="POST">
-            <button type="submit">Edit product</button>
+            {% csrf_token %}
             <button type="submit">Delete product</button>            
         </form>
         </div>

@@ -1,0 +1,22 @@
+{% extends 'ui/base.html' %}
+{% load static %}
+
+{% block ext_style %}
+<style>
+</style>
+{% endblock %}
+
+{% block content %}
+    <h3>Редагування даних про зібраний продукт</h3>
+    <hr>
+    <form action="{% url 'scrapper:product_detail_edit' pk=pk %}" method="POST">
+        {% csrf_token %}
+        {% for field in form %}
+            <div>{{ field.label_tag }} {% if field.label_tag != 'Item id' %}{{ field }}{% endif %}</div>
+        {% endfor %}
+        
+        <button type="submit">Save</button>
+    </form>
+
+{% endblock %}
+

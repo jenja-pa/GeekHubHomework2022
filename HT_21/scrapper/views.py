@@ -3,13 +3,13 @@ import threading
 import uuid
 from pathlib import Path
 
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect, reverse
 from django.forms.models import model_to_dict
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 
-from .forms import AddProductToBasketForm
+from .forms import AddProductToBasketForm, ProductEditForm
 from .models import Product
 from .models import Category
 from .models import BackgroundProcessMessage
@@ -125,3 +125,26 @@ def product_detail(request, pk):
     # print(f"product_detail:{context=}")
     return render(
         request, 'scrapper/products_detail.html', context)
+
+
+def product_detail_edit(request, pk):
+    print(f"product_detail_edit:{request.method=}, {pk=}")
+
+    context = {
+       "title": "Редагування продукта :: HT_21",
+       "pk": pk,
+    }
+    if request.method == "GET":
+        context["form"] = ProductEditForm(instance=Product.objects.get(pk=pk)) 
+    else:
+        # POST need save modified data Product
+        form = ProductEditForm(request.POST)
+        print(f"product_detail_edit:{request.POST=}")
+        if form.is_valid():
+            print(f"product_detail_edit:valid:{form.cleaned_data=}")
+            form.save(commit=True)
+            return redirect(reverse("scrapper:product_detail", kwargs={'pk': context["pk"]}))
+        else:
+            context["form"] = form 
+    return render(
+        request, 'scrapper/products_detail_edit.html', context)
