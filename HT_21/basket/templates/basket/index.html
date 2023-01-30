@@ -1,0 +1,84 @@
+{% extends 'ui/base.html' %}
+
+{% load static %}
+
+{% block ext_style %}
+<style>
+    h2 form {
+        display: inline-block;
+    }
+    .row_action {
+        display: flex;
+        align-items: flex-end;
+    }
+    form input {
+        width: 40px;
+        text-align: right;
+    }
+    .gap {
+        flex: 1;
+    }
+    .error_change {
+        font-style: italic;
+        font-size: -2pt;
+        color: red;
+        border: 1px dotted #ED365D;
+        padding: 2px;
+    }    
+</style>
+{% endblock %}
+
+{% block content %}
+<h2>Ваша корзина <form action="{% url 'basket:clear_basket' %}" method="POST">{% csrf_token %}<button type="submit">Очистити корзину</button></form></h2>
+<hr>
+{% for product in products_in_basket %}
+<div>
+    <p>Код продукта ID {{ product.item_id }}</p>
+    <p>Назва: {{ product.title }}</p>
+    <p>Ціна: {{ product.current_price }}</p>
+    <p>Поточна кількість: {{ product.quantity }}</p>
+    <div class="row_action">
+        <form action="{% url 'basket:change_quantity' %}" method="POST">
+            {% csrf_token %}
+            {% for field in product.form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                  <div>
+                    {{ field.label_tag }}  {{ field }}
+
+                    {% if field.errors %}
+                        {% for error_mess in field.errors %}
+                            <span class="error_change">
+                                {{ error_mess|safe }}
+                            </span>
+                        {% endfor %}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <span>{{ field.help_text|safe }}</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+            {% endfor %}
+            <button type="submit">Змінити кількість</button>
+        </form>
+
+        <form action="{% url 'basket:delete_product' %}" method="POST">
+            {% csrf_token %}
+            {{ product.form_delete_product }}
+            <button type="submit">Видалити продукт</button>
+        </form>
+        <div class="gap">&nbsp;</div>
+    </div>
+</div>
+<hr> 
+{% empty %}
+    <p>На даний момент корзина порожня</p>
+{% endfor %}
+
+{% if products_in_basket %}
+    <hr>
+    <p>Повна вартість: {{ full_cost|floatformat:2 }}&nbsp;грн.</p>
+{% endif %}
+{% endblock %}
