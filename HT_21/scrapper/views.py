@@ -138,7 +138,7 @@ def product_detail_edit(request, pk):
         context["form"] = ProductEditForm(instance=Product.objects.get(pk=pk)) 
     else:
         # POST need save modified data Product
-        form = ProductEditForm(request.POST)
+        form = ProductEditForm(request.POST, instance=Product.objects.get(pk=pk))
         print(f"product_detail_edit:{request.POST=}")
         if form.is_valid():
             print(f"product_detail_edit:valid:{form.cleaned_data=}")
